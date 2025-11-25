@@ -7,14 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model SeedOrganization {
+  id         Int @id
+  nextValOrg Int @map("root_val_org")
+
+  @@map("seed_organization")
+}
+
+model SeedUserLogin {
+  id           Int @id
+  nextValLogin Int @map("root_val_login")
+
+  @@map("seed_user_login")
+}
+
 model User {
-  id                 String         @id @default(uuid())
-  name               String?
-  email              String         @unique
-  passwordHash       String?        @map("password_hash")
-  avatarUrl          String?        @map("avatar_url")
-  createdAt          DateTime       @default(now()) @map("created_at")
-  updatedAt          DateTime       @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  name         String?
+  email        String   @unique
+  login        String   @unique
+  passwordHash String?  @map("password_hash")
+  avatarUrl    String?  @map("avatar_url")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
   tokens             Token[]
   accounts           Account[]
   invites            Invite[]
@@ -22,11 +38,7 @@ model User {
   owns_organizations Organization[]
   owns_projects      Project[]
 
-  @@map("users")
-}
-
-enum TokenType {
-  PASSWORD_RECOVER
+  @@map("user")
 }
 
 model Token {
@@ -36,11 +48,7 @@ model Token {
   userId    String    @map("user_id")
   createdAt DateTime  @default(now()) @map("created_at")
 
-  @@map("tokens")
-}
-
-enum AccountProvider {
-  GITHUB
+  @@map("token")
 }
 
 model Account {
@@ -52,13 +60,7 @@ model Account {
   createdAt         DateTime        @default(now()) @map("created_at")
 
   @@unique([provider, userId])
-  @@map("accounts")
-}
-
-enum Role {
-  ADMIN
-  MEMBER
-  BILLING
+  @@map("account")
 }
 
 model Invite {
@@ -76,7 +78,7 @@ model Invite {
 
   @@unique([email, organizationId])
   @@index([email])
-  @@map("invites")
+  @@map("invite")
 }
 
 model Member {
@@ -89,28 +91,38 @@ model Member {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @map("user_id")
 
+  email  String?
+  cpf    String?
+  status Boolean @default(true)
+
   @@unique([organizationId, userId])
-  @@map("members")
+  @@map("member")
 }
 
 model Organization {
-  id                       String   @id @default(uuid())
+  id                       String     @id @default(uuid())
   name                     String
-  slug                     String   @unique
-  domain                   String?  @unique
-  shouldAttachUserByDomain Boolean  @default(false) @map("should_attach_user_by_domain")
-  avatarUrl                String?  @map("avatar_url")
-  createdAt                DateTime @default(now()) @map("created_at")
-  updatedAt                DateTime @updatedAt @map("updated_at")
+  slug                     String     @unique
+  domain                   String?    @unique
+  shouldAttachUserByDomain Boolean    @default(false) @map("should_attach_user_by_domain")
+  avatarUrl                String?    @map("avatar_url")
+  tipoPessoa               PersonType @default(JURIDICA) @map("tipo_pessoa")
+  loginCode                String     @unique @map("login_code")
+  stripeCustomerId         String?    @map("stripe_customer_id")
+  status                   Boolean    @default(true)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   owner   User   @relation(fields: [ownerId], references: [id])
   ownerId String @map("user_id")
 
-  invites  Invite[]
-  members  Member[]
-  projects Project[]
+  subscription Subscription?
+  invites      Invite[]
+  members      Member[]
+  projects     Project[]
 
-  @@map("organizations")
+  @@map("organization")
 }
 
 model Project {
@@ -128,5 +140,50 @@ model Project {
   owner   User   @relation(fields: [ownerId], references: [id])
   ownerId String @map("owner_id")
 
-  @@map("projects")
+  @@map("project")
+}
+
+model Subscription {
+  id      Int     @id @default(autoincrement())
+  status  String
+  plan    Plan
+  priceId String? @map("price_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organizationId String       @unique @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("subscription")
+}
+
+enum TokenType {
+  PASSWORD_RECOVER
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+  BILLING
+  CHECKIN
+}
+
+enum PersonType {
+  FISICA
+  JURIDICA
+}
+
+enum Gender {
+  MASCULINO
+  FEMININO
+}
+
+enum Plan {
+  BASIC
+  PROFESSIONAL
+}
+
+enum AccountProvider {
+  GITHUB
 }
