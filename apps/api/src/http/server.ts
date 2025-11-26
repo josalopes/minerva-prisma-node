@@ -14,6 +14,7 @@ import { env } from '@saas/env';
 
 import { createAccount } from './routes/auth/create-account'
 import { authenticateWithPassword } from './routes/auth/authenticate-with-password'
+import { authenticateWithLoginCode } from './routes/auth/authenticate-with-login-code'
 import { getProfile } from './routes/auth/get-profile'
 import { requestPasswordRecovery } from './routes/auth/request-password-recover'
 import { resetPassword } from './routes/auth/reset-password'
@@ -85,6 +86,7 @@ app.register(fastifyCors)
 
 app.register(createAccount)
 app.register(authenticateWithPassword)
+app.register(authenticateWithLoginCode)
 app.register(authenticateWithGithub)
 app.register(getProfile)
 app.register(requestPasswordRecovery)

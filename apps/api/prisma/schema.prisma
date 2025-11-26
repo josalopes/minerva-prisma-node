@@ -102,11 +102,12 @@ model Member {
 model Organization {
   id                       String     @id @default(uuid())
   name                     String
+  cpfCnpj                  String     @unique @map("cpf_cnpj")
   slug                     String     @unique
   domain                   String?    @unique
   shouldAttachUserByDomain Boolean    @default(false) @map("should_attach_user_by_domain")
   avatarUrl                String?    @map("avatar_url")
-  tipoPessoa               PersonType @default(JURIDICA) @map("tipo_pessoa")
+  personType               PersonType @default(JURIDICA) @map("tipo_pessoa")
   loginCode                String     @unique @map("login_code")
   stripeCustomerId         String?    @map("stripe_customer_id")
   status                   Boolean    @default(true)

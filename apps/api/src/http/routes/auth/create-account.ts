@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import { prisma } from "@/lib/prisma";
 import { BadRequestError } from "../-errors/bad-request-error";
+import { gerarNextVal } from "@/utils/generate-next-sequence";
 
 export async function createAccount(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>().post(
@@ -29,6 +30,13 @@ export async function createAccount(app: FastifyInstance) {
             },            
         }, 
         async (request, reply) => {
+            const geradorLoginUsuario = await prisma.seedUserLogin.findFirst({
+                where: {
+                    id: 1,
+                }
+            })
+
+            const nextValUserLogin = geradorLoginUsuario?.nextValLogin ?? 10000
             const { name, email, password } = request.body
 
             const userWithSameEmail = await prisma.user.findUnique({
@@ -38,8 +46,7 @@ export async function createAccount(app: FastifyInstance) {
             })
 
             if (userWithSameEmail) {
-                // throw new BadRequestError('Este e-mail já está em uso')
-                return reply.status(400).send({ message: 'Este e-mail já está em uso' })
+                throw new BadRequestError('Este e-mail já está em uso')
             }
 
             const [, domain] = email.split('@')
@@ -58,6 +65,7 @@ export async function createAccount(app: FastifyInstance) {
                     name,
                     email,
                     passwordHash,
+                    login: (await gerarNextVal('seed_login') + BigInt(nextValUserLogin)).toString(),
                     member_on: autoJoinOrganization ? {
                         create: {
                             organizationId: autoJoinOrganization.id,

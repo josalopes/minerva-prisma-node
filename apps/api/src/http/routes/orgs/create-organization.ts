@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/http/middlewares/auth";
 import { createSlug } from "@/utils/create-slug";
 import { BadRequestError } from "../-errors/bad-request-error";
+import { gerarNextVal } from "@/utils/generate-next-sequence";
 
 export async function createOrganization(app: FastifyInstance) {
     app
@@ -18,6 +19,7 @@ export async function createOrganization(app: FastifyInstance) {
             securiry: [{ bearerAuth: [] }],
             body: z.object({
                 name: z.string(),
+                cpfCnpj: z.string(),
                 domain: z.string().nullish(),
                 shouldAttachUserByDomain: z.boolean().optional()
             }),
@@ -33,7 +35,17 @@ export async function createOrganization(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const userId = await request.getCurrentUserid()
-        const { name, domain, shouldAttachUserByDomain } = request.body
+        const { name, domain, shouldAttachUserByDomain, cpfCnpj } = request.body
+
+        const user = await prisma.user.findFirst({
+            where: {
+                id: userId
+            }
+        })
+
+        if (!user) {
+            throw new BadRequestError('Usuário não encontrado')
+        }
 
         if (domain) {
             const organizationByDomain = await prisma.organization.findUnique({
@@ -47,6 +59,18 @@ export async function createOrganization(app: FastifyInstance) {
             }
         }
 
+        if (cpfCnpj) {
+            const organizationByCnpj = await prisma.organization.findUnique({
+                where: {
+                    cpfCnpj
+                },
+            })
+
+            if (organizationByCnpj) {
+                throw new BadRequestError('Já existe uma organização com este CPF/CNPJ')
+            }
+        }
+
         const slug = createSlug(name)
 
         const organizationBySlug = await prisma.organization.findUnique({
@@ -57,14 +81,24 @@ export async function createOrganization(app: FastifyInstance) {
 
         if (organizationBySlug) {
             throw new BadRequestError('Já existe uma organização com este slug')
-        }        
+        }
+        
+        const geradorCodigoEmpresa = await prisma.seedOrganization.findFirst({
+            where: {
+                id: 1,
+            }
+        })
+
+        const nextValOrg = geradorCodigoEmpresa?.nextValOrg ?? 100000
 
         const organization = await prisma.organization.create({
             data: {
                 name,
                 slug: createSlug(name),
                 domain,
+                cpfCnpj,
                 shouldAttachUserByDomain,
+                loginCode: (await gerarNextVal('seed_org') + BigInt(nextValOrg)).toString(),
                 ownerId: userId,
                 members: {
                     create: {

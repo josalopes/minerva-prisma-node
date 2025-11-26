@@ -65,11 +65,13 @@ async function seed() {
         data: {
             name: 'Acme Inc (Admin)',
             domain: 'acme.com',
+            cpfCnpj: '23456789100050',
             slug: 'acme-domain',
             loginCode: (await gerarNextVal('seed_org') + BigInt(nextValOrg)).toString(),
             avatarUrl: faker.image.avatarGitHub(),
             shouldAttachUserByDomain: true,
             ownerId: user.id,
+            personType: 'JURIDICA',
             projects: {
                 createMany: {
                 data: [
@@ -136,9 +138,11 @@ async function seed() {
     data: {
       name: 'Acme Inc (Member)',
       slug: 'acme-member',
+      cpfCnpj: '04674405300',
       loginCode: (await gerarNextVal('seed_org') + BigInt(nextValOrg)).toString(),
       avatarUrl: faker.image.avatarGitHub(),
       ownerId: user.id,
+      personType: 'FISICA',
       projects: {
         createMany: {
           data: [

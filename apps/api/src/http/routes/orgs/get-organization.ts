@@ -62,31 +62,8 @@ export async function getOrganization(app: FastifyInstance) {
                     ownerId: organization.ownerId
                 }
 
-                // const organizacao = {
-                //     id: org.id,
-                //         name: org?.name,
-                //         slug: org.slug,
-                //         domain: org.domain,
-                //         shouldAttachUsersByDomain: org.shouldAttachUsersByDomain,
-                //         avatarUrl: org.avatarUrl,
-                //         createdAt: org.createdAt,
-                //         updatedAt: org.updatedAt,
-                //         ownerId: org.ownerId
-                // }
-
                 return reply.status(200).send(
                     {organizacao}
-                    // {
-                    //     id: org.id,
-                    //     name: org?.name,
-                    //     slug: org.slug,
-                    //     domain: org.domain,
-                    //     shouldAttachUsersByDomain: org.shouldAttachUsersByDomain,
-                    //     avatarUrl: org.avatarUrl,
-                    //     createdAt: org.createdAt,
-                    //     updatedAt: org.updatedAt,
-                    //     ownerId: org.ownerId
-                    // }
                 )
             }
         )

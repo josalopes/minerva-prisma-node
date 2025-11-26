@@ -27,6 +27,7 @@ export async function getProfile(app: FastifyInstance) {
                             id: z.string(),
                             name: z.string().nullable(),
                             email: z.email(),
+                            login: z.string(),
                             avatarUrl: z.string().nullable(),
                         }),
                     }),
@@ -44,13 +45,13 @@ export async function getProfile(app: FastifyInstance) {
                     id: true,
                     name: true,
                     email: true,
+                    login: true,
                     avatarUrl: true,
                 },
             })
 
             if (!user) {
-                // throw new BadRequestError('Usuário não encontrado')
-                return reply.status(400).send({ message: 'Usuário não encontrada' })
+                throw new BadRequestError('Usuário não encontrado')
             }
 
             return reply.send({ user })
