@@ -11,3 +11,7 @@ export async function signInWithGithub() {
 
     redirect(githubSignInURL.toString())
 }
+
+export async function signInWithCode() {
+    redirect('/auth/sign-in-login-code')
+}

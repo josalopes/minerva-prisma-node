@@ -71,17 +71,17 @@ export async function createOrganization(app: FastifyInstance) {
             }
         }
 
-        const slug = createSlug(name)
+        // const slug = createSlug(name)
 
-        const organizationBySlug = await prisma.organization.findUnique({
-            where: {
-                slug
-            },
-        })
+        // const organizationBySlug = await prisma.organization.findUnique({
+        //     where: {
+        //         slug
+        //     },
+        // })
 
-        if (organizationBySlug) {
-            throw new BadRequestError('Já existe uma organização com este slug')
-        }
+        // if (organizationBySlug) {
+        //     throw new BadRequestError('Já existe uma organização com este slug')
+        // }
         
         const geradorCodigoEmpresa = await prisma.seedOrganization.findFirst({
             where: {
@@ -94,11 +94,10 @@ export async function createOrganization(app: FastifyInstance) {
         const organization = await prisma.organization.create({
             data: {
                 name,
-                slug: createSlug(name),
                 domain,
                 cpfCnpj,
                 shouldAttachUserByDomain,
-                loginCode: (await gerarNextVal('seed_org') + BigInt(nextValOrg)).toString(),
+                slug: (await gerarNextVal('seed_org') + BigInt(nextValOrg)).toString(),
                 ownerId: userId,
                 members: {
                     create: {

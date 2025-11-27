@@ -1,29 +1,23 @@
 'use client'
 
 import Link from "next/link";
-// import Image from "next/image";
-import { useTransition, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2, AlertTriangle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
 
-import { Loader2, AlertTriangle } from "lucide-react";
-
-// import githubIcon from "@/assets/github-icon.svg"
-import { signInWithEmailAndPassword } from './actions'
+import { signInWithLoginCodeAndPassword } from './actions'
 import { useFormState } from '@/hooks/use-form-state'
-import { signInWithCode, signInWithGithub } from "../actions";
 
-export function SignInForm() {
+export function SignInLoginCodeForm() {
     const router = useRouter()
     const searchParams = useSearchParams()
 
     const [{ success, message, errors }, handleSubmit, isPending] = useFormState(
-        signInWithEmailAndPassword,
+        signInWithLoginCodeAndPassword,
         () => {
             router.push('/')
         }
@@ -43,11 +37,11 @@ export function SignInForm() {
                 )}
 
                 <div className="space-y-1">
-                    <Label htmlFor="email">E-mail</Label>
-                    <Input type="email" name="email"  id="email" defaultValue={searchParams.get('email') ?? ''} />
+                    <Label htmlFor="login">Código de login</Label>
+                    <Input type="login" name="login"  id="login" defaultValue={searchParams.get('login') ?? ''} />
 
-                    {errors?.email && (
-                        <span className="text-xs font-medium text-red-500">{errors.email[0]}</span>
+                    {errors?.login && (
+                        <span className="text-xs font-medium text-red-500">{errors.login[0]}</span>
                     )}
                 </div>
 
@@ -71,7 +65,7 @@ export function SignInForm() {
                     {isPending ? (
                         <Loader2 className="size-4 animate-spin"/>
                     )  : (
-                        'Entrar com e-mail'
+                        'Entrar'
                     )}
                 </Button>
 
@@ -82,16 +76,6 @@ export function SignInForm() {
                 </Button>
 
             </form>    
-            <Separator />
-
-            <form action={signInWithCode}>
-                <Button 
-                    type="submit"
-                    className="w-full"
-                >
-                    Entrar com código
-                </Button>
-            </form>
         </div>
     )
 }

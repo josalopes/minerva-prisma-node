@@ -5,6 +5,7 @@ interface GetProfileResponse {
         id: string,
         name: string | null,
         email: string,
+        login: string,
         avatarUrl: string | null,
     }
 }

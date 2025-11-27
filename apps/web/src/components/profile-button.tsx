@@ -1,4 +1,9 @@
-import { DropdownMenu, DropdownMenuItem, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { 
+    DropdownMenu, 
+    DropdownMenuItem, 
+    DropdownMenuContent, 
+    DropdownMenuTrigger 
+} from "./ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { ChevronDown, LogOut } from "lucide-react";
 import Link from "next/link";
@@ -22,7 +27,7 @@ export async function ProfileButton() {
             <DropdownMenuTrigger className="flex items-center gap-3 outline-none">
                 <div className="flex flex-col items-end">
                     <span className="text-sm font-medium">{user.name}</span>
-                    <span className="text-xs text-muted-foregrouns">{user.email}</span>
+                    <span className="text-xs text-muted-foregrouns">{user.email} - {user.login}</span>
                 </div>
                 <Avatar>
                     {user.avatarUrl && <AvatarImage src={user.avatarUrl} className="size-8"/>}
