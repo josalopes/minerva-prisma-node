@@ -24,6 +24,7 @@ export async function getOrganizations(app: FastifyInstance) {
                                         id: z.uuid(),
                                         name: z.string().describe('O nome da organização'),
                                         slug: z.string().describe('O nome abreviado da organização'),
+                                        loginCode: z.string().describe('O identificador de acesso da organização'),
                                         avatarUrl: z.url().nullable().describe('O avatar da organização'),
                                         role: roleSchema.describe('O papel dos membros da organização'),
                                     }).describe('Detalhes da organização'),
@@ -39,6 +40,7 @@ export async function getOrganizations(app: FastifyInstance) {
                         id: true,
                         name: true,
                         slug: true,
+                        loginCode: true,
                         avatarUrl: true,
                         members: {
                             select: {

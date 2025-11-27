@@ -33,6 +33,7 @@ export async function getMembers(app: FastifyInstance) {
                                 role: roleSchema,
                                 name: z.string().nullable(),
                                 email: z.email(),
+                                login: z.string(),
                                 avatarUrl: z.url().nullable(),
                             }),
                         ),
@@ -64,6 +65,7 @@ export async function getMembers(app: FastifyInstance) {
                         id: true,
                         name: true,
                         email: true,
+                        login: true,
                         avatarUrl: true,
                     }
                 },

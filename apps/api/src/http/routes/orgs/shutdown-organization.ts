@@ -41,7 +41,6 @@ export async function shutdownOrganization(app: FastifyInstance) {
 
         if (cannot('delete', authOrganization)) {
             throw new BadRequestError('Você não tem permissão para desativar essa organização')
-            // return reply.status(401).send({ message: 'Você não tem permissão para desativar esta organização' })
         }
 
 

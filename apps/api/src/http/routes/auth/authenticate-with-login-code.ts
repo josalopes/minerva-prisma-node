@@ -23,7 +23,6 @@ export async function authenticateWithLoginCode(app: FastifyInstance) {
                     }),
                     201: z.object({
                         token: z.string(),
-                        // organizationSlug: z.string().nullable()
                     })
                 }
             }, 
@@ -42,7 +41,7 @@ export async function authenticateWithLoginCode(app: FastifyInstance) {
             }
 
             if (userFromLoginCode.passwordHash === null) {
-                throw new BadRequestError('Usuário não tenha uma senha, use o login social.')
+                throw new BadRequestError('Usuário não tem senha, use o login social.')
             }
 
             const isPasswordValid = await compare(

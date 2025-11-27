@@ -50,7 +50,6 @@ export async function updateOrganization(app: FastifyInstance) {
 
         if (cannot('update', authOrganization)) {
             throw new BadRequestError('Você não tem permissão para atualizar esta organização')
-            // return reply.status(401).send({ message: 'Você não tem permissão para atualizar esta organização' })
         }
 
         if (domain) {
@@ -65,7 +64,6 @@ export async function updateOrganization(app: FastifyInstance) {
 
             if (organizationByDomain) {
                 throw new BadRequestError('Já existe uma organização com este domínio')
-                // return reply.status(400).send({ message: 'Já existe uma organização com este domínio' })
             }
         }
 

@@ -49,7 +49,6 @@ export async function transferOrganization(app: FastifyInstance) {
 
         if (cannot('transfer_ownership', authOrganization)) {
           throw new BadRequestError('Você não tem permissão para transferir esta organização')
-            // return reply.status(401).send({ message: 'Você não tem permissão para transferir esta organização' })
         }
 
         const transferMembership = await prisma.member.findUnique({
@@ -63,7 +62,6 @@ export async function transferOrganization(app: FastifyInstance) {
 
         if (!transferMembership) {
           throw new BadRequestError('O usuário destinatário não é membro desta organização')
-          // return reply.status(400).send({ message: 'O usuário destinatário não é membro desta organização' })
         }
 
         await prisma.$transaction([
