@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "pnpm env:load next dev --turbopack",
-    "build": "next next build --turbopack",
-    "start": "next next start",
+    "build": "next build --turbopack",
+    "start": "next start",
     "lint": "next next lint",
     "env:load": "dotenv -e ../../.env --"
   },
