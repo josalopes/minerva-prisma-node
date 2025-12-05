@@ -6,9 +6,13 @@ import { createOrganization } from '@/http/create-organization'
 import { getCurrentOrg } from '@/auth/auth'
 import { updateOrganization } from '@/http/update-organization'
 import { revalidateTag } from 'next/cache'
+import { personTypeSchema } from "../../../../src/http/schemas";
 
 const organizationSchema = z.object({
     name: z.string().min(4, { message: 'O nome deve ter no mínimo 4 caracteres'}),
+    cpfCnpj: z.string(),
+    personType: personTypeSchema,
+    avatarUrl: z.url().nullable(),
     domain: z.string()
     .nullable()
     .refine((value) => {
@@ -20,6 +24,7 @@ const organizationSchema = z.object({
 
         return true
     },
+
 {
     message: 'Entre com umm domínio válido'
 }),
@@ -56,11 +61,11 @@ export async function createOrganizationAction(data: FormData) {
         return { success: false, message: null, errors }
     }
 
-    const { name, domain, shouldAttachUsersByDomain } = result.data
+    const { name, cpfCnpj, domain, shouldAttachUsersByDomain, personType, avatarUrl } = result.data
 
     try {
         await createOrganization({
-            name, domain, shouldAttachUsersByDomain,
+            name, cpfCnpj, domain, shouldAttachUsersByDomain, personType, avatarUrl
         }) 
         
         revalidateTag('organizations')
