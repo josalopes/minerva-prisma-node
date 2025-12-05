@@ -31,8 +31,8 @@ async function seed() {
 
   const nextValOrg = geradorCodigoEmpresa?.nextValOrg ?? 100000
 
-    const user = await prisma.user.create({
-    data: {
+  const user = await prisma.user.create({
+  data: {
       name: 'John Doe',
       email: 'john@acme.com',
       login: (await gerarNextVal('seed_login') + BigInt(nextValUserLogin)).toString(),
