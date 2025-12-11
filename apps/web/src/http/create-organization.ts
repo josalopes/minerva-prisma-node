@@ -1,19 +1,18 @@
 import { api } from "./api-client";
-import { PersonType } from "./schemas";
 interface CreateOrganizationRequest {
     name: string,
     cpfCnpj: string,
-    domain: string | null,
+    domain: string | undefined,
     shouldAttachUsersByDomain: boolean,
-    personType: PersonType,
-    avatarUrl: string | null
+    personType: string,
 }
 
 type CreateOrganizationResponse = void
 
 export async function createOrganization({
-    name, cpfCnpj, domain, shouldAttachUsersByDomain, personType, avatarUrl
+    name, cpfCnpj, domain, shouldAttachUsersByDomain, personType
 }: CreateOrganizationRequest): Promise<CreateOrganizationResponse> {
+    console.log('Passando em http-create-organization: ', name, cpfCnpj, personType)
     const response = await api.post('organization', {
         json: { 
             name,
@@ -21,7 +20,6 @@ export async function createOrganization({
             domain, 
             shouldAttachUsersByDomain ,
             personType,
-            avatarUrl
         },
     })
 }

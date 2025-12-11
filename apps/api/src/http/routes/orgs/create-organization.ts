@@ -7,6 +7,7 @@ import { auth } from "@/http/middlewares/auth";
 import { createSlug } from "@/utils/create-slug";
 import { BadRequestError } from "../-errors/bad-request-error";
 import { gerarNextVal } from "@/utils/generate-next-sequence";
+import { personTypeSchema } from "../../../http/schemas";
 
 export async function createOrganization(app: FastifyInstance) {
     app
@@ -21,7 +22,8 @@ export async function createOrganization(app: FastifyInstance) {
                 name: z.string(),
                 cpfCnpj: z.string(),
                 domain: z.string().nullish(),
-                shouldAttachUserByDomain: z.boolean().optional()
+                shouldAttachUserByDomain: z.boolean().optional(),
+                personType: personTypeSchema
             }),
             response: {
                 400: z.object({
@@ -35,7 +37,7 @@ export async function createOrganization(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const userId = await request.getCurrentUserid()
-        const { name, domain, shouldAttachUserByDomain, cpfCnpj } = request.body
+        const { name, domain, shouldAttachUserByDomain, cpfCnpj, personType } = request.body
 
         const user = await prisma.user.findFirst({
             where: {
@@ -97,10 +99,12 @@ export async function createOrganization(app: FastifyInstance) {
                 domain,
                 cpfCnpj,
                 shouldAttachUserByDomain,
+                personType,
                 slug: (await gerarNextVal('seed_org') + BigInt(nextValOrg)).toString(),
                 ownerId: userId,
                 members: {
                     create: {
+                        email: user.email,
                         userId,
                         role: 'ADMIN',
                     },

@@ -51,11 +51,11 @@ export async function createMember(app: FastifyInstance) {
         const currentUserId = await request.getCurrentUserid()
         const { organization, membership } = await request.getUserMembership(slug)
 
-        const { cannot } = getUserPermissions(currentUserId, membership.role)
+        // const { cannot } = getUserPermissions(currentUserId, membership.role)
         
-        if (cannot('create', 'Project')) {
-            return reply.status(401).send({ message: 'Você não tem permissão para criar projetos' })
-        }  
+        // if (cannot('create', 'Project')) {
+        //     return reply.status(401).send({ message: 'Você não tem permissão para criar projetos' })
+        // }  
         
 
         if (!organization) {

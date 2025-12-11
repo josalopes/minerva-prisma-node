@@ -4,7 +4,7 @@ import { api } from "./api-client";
 interface UpdateOrganizationRequest {
     org: string,
     name: string,
-    domain: string | null,
+    domain: string | undefined,
     shouldAttachUsersByDomain: boolean,
 }
 

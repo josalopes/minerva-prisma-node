@@ -6,4 +6,3 @@ export const personTypeSchema = z.union([
 ])
 
 export type PersonType = z.infer<typeof personTypeSchema>
-

@@ -3,15 +3,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useFormState } from '@/hooks/use-form-state'
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useFormState } from '@/hooks/use-form-state'
+
 import { AlertTriangle, Loader2 } from "lucide-react";
 
 import { OrganizationSchema } from "./actions";
 import { createOrganizationAction } from "./actions";
 import { updateOrganizationAction } from "./actions";
+import { useState } from "react";
 
 interface OrganizationFormProps {
     isUpdating?: boolean,
@@ -19,9 +21,9 @@ interface OrganizationFormProps {
 }
 
 export function OrganizationForm({ isUpdating, initialData }: OrganizationFormProps) {
-    
+    const [selectedValue, setSelectedValue] = useState("");
     const formAction = isUpdating ? updateOrganizationAction : createOrganizationAction
-
+   
     const [{ success, message, errors }, handleSubmit, isPending] = useFormState(
         formAction,
     )
@@ -39,7 +41,7 @@ export function OrganizationForm({ isUpdating, initialData }: OrganizationFormPr
             )}
             
             {success === true && message && (
-                <Alert>
+                <Alert variant="success">
                     <AlertTriangle className="size-4"/>
                     <AlertTitle>Sucesso!</AlertTitle>
                     <AlertDescription>
@@ -62,6 +64,42 @@ export function OrganizationForm({ isUpdating, initialData }: OrganizationFormPr
                 )}
             </div>
             
+            
+
+            <div className="space-y-1">
+                <RadioGroup 
+                    defaultValue="JURIDICA"  
+                    onValueChange={setSelectedValue}
+                    className="flex flex-row gap-4" 
+                >
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="JURIDICA" id="juridica" />
+                        <Label htmlFor="juridica">Pessoa Jurídica</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="FISICA" id="fisica" />
+                        <Label htmlFor="fisica">Pessoa Física</Label>
+                    </div>
+                </RadioGroup>
+            </div>
+
+            
+            <div className="space-y-1">
+                <Label htmlFor="cpfCnpj">CNPJ/CPF</Label>
+                <Input 
+                    type="text" 
+                    name="cpfCnpj"  
+                    id="cpfCnpj" 
+                    inputMode="numeric" 
+                    placeholder="04674405300"
+                    defaultValue={initialData?.cpfCnpj ?? undefined}
+                />
+
+                {errors?.cpfCnpj && (
+                    <span className="text-xs font-medium text-red-500">{errors.cpfCnpj[0]}</span>
+                )}
+            </div>
+
             <div className="space-y-1">
                 <Label htmlFor="domain">Domínio do e-mail</Label>
                 <Input 

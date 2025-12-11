@@ -11,9 +11,9 @@ import { Separator } from "@/components/ui/separator";
 import { useFormState } from '@/hooks/use-form-state'
 
 import githubIcon from "@/assets/github-icon.svg"
-import { signUpAction } from "./actions";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle, Loader2 } from "lucide-react";
+import { signUpAction } from "./actions";
 import { signInWithGithub } from "../actions";
 
 export function SignUpForm() {
@@ -92,16 +92,16 @@ export function SignUpForm() {
 
             <Separator />
 
-            <form action={signInWithGithub}>
-                <Button 
+            {/* <form action={signInWithGithub}> */}
+                {/* <Button 
                     type="submit"
                     variant="outline" 
                     className="w-full"
                 >
                     <Image src={githubIcon} alt="" className="size-4 mr-2 dark:invert" />
                     Entrar com GitHub
-                </Button>
-            </form>
+                </Button> */}
+            {/* </form> */}
         </div>
     )
 }

@@ -6,15 +6,15 @@ import { createOrganization } from '@/http/create-organization'
 import { getCurrentOrg } from '@/auth/auth'
 import { updateOrganization } from '@/http/update-organization'
 import { revalidateTag } from 'next/cache'
-import { personTypeSchema } from "../../../../src/http/schemas";
 
 const organizationSchema = z.object({
     name: z.string().min(4, { message: 'O nome deve ter no mínimo 4 caracteres'}),
-    cpfCnpj: z.string(),
-    personType: personTypeSchema,
-    avatarUrl: z.url().nullable(),
+    cpfCnpj: z.string()
+      .min(11, "O tamanho não pode ser menor que 11 caracteres")
+      .max(14, "O tamanho não pode ser maior que 14 caracteres"),
+    personType: z.string(),
     domain: z.string()
-    .nullable()
+    .nullish()
     .refine((value) => {
         if (value) {
             const domainRegex = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -26,8 +26,9 @@ const organizationSchema = z.object({
     },
 
 {
-    message: 'Entre com umm domínio válido'
-}),
+    message: 'Entre com um domínio válido'
+})
+    .transform((value) => value ?? undefined),
    shouldAttachUsersByDomain: z.union([
         z.literal('on'),
         z.literal('off'),
@@ -54,18 +55,20 @@ export type OrganizationSchema = z.infer<typeof organizationSchema>
 export async function createOrganizationAction(data: FormData) {
     const entries = Object.fromEntries(data.entries())
     const result = organizationSchema.safeParse(entries)
+    console.log('Entries:', entries)
     
     if (!result.success) {
         const errors = result.error.flatten().fieldErrors
-        
+        console.log('Erros:', errors)
         return { success: false, message: null, errors }
     }
+    const { name, cpfCnpj, domain, shouldAttachUsersByDomain, personType } = result.data
 
-    const { name, cpfCnpj, domain, shouldAttachUsersByDomain, personType, avatarUrl } = result.data
+    console.log('Passando em actions.ts', { name, cpfCnpj, domain, shouldAttachUsersByDomain, personType })
 
     try {
         await createOrganization({
-            name, cpfCnpj, domain, shouldAttachUsersByDomain, personType, avatarUrl
+            name, cpfCnpj, domain, shouldAttachUsersByDomain, personType
         }) 
         
         revalidateTag('organizations')
