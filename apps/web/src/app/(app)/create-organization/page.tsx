@@ -1,4 +1,4 @@
-import { OrganizationForm } from "../org/organization-form1";
+import { OrganizationForm } from "../org/organization-form";
 // import { OrganizationForm } from "../org/organization-form";
 
 export default function CreateOrganization() {

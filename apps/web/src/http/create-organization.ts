@@ -12,7 +12,6 @@ type CreateOrganizationResponse = void
 export async function createOrganization({
     name, cpfCnpj, domain, shouldAttachUsersByDomain, personType
 }: CreateOrganizationRequest): Promise<CreateOrganizationResponse> {
-    console.log('Passando em http-create-organization: ', name, cpfCnpj, personType)
     const response = await api.post('organization', {
         json: { 
             name,

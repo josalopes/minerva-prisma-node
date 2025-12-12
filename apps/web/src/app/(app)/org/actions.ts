@@ -7,11 +7,24 @@ import { getCurrentOrg } from '@/auth/auth'
 import { updateOrganization } from '@/http/update-organization'
 import { revalidateTag } from 'next/cache'
 
+import { validarCPF } from '../../../utils/cpf-utils'
+import { validarCNPJ } from '../../../utils/cnpj-utils'
+
 const organizationSchema = z.object({
     name: z.string().min(4, { message: 'O nome deve ter no mínimo 4 caracteres'}),
-    cpfCnpj: z.string()
-      .min(11, "O tamanho não pode ser menor que 11 caracteres")
-      .max(14, "O tamanho não pode ser maior que 14 caracteres"),
+    cpfCnpj: z.string({ message: 'CPF/CNPJ é obrigatório.' })
+      .refine((doc) => {
+        const replacedDoc = doc.replace(/\D/g, '');
+        return replacedDoc.length >= 11;
+        }, 'CPF/CNPJ deve conter no mínimo 11 caracteres.')
+        .refine((doc) => {
+        const replacedDoc = doc.replace(/\D/g, '');
+        return replacedDoc.length <= 14;
+        }, 'CPF/CNPJ deve conter no máximo 14 caracteres.')
+        .refine((doc) => {
+        const replacedDoc = doc.replace(/\D/g, '');
+        return !!Number(replacedDoc);
+        }, 'CPF/CNPJ deve conter apenas números.'),
     personType: z.string(),
     domain: z.string()
     .nullish()
@@ -55,20 +68,42 @@ export type OrganizationSchema = z.infer<typeof organizationSchema>
 export async function createOrganizationAction(data: FormData) {
     const entries = Object.fromEntries(data.entries())
     const result = organizationSchema.safeParse(entries)
-    console.log('Entries:', entries)
     
     if (!result.success) {
         const errors = result.error.flatten().fieldErrors
-        console.log('Erros:', errors)
         return { success: false, message: null, errors }
     }
     const { name, cpfCnpj, domain, shouldAttachUsersByDomain, personType } = result.data
+    const unmaskedCpfCnpj = cpfCnpj.toString().replace(/\.|-/gm,'')
 
-    console.log('Passando em actions.ts', { name, cpfCnpj, domain, shouldAttachUsersByDomain, personType })
+    switch (personType) {
+        case "FISICA":
+            if (!validarCPF(unmaskedCpfCnpj)) {
+                return { 
+                    success: false, 
+                    message: 'CPF inválido', 
+                    errors: null
+                }
+            }
+            break
+        case "JURIDICA":
+            if (!validarCNPJ(unmaskedCpfCnpj)) {
+                return { 
+                    success: false, 
+                    message: 'CNPJ inválido', 
+                    errors: null
+                }
+            }
+            break    
+    }
 
     try {
         await createOrganization({
-            name, cpfCnpj, domain, shouldAttachUsersByDomain, personType
+            name, 
+            cpfCnpj: unmaskedCpfCnpj, 
+            domain, 
+            shouldAttachUsersByDomain, 
+            personType
         }) 
         
         revalidateTag('organizations')
@@ -89,7 +124,11 @@ export async function createOrganizationAction(data: FormData) {
          }
     }
 
-    return { success: true, message: 'Organização salva com sucesso', errors: null }
+    return { 
+        success: true,
+        message: 'Organização salva com sucesso', 
+        errors: null 
+    }
 }
 
 

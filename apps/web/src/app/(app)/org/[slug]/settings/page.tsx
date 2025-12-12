@@ -32,7 +32,9 @@ export default async function Settings() {
                         <CardContent>
                             <OrganizationForm isUpdating initialData={{
                                 name: organizacao.name,
-                                domain: organizacao.domain,
+                                cpfCnpj: organizacao.cpfCnpj,
+                                personType: organizacao.personType,
+                                domain: organizacao.domain ?? undefined,
                                 shouldAttachUsersByDomain: organizacao.shouldAttachUsersByDomain,
                             }}/>
                         </CardContent>

@@ -4,6 +4,8 @@ interface GetOrganizationResponse {
     organizacao: {
         id: string;
         name: string;
+        cpfCnpj: string,
+        personType: string,
         slug: string;
         domain: string | null;
         shouldAttachUsersByDomain: boolean;
