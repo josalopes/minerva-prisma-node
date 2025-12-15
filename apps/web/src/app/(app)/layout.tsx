@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { isAuthenticated } from '@/auth/auth'
+import { SidebarDashboard } from '../(panel)/dashboard/_components/sidebar';
 
 export default async function AppLayout({
   children,
@@ -15,6 +16,12 @@ export default async function AppLayout({
   }
 
   return (
-      <>{children}{sheet}</>
+    <>
+      <SidebarDashboard>
+        {children}
+        {sheet}
+      </SidebarDashboard>
+    </>
+      // <>{children}{sheet}</>
     )
 }
