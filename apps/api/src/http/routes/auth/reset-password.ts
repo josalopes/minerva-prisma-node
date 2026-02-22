@@ -19,7 +19,7 @@ export async function resetPassword(app: FastifyInstance) {
                 summary: 'Troca a senha',
                 body: z.object({
                     code: z.string(),
-                    password: z.email().min(6)
+                    password: z.string().min(6)
                 }),              
                 response: {
                     401: z.object({

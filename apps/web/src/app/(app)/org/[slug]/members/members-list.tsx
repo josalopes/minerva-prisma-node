@@ -15,13 +15,13 @@ export default async function MemberList() {
     const currentOrg = await getCurrentOrg()
     const permissions = await ability()
 
-    const [{ members }, {membership }, { organizacao }] = await Promise.all([
+    const [{ members }, {membership }, { organization }] = await Promise.all([
         getMembers(currentOrg!),
         getMembership(currentOrg!),
         getOrganization(currentOrg!)
     ])
 
-    const authOrganization = organizationSchema.parse(organizacao)
+    const authOrganization = organizationSchema.parse(organization)
 
     return (
         <div className="space-y-2">
@@ -53,7 +53,7 @@ export default async function MemberList() {
                                         <span className="inline-flex items-center gap-2 font-medium">
                                             {member.name}
                                             {member.userId === membership.userid && ' (eu)'}
-                                            {organizacao.ownerId === member.userId && (
+                                            {organization.ownerId === member.userId && (
                                                 <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                                                     <Crown className="size-3" />
                                                     Dono
@@ -78,7 +78,7 @@ export default async function MemberList() {
                                             value={member.role}
                                             disabled={
                                                 member.userId === membership.userid ||
-                                                organizacao.ownerId === member.userId ||
+                                                organization.ownerId === member.userId ||
                                                 permissions?.cannot('update', 'User')
                                             }
                                         />
@@ -88,7 +88,7 @@ export default async function MemberList() {
                                                 <Button 
                                                     disabled={
                                                         member.userId === membership.userid ||
-                                                        organizacao.ownerId === member.userId
+                                                        organization.ownerId === member.userId
                                                     } 
                                                     type="submit" 
                                                     size="sm" 

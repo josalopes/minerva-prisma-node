@@ -32,9 +32,10 @@ export async function signInWithEmailAndPassword(data: FormData) {
     const { email, password } = result.data
 
     try {
-        const { token} = await signInWithPassword({
+        const { token } = await signInWithPassword({
             email, password,
         })  
+
         
         const cookieStore = await cookies();
         cookieStore.set('token', token, 

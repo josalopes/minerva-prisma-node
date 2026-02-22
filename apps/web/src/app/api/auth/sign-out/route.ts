@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
 
     const cookieStore = await cookies()
     cookieStore.delete('token')
+    // cookieStore.delete('current-org')
     
     return NextResponse.redirect(redirectUrl)
 }

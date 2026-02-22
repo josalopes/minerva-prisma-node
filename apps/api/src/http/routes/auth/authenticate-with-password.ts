@@ -31,11 +31,9 @@ export async function authenticateWithPassword(app: FastifyInstance) {
         async (request, reply) => {
             const { email, password } = request.body
 
-            console.log('Logando com e-mail e senha',email, password)
-
-            const userFromEmail = await prisma.user.findUnique({
+            const userFromEmail = await prisma.user.findFirst({
                 where: {
-                email,
+                    email,
                 },
             })
 

@@ -11,7 +11,8 @@ export async function isAuthenticated() {
 }
 
 export async function getCurrentOrg() {
-    return (await cookies()).get('org')?.value ?? null
+    const currentOrg = (await cookies()).get('current-org')?.value ?? null
+    return currentOrg
 }
 
 export async function getCurrentMembership() {

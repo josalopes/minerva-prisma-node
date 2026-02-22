@@ -1,6 +1,5 @@
 import { type FormEvent, useTransition, useState } from "react";
 import { requestFormReset } from "react-dom"
-
 interface FormState {
     success: boolean,
     message: string | null,

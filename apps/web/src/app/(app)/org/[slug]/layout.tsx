@@ -1,21 +1,34 @@
-import Header from "@/components/header"
-import { Tabs } from "@/components/tabs"
+import { ReactNode } from "react";
+import { getOrganizationBySlug } from "@/http/get-organization-by-slug";
+import { Organization, OrganizationProvider } from "@/contexts/organization-context";
+import { SidebarDashboardClient } from "@/app/(panel)/dashboard/_components/sidebar";
+interface OrgLayoutProps {
+  children: ReactNode;
+  params: Promise<{
+    slug: string;
+  }>;
+}
 
 export default async function OrgLayout({
-    children,
-}: Readonly<{
-    children: React.ReactNode
-}>) {
-    return (
-        <div>
-            <div className="pt-6">
-                <Header />
-                <Tabs />
-            </div>
+  children,
+  params,
+}: OrgLayoutProps) {
+  const { slug } = await params  
+  const response = (await getOrganizationBySlug(slug)).organization;
+  
+  const organization: Organization = {
+    id: response.id,
+    name: response.name,
+    slug: response.slug,
+    avatarUrl: response.avatarUrl,
+    logoUrl: response.logoUrl,
+  };
 
-            <main className="mx-auto w-full max-w-[1200px] py-4">
-                {children}
-            </main>
-        </div>
-    )
+  return (
+    <OrganizationProvider organization={organization}>
+        <SidebarDashboardClient>
+            {children}
+        </SidebarDashboardClient>
+    </OrganizationProvider>
+  );
 }

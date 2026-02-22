@@ -65,7 +65,7 @@ async function seed() {
         data: {
             name: 'Acme Inc (Admin)',
             domain: 'acme.com',
-            cpfCnpj: '23456789100050',
+            cpfCnpj: '04324706000160',
             slug: (await gerarNextVal('seed_org') + BigInt(nextValOrg)).toString(),
             avatarUrl: faker.image.avatarGitHub(),
             shouldAttachUserByDomain: true,
@@ -136,7 +136,7 @@ async function seed() {
     await prisma.organization.create({
     data: {
       name: 'Acme Inc (Member)',
-      cpfCnpj: '04674405300',
+      cpfCnpj: '22124143000148',
       slug: (await gerarNextVal('seed_org') + BigInt(nextValOrg)).toString(),
       avatarUrl: faker.image.avatarGitHub(),
       ownerId: user.id,

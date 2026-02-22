@@ -1,24 +1,40 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider } from "next-themes";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/lib/react-query";
 import { Providers } from "./providers";
-
+import { getOrganizationBySlug } from "@/http/get-organization-by-slug";
+import { cookies } from "next/headers";
+import { OrganizationProvider } from "@/contexts/organization-context";
+import { getCurrentOrg } from "@/auth/auth";
 
 export const metadata: Metadata = {
-  title: "Create Next App",
+  title: "Minerva App",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const slug = await getCurrentOrg()
+
+  let organization = null
+
+  if (slug) {
+    organization = (await getOrganizationBySlug(slug)).organization;
+  }
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="pt">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          {organization ? (
+          <OrganizationProvider organization={organization}>
+            {children}
+          </OrganizationProvider>
+        ) : (
+          children
+        )}
+        </Providers>
       </body>
     </html>
   );

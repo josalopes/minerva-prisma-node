@@ -9,7 +9,7 @@ import { Billing } from "./billing"
 export default async function Settings() {
     const currentOrg = await getCurrentOrg()
     const permissions = await ability()
-    const { organizacao } = await getOrganization(currentOrg!)
+    const { organization } = await getOrganization(currentOrg!)
 
     const canUpdateOrganization = permissions?.can('update', 'Organization')
     const canGetBilling = permissions?.can('get', 'Billing')
@@ -31,17 +31,17 @@ export default async function Settings() {
                         </CardHeader>
                         <CardContent>
                             <OrganizationForm isUpdating initialData={{
-                                name: organizacao.name,
-                                cpfCnpj: organizacao.cpfCnpj,
-                                personType: organizacao.personType,
-                                domain: organizacao.domain ?? undefined,
-                                shouldAttachUsersByDomain: organizacao.shouldAttachUsersByDomain,
+                                name: organization.name,
+                                cpfCnpj: organization.cpfCnpj,
+                                personType: organization.personType,
+                                domain: organization.domain ?? undefined,
+                                shouldAttachUsersByDomain: organization.shouldAttachUsersByDomain,
                             }}/>
                         </CardContent>
                     </Card>
                 )}
                 
-                {canGetBilling && <Billing />}
+                {/* {canGetBilling && <Billing />} */}
 
                 {canShutdownOrganization && (
                     <Card>

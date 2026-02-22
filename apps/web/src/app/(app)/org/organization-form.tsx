@@ -20,7 +20,7 @@ import { AlertTriangle, Loader2 } from "lucide-react";
 import { OrganizationSchema } from "./actions";
 import { createOrganizationAction } from "./actions";
 import { updateOrganizationAction } from "./actions";
-import { useOrganizationForm } from "./organizacao-form";
+import { useOrganizationForm } from "./use-organization-form";
 import { formatCpfCnpj } from "@/utils/formata-cpf-cnpj";
 
 interface OrganizationFormProps {
@@ -29,7 +29,10 @@ interface OrganizationFormProps {
 }
 
 export function OrganizationForm({ isUpdating, initialData }: OrganizationFormProps) {
-    const form = useOrganizationForm();
+    const form = useOrganizationForm({
+        initialValues: initialData
+    });
+
     const formAction = isUpdating ? updateOrganizationAction : createOrganizationAction
    
     const [{ success, message, errors }, handleSubmit, isPending] = useFormState(
@@ -74,7 +77,7 @@ export function OrganizationForm({ isUpdating, initialData }: OrganizationFormPr
                                     <Input 
                                         type="text"
                                         id="name"
-                                        defaultValue={initialData?.name} 
+                                        // defaultValue={initialData?.name} 
                                         placeholder="Digite o nome da Organização" 
                                         {...field} 
                                     />
@@ -98,7 +101,7 @@ export function OrganizationForm({ isUpdating, initialData }: OrganizationFormPr
                             <FormControl>
                                 <RadioGroup
                                     className="flex flex-row gap-4"
-                                    defaultValue={field.value}
+                                    // defaultValue={field.value}
                                     onValueChange={field.onChange}
                                     {...field}
                                 >

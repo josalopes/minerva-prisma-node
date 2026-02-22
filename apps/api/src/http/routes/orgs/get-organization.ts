@@ -25,16 +25,29 @@ export async function getOrganization(app: FastifyInstance) {
                             message: z.string(),
                             }),
                         200: z.object({
-                            organizacao: z.object({
+                            organization: z.object({
                                 id: z.uuid(),
                                 name: z.string(),
                                 slug: z.string(),
                                 domain: z.string().nullable(),
-                                shouldAttachUsersByDomain: z.boolean(),
+                                shouldAttachUserByDomain: z.boolean(),
                                 avatarUrl: z.url().nullable(),
+                                logoUrl: z.url().nullable(),
                                 createdAt: z.date(),
-                                updatedAt: z.date(),
-                                ownerId: z.uuid()
+                                updatedAt: z.date().nullable(),
+                                deletedAt: z.date().nullable(),
+                                ownerId: z.uuid().nullable(),
+                                addresses: z.array(
+                                    z.object({
+                                        id: z.int(),
+                                        street: z.string().nullable(),
+                                        number: z.string().nullable(),
+                                        district: z.string().nullable(),
+                                        city: z.string().nullable(),
+                                        state: z.string().nullable(),
+                                        zipCode: z.string().nullable(),
+                                    })
+                                ),
                             }),
                         })
                     },                
@@ -43,27 +56,39 @@ export async function getOrganization(app: FastifyInstance) {
             async (request, reply) => {
                 const { slug } = request.params
                 const organization = await prisma.organization.findUnique({
-                  where: { slug },
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    domain: true,
+                    shouldAttachUserByDomain: true,
+                    avatarUrl: true,
+                    logoUrl: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    deletedAt: true,
+                    ownerId: true,
+                    addresses: {
+                        select: {
+                            id: true,
+                            street: true,
+                            number: true,
+                            district: true,
+                            city: true,
+                            state: true,
+                            zipCode: true,
+                        },
+                    },
+                  }, 
+                    where: { slug },
                 })
 
                 if (!organization) {
                     throw new BadRequestError('Organização não encontrada')
                 }
 
-                const organizacao = {
-                    id: organization.id,
-                    name: organization?.name,
-                    slug: organization.slug,
-                    domain: organization.domain,
-                    shouldAttachUsersByDomain: organization.shouldAttachUserByDomain,
-                    avatarUrl: organization.avatarUrl,
-                    createdAt: organization.createdAt,
-                    updatedAt: organization.updatedAt,
-                    ownerId: organization.ownerId
-                }
-
                 return reply.status(200).send(
-                    {organizacao}
+                    {organization}
                 )
             }
         )

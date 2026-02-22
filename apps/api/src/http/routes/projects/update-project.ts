@@ -14,7 +14,7 @@ export async function updateProject(app: FastifyInstance) {
       .put('/organization/:slug/project/:projectId', {
         schema: {
             tags: ['Projects'],
-            summary: 'Atuaiza dados de projeto de uma organização',
+            summary: 'Atualiza dados de projeto de uma organização',
             body: z.object({
                 name: z.string(),
                 description: z.string(),

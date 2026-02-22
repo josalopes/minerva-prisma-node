@@ -1,7 +1,7 @@
 import { api } from "./api-client";
 
 interface GetOrganizationResponse {
-    organizacao: {
+    organization: {
         id: string;
         name: string;
         cpfCnpj: string,

@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { usePathname } from "next/navigation"
+import Image from "next/image";
+import { useState, useTransition } from "react";
+import { usePathname, useRouter } from "next/navigation"
 import clsx from "clsx";
+
 import { 
     Banknote, 
     CalendarCheck2, 
@@ -10,7 +12,11 @@ import {
     ChevronRight, 
     Folder, 
     List, 
-    Settings
+    Settings,
+    UserPen,
+    Users, Store,
+    Warehouse,
+    Feather
  } from "lucide-react";
 
 import {
@@ -27,17 +33,83 @@ import {
 } from "@/components/ui/collapsible"
 
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import Image from "next/image";
-import logoImg from "../../../../../public/logo-odonto.png"
 
-export function SidebarDashboard({ children }: { children: React.ReactNode }) {
+import logoImg from "../../../../../public/logo-ambiental-reciclagem.png"
+import { useOrganization } from "@/hooks/use-organization";
+import { SidebarActionButton } from "./sidebar-action-button";
+import { SidebarNavLink } from "./sidebar-nav-link";
+
+export function SidebarDashboardClient({ children }: { children: React.ReactNode }) {
+    const router = useRouter()
+    const { currentOrg } = useOrganization()
+    const [isPending, startTransition] = useTransition()
+    const logoUrl = currentOrg.logoUrl
+    
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    
+    function handleOrganizationAvatar() {
+        if (!currentOrg) {
+            return
+        }
+
+        startTransition(() => {
+            router.push(`/org/${currentOrg.slug}/update-avatar-organization`)
+        })
+    }
+    
+    function handleOrganizationLogo() {
+        if (!currentOrg) {
+            return
+        }
+
+        startTransition(() => {
+            router.push(`/org/${currentOrg.slug}/update-logo-organization`)
+        })
+    }
+
+    function handleMembers() {
+        if (!currentOrg) {
+            return
+        }
+
+        startTransition(() => {
+            router.push(`/org/${currentOrg.slug}/members`)
+        })
+    }
+
+    function handleProduct() {
+        if (!currentOrg) {
+            return
+        }
+
+        startTransition(() => {
+            router.push(`/org/${currentOrg.slug}/products`)
+        })
+    }    
+    
+    function handleConfiguration() {
+        if (!currentOrg) {
+            return
+        }
+
+        startTransition(() => {
+            router.push(`/org/${currentOrg.slug}/settings`)
+        })
+    }
+    
+    function handleAddress() {
+        if (!currentOrg) {
+            return
+        }
+
+        startTransition(() => {
+            router.push(`/org/${currentOrg.slug}/address`)
+        })
+    }
 
     return (
         <div className="flex min-h-screen w-full">
-
             <aside
               className={clsx("flex flex-col border-r bg-background transition-all duration-300 p-4 h-full", {
                 "w-20": isCollapsed,
@@ -48,10 +120,14 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
                 <div className="mb-6 mt-4">
                     {!isCollapsed && (
                         <Image 
-                          src={logoImg} 
-                          alt="Logo do odontopro" 
+                          src={logoUrl || logoImg} 
+                          alt="Logo da organização" 
+                          width={0}
+                          height={0}
+                          sizes="100vw"
                           priority
                           quality={100}
+                          className="w-40 h-auto"
                         />
                     )}
                 </div>
@@ -65,23 +141,42 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
 
                 {isCollapsed && (
                     <nav className="flex flex-col gap-1 overflow-hidden mt-2">
-                       <SidebarLink 
-                            href="/dashboard"
-                            label="Agendamentos"
-                            pathname={pathname}
+                       <SidebarActionButton
+                            icon={<UserPen className="w-6 h-6" />}
+                            label="Avatar"
                             isCollapsed={isCollapsed}
+                            onClick={handleOrganizationAvatar}
+                        />
+
+                        <SidebarActionButton
+                            icon={<Feather className="w-6 h-6" />}
+                            label="Logo"
+                            isCollapsed={isCollapsed}
+                            onClick={handleOrganizationLogo}
+                        />
+
+                        <SidebarActionButton
+                            icon={<Users className="w-6 h-6" />}
+                            label="Membros"
+                            isCollapsed={isCollapsed}
+                            onClick={handleMembers}
+                        />
+
+                        <SidebarActionButton
+                            icon={<Warehouse className="w-6 h-6" />}
+                            label="Produtos"
+                            isCollapsed={isCollapsed}
+                            onClick={handleProduct}
+                        />
+
+                        <SidebarActionButton
                             icon={<CalendarCheck2 className="w-6 h-6" />}
-                        />
-
-                        <SidebarLink 
-                            href="/dashboard/services"
-                            label="Serviços"
-                            pathname={pathname}
+                            label="Organização"
                             isCollapsed={isCollapsed}
-                            icon={<Folder className="w-6 h-6" />}
+                            onClick={handleConfiguration}
                         />
-
-                        <SidebarLink 
+                            
+                        <SidebarNavLink 
                             href="/dashboard/profile"
                             label="Meu perfil"
                             pathname={pathname}
@@ -89,7 +184,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
                             icon={<Settings className="w-6 h-6" />}
                         />
 
-                        <SidebarLink 
+                        <SidebarNavLink 
                             href="/dashboard/plans"
                             label="Planos"
                             pathname={pathname}
@@ -103,44 +198,70 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
                   <CollapsibleContent>
                     <nav className="flex flex-col gap-1 overflow-hidden">
                         <span className="text-sm text-gray-400 font-medium mt-1 uppercase">
-                            Painel
+                            Organização
+                        </span>
+                        
+                        <SidebarActionButton
+                            icon={<UserPen className="w-6 h-6" />}
+                            label="Avatar"
+                            isCollapsed={isCollapsed}
+                            onClick={handleOrganizationAvatar}
+                        />
+
+                        <SidebarActionButton
+                            icon={<Feather className="w-6 h-6" />}
+                            label="Logo"
+                            isCollapsed={isCollapsed}
+                            onClick={handleOrganizationLogo}
+                        />
+
+                        <SidebarActionButton
+                            icon={<Users className="w-6 h-6" />}
+                            label="Membros"
+                            isCollapsed={isCollapsed}
+                            onClick={handleMembers}
+                        />
+
+                        <SidebarActionButton
+                            icon={<Warehouse className="w-6 h-6" />}
+                            label="Produtos"
+                            isCollapsed={isCollapsed}
+                            onClick={handleProduct}
+                        />
+
+                        <span className="text-sm text-gray-400 font-medium mt-1 uppercase">
+                            Configurações
                         </span>
 
-                        <SidebarLink 
-                              href="/dashboard"
-                              label="Agendamentos"
-                              pathname={pathname}
-                              isCollapsed={isCollapsed}
-                              icon={<CalendarCheck2 className="w-6 h-6" />}
-                            />
+                        <SidebarActionButton
+                            icon={<Store className="w-6 h-6" />}
+                            label="Organização"
+                            isCollapsed={isCollapsed}
+                            onClick={handleConfiguration}
+                        />
+                        
+                        <SidebarActionButton
+                            icon={<Store className="w-6 h-6" />}
+                            label="Endereços"
+                            isCollapsed={isCollapsed}
+                            onClick={handleAddress}
+                        />
 
-                            <SidebarLink 
-                              href="/dashboard/services"
-                              label="Serviços"
-                              pathname={pathname}
-                              isCollapsed={isCollapsed}
-                              icon={<Folder className="w-6 h-6" />}
-                            />
+                        <SidebarNavLink 
+                            href="/dashboard/profile"
+                            label="Meu perfil"
+                            pathname={pathname}
+                            isCollapsed={isCollapsed}
+                            icon={<Settings className="w-6 h-6" />}
+                        />
 
-                            <span className="text-sm text-gray-400 font-medium mt-1 uppercase">
-                                Configurações
-                            </span>
-
-                            <SidebarLink 
-                              href="/dashboard/profile"
-                              label="Meu perfil"
-                              pathname={pathname}
-                              isCollapsed={isCollapsed}
-                              icon={<Settings className="w-6 h-6" />}
-                            />
-
-                            <SidebarLink 
-                              href="/dashboard/plans"
-                              label="Planos"
-                              pathname={pathname}
-                              isCollapsed={isCollapsed}
-                              icon={<Banknote className="w-6 h-6" />}
-                            />
+                        <SidebarNavLink 
+                            href="/dashboard/plans"
+                            label="Planos"
+                            pathname={pathname}
+                            isCollapsed={isCollapsed}
+                            icon={<Banknote className="w-6 h-6" />}
+                        />
                     </nav>
                   </CollapsibleContent>
                 </Collapsible>
@@ -175,7 +296,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
                         <SheetDescription>Menu Administrativo</SheetDescription>
 
                         <nav className="grid gap-2 text-base pt-5">
-                            <SidebarLink 
+                            <SidebarNavLink 
                               href="/dashboard"
                               label="Agendamentos"
                               pathname={pathname}
@@ -183,7 +304,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
                               icon={<CalendarCheck2 className="w-6 h-6" />}
                             />
 
-                            <SidebarLink 
+                            <SidebarNavLink 
                               href="/dashboard/services"
                               label="Serviços"
                               pathname={pathname}
@@ -191,7 +312,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
                               icon={<Folder className="w-6 h-6" />}
                             />
                             
-                            <SidebarLink 
+                            <SidebarNavLink 
                               href="/dashboard/profile"
                               label="Meu perfil"
                               pathname={pathname}
@@ -199,7 +320,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
                               icon={<Settings className="w-6 h-6" />}
                             />
 
-                            <SidebarLink 
+                            <SidebarNavLink 
                               href="/dashboard/plans"
                               label="Planos"
                               pathname={pathname}
@@ -216,32 +337,5 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
                 </main>
             </div>
         </div>
-    )
-}
-
-interface SidebarLinkProps {
-    href: string;
-    icon: React.ReactNode;
-    label: string;
-    pathname: string;
-    isCollapsed: boolean
-}
-
-function SidebarLink({ href, icon, label, pathname, isCollapsed}: SidebarLinkProps) {
-    return (
-        <Link 
-          href={href}
-        >
-            <div
-                className={clsx("flex items-center gap-2 px-3 py-2 rounded-md transition-colors", {
-                "text-white bg-blue-500": pathname === href,
-                "text-gray-700 hover:bg-gray-100": pathname !== href,
-                })}
-            >
-                <span className="w-6 h-6">{icon}</span>
-                {!isCollapsed && <span>{label}</span>}
-            </div>
-                  
-        </Link>
     )
 }

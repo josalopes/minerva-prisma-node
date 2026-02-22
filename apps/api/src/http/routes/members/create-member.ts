@@ -72,9 +72,10 @@ export async function createMember(app: FastifyInstance) {
 
         const login = (await gerarNextVal('seed_login') + BigInt(nextValUserLogin)).toString()
 
-        const userWithSameEmail = await prisma.user.findUnique({
+        const userWithSameEmail = await prisma.user.findFirst({
             where: {
-                email
+                email,
+                deletedAt: null
             },
         })
 

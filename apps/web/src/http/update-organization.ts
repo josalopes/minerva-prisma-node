@@ -8,11 +8,11 @@ interface UpdateOrganizationRequest {
     shouldAttachUsersByDomain: boolean,
 }
 
-type CreateOrganizationResponse = void
+type UpdateOrganizationResponse = void
 
 export async function updateOrganization({
     org, name, domain, shouldAttachUsersByDomain,
-}: UpdateOrganizationRequest): Promise<CreateOrganizationResponse> {
+}: UpdateOrganizationRequest): Promise<UpdateOrganizationResponse> {
     const response = await api.put(`organization/${org}`, {
         json: { 
             name, 

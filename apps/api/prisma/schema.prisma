@@ -22,14 +22,16 @@ model SeedUserLogin {
 }
 
 model User {
-  id           String   @id @default(uuid())
+  id           String  @id @default(uuid())
   name         String?
-  email        String   @unique
-  login        String   @unique
-  passwordHash String?  @map("password_hash")
-  avatarUrl    String?  @map("avatar_url")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  email        String
+  login        String  @unique
+  passwordHash String? @map("password_hash")
+  avatarUrl    String? @map("avatar_url")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   tokens             Token[]
   accounts           Account[]
@@ -58,6 +60,8 @@ model Account {
   user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String          @map("user_id")
   createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  deletedAt         DateTime?       @map("deleted_at")
 
   @@unique([provider, userId])
   @@map("account")
@@ -74,7 +78,9 @@ model Invite {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String       @map("organization_id")
 
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@unique([email, organizationId])
   @@index([email])
@@ -91,11 +97,16 @@ model Member {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @map("user_id")
 
-  email  String?
-  cpf    String?
-  status Boolean @default(true)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-  @@unique([organizationId, userId])
+  email     String?
+  cpf       String?
+  addresses Address[]
+
+  @@index([organizationId])
+  @@index([userId])
   @@map("member")
 }
 
@@ -107,32 +118,75 @@ model Organization {
   domain                   String?    @unique
   shouldAttachUserByDomain Boolean    @default(false) @map("should_attach_user_by_domain")
   avatarUrl                String?    @map("avatar_url")
+  logoUrl                  String?    @map("logo_url")
   personType               PersonType @default(JURIDICA) @map("tipo_pessoa")
   stripeCustomerId         String?    @map("stripe_customer_id")
-  status                   Boolean    @default(true)
+  email                    String?    @map("email")
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-  owner   User   @relation(fields: [ownerId], references: [id])
-  ownerId String @map("user_id")
+  owner   User?   @relation(fields: [ownerId], references: [id])
+  ownerId String? @map("user_id")
 
   subscription Subscription?
   invites      Invite[]
   members      Member[]
   projects     Project[]
+  products     Product[]
+  customers    Customer[]
+  transactions Transaction[]
+  addresses    Address[]
 
+  @@index([ownerId])
   @@map("organization")
 }
 
+model Address {
+  id         Int         @id @default(autoincrement())
+  ownerType  String // 'organization' | 'user' | 'customer' | 'supplier'
+  ownerId    String
+  street     String?     @map("street")
+  number     String?     @map("number")
+  complement String?     @map("complement")
+  district   String?     @map("district")
+  city       String?     @map("city")
+  state      String?     @map("state")
+  zipCode    String?     @map("postalCode")
+  country    String      @default("BR")
+  isPrimary  Boolean     @default(false) @map("is_primary")
+  type       AddressType @default(GENERAL)
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
+
+  member   Member? @relation(fields: [memberId], references: [id])
+  memberId String?
+
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+
+  // @@index([organizationId])
+  // @@index([memberId])
+  // @@index([customerId])
+  @@index([ownerType, ownerId])
+  @@map("address")
+}
+
 model Project {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   description String?
-  slug        String   @unique
-  avatarUrl   String?  @map("avatar_url")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  slug        String    @unique
+  avatarUrl   String?   @map("avatar_url")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
 
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String       @map("organization_id")
@@ -144,13 +198,14 @@ model Project {
 }
 
 model Subscription {
-  id      Int     @id @default(autoincrement())
+  id      String  @id @default(uuid())
   status  String
   plan    Plan
   priceId String? @map("price_id")
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   organizationId String       @unique @map("organization_id")
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -158,8 +213,99 @@ model Subscription {
   @@map("subscription")
 }
 
+model Product {
+  id          String      @id @default(uuid())
+  code        String
+  name        String
+  price       Int
+  measureUnit ProductUnit @default(kilo) @map("measure_unit")
+  imageUrl    String?     @map("image_url")
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String       @map("organization_id")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map("deleted_at")
+
+  transactionItems TransactionItems[]
+
+  @@unique([organizationId, code])
+  @@map("product")
+}
+
+model Customer {
+  id             String       @id @default(uuid())
+  name           String?
+  cpfCnpj        String?      @map("cpf_cnpj")
+  code           String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String       @map("organization_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  transactions Transaction[]
+  addresses    Address[]
+
+  @@unique([organizationId, cpfCnpj])
+  @@index([organizationId, name])
+  @@map("customer")
+}
+
+model Transaction {
+  id              String          @id @default(uuid())
+  date            DateTime
+  transactionType TransactionType
+  totalValue      Int
+  customer        Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId      String          @map("customer_id")
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String       @map("organization_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  transactionItems TransactionItems[]
+
+  @@index([organizationId])
+  @@index([customerId])
+  @@map("transaction")
+}
+
+model TransactionItems {
+  id       Int @id @default(autoincrement())
+  quantity Int
+  value    Int
+
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  transactionId String      @map("transaction_id")
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String  @map("product_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("transaction_items")
+}
+
 enum TokenType {
   PASSWORD_RECOVER
+}
+
+enum TransactionType {
+  COMPRA
+  VENDA
+}
+
+enum ProductUnit {
+  kilo
+  litro
 }
 
 enum Role {
@@ -182,6 +328,18 @@ enum Gender {
 enum Plan {
   BASIC
   PROFESSIONAL
+}
+
+enum AddressOwnerType {
+  ORGANIZATION
+  CUSTOMER
+  MEMBER
+}
+
+enum AddressType {
+  GENERAL
+  BILLING
+  SHIPPING
 }
 
 enum AccountProvider {

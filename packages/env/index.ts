@@ -14,6 +14,7 @@ export const env = createEnv({
     client: {},
     shared: {
         NEXT_PUBLIC_API_URL: z.url(),
+        NEXT_PUBLIC_URL: z.url(),
     },
     runtimeEnv: {
         PORT: process.env.PORT,
@@ -23,6 +24,7 @@ export const env = createEnv({
         GITHUB_OAUTH_CLIENT_SECRET: process.env.GITHUB_OAUTH_CLIENT_SECRET,
         GITHUB_OAUTH_CLIENT_REDIRECT_URI: process.env.GITHUB_OAUTH_CLIENT_REDIRECT_URI,
         NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+        NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     },
     emptyStringAsUndefined: true,
 })

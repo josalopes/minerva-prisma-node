@@ -1,0 +1,30 @@
+.cq-carousel {
+  container-type: inline-size;
+}
+
+.carousel-gradient-left,
+.carousel-gradient-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.carousel-gradient-left {
+  left: 0;
+  background: linear-gradient(to right, var(--background), transparent);
+}
+
+.carousel-gradient-right {
+  right: 0;
+  background: linear-gradient(to left, var(--background), transparent);
+}
+
+/* Container Queries */
+@container (max-width: 600px) {
+  .cq-carousel .carousel-item {
+    flex: 0 0 100%;
+  }
+}

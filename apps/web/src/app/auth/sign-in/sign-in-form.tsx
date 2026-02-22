@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 // import Image from "next/image";
-import { useTransition, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -16,12 +15,13 @@ import { Loader2, AlertTriangle } from "lucide-react";
 // import githubIcon from "@/assets/github-icon.svg"
 import { signInWithEmailAndPassword } from './actions'
 import { useFormState } from '@/hooks/use-form-state'
-import { signInWithCode, signInWithGithub } from "../actions";
+import { signInWithCode } from "../actions";
+
 
 export function SignInForm() {
     const router = useRouter()
     const searchParams = useSearchParams()
-
+    
     const [{ success, message, errors }, handleSubmit, isPending] = useFormState(
         signInWithEmailAndPassword,
         () => {

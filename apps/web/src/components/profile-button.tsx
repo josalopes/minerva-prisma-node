@@ -6,7 +6,6 @@ import {
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { ChevronDown, LogOut } from "lucide-react";
-import Link from "next/link";
 import { auth } from "@/auth/auth";
 
 function getInitials(name: string) {
@@ -38,9 +37,21 @@ export async function ProfileButton() {
 
             <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
+                    <a href="/profile">
+                    <LogOut className="mr-2 size-4" />
+                        Trocar foto do perfil
+                    </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <a href="/api/auth/reset-password">
+                    <LogOut className="mr-2 size-4" />
+                        Trocar senha
+                    </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                     <a href="/api/auth/sign-out">
                     <LogOut className="mr-2 size-4" />
-                        Sign out
+                        Sair
                     </a>
                 </DropdownMenuItem>
             </DropdownMenuContent>

@@ -1,5 +1,4 @@
 import { OrganizationForm } from "../org/organization-form";
-// import { OrganizationForm } from "../org/organization-form";
 
 export default function CreateOrganization() {
     return (
@@ -8,7 +7,6 @@ export default function CreateOrganization() {
                 <h1 className="text-2xl font-bold">Criar Organização</h1>    
             
                 <OrganizationForm />
-                {/* <OrganizationForm /> */}
             </main>
         </div>
     )

@@ -3,7 +3,7 @@ interface CreateOrganizationRequest {
     name: string,
     cpfCnpj: string,
     domain: string | undefined,
-    shouldAttachUsersByDomain: boolean,
+    shouldAttachUsersByDomain?: boolean,
     personType: string,
 }
 
