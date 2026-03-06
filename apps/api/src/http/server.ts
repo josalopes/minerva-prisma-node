@@ -1,3 +1,4 @@
+// import { createAddress } from '@/services/addresses';
 import {fastify} from 'fastify'
 import fastifyCors from '@fastify/cors'
 import fastifyJwt from '@fastify/jwt'
@@ -33,7 +34,11 @@ import { updateOrganizationLogo } from './routes/orgs/update-organization-logo'
 import { shutdownOrganization } from './routes/orgs/shutdown-organization'
 import { transferOrganization } from './routes/orgs/transfer-organization'
 
-import { addressRoutes } from './routes/addresses/address-routes'
+// import { addressRoutes } from './routes/addresses/address-routes'
+import { createAddress } from './routes/addresses/create-address'
+import { updateAddress } from './routes/addresses/update-address'
+import { getAddresses } from './routes/addresses/get-address'
+import { deleteAddress } from './routes/addresses/delete-address'
 
 import { createProject } from './routes/projects/create-project'
 import { deleteProject } from './routes/projects/delete-project'
@@ -124,7 +129,11 @@ app.register(updateOrganizationLogo)
 app.register(shutdownOrganization)
 app.register(transferOrganization)
 
-app.register(addressRoutes)
+// app.register(addressRoutes)
+app.register(createAddress)
+app.register(updateAddress)
+app.register(getAddresses)
+app.register(deleteAddress)
 
 app.register(createProject)
 app.register(deleteProject)

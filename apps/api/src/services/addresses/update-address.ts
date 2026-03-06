@@ -1,7 +1,10 @@
+import { AddressType } from '@prisma/client'
 import { addressRepository } from '../../repositories/address-repository'
 
 interface UpdateAddressRequest {
   id: number
+  // ownerType: string
+  // ownerId: string
   street?: string
   number?: string
   complement?: string
@@ -10,9 +13,10 @@ interface UpdateAddressRequest {
   state?: string
   zipCode?: string
   country?: string
+  type?: AddressType
 }
 
-export async function updateAddress(data: UpdateAddressRequest) {
+export async function updateAddressService(data: UpdateAddressRequest) {
   const { id, ...rest } = data
 
   const address = await addressRepository.update(id, rest)

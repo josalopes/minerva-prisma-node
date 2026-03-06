@@ -1,3 +1,4 @@
+import { AddressType } from "@prisma/client";
 import z from "zod";
 
 export const personTypeSchema = z.union([
@@ -22,3 +23,30 @@ export const typeAddressSchema = z.union([
 ])
 
 export type typeAddress = z.infer<typeof typeAddressSchema>
+
+export const newAddressSchema = z.object({
+    ownerType: z.enum(["organization", "member"]),
+    ownerId: z.string(),
+    type: z.string(),
+    street: z.string().optional(),
+    number: z.string().optional(),
+    complement: z.string().optional(),
+    district: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    zipCode: z.string().optional(),
+})
+
+export const updateAddressSchema = z.object({
+    type: z.string(),
+    street: z.string().optional(),
+    number: z.string().optional(),
+    complement: z.string().optional(),
+    district: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    zipCode: z.string().optional(),
+})
+
+// export type newAddress = z.infer<typeof newAddressSchema>
+// export type updateAddress = z.infer<typeof updateAddressSchema>

@@ -2,10 +2,12 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/http/middlewares/auth";
+import { updateAddressSchema } from "@/http/schemas";
+import { AddressType } from "@prisma/client";
+import { updateAddressService } from "@/services/addresses/update-address";
 
-export async function createProject(app: FastifyInstance) {
+export async function updateAddress(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
       .register(auth)
@@ -14,15 +16,17 @@ export async function createProject(app: FastifyInstance) {
             tags: ['Adrdresses'],
             summary: 'Atualiza o endereço de uma entidade',
             body: z.object({
-                street: z.string().nullable(),
-                number: z.string().nullable(),
-                district: z.string().nullable(),
-                city: z.string().nullable(),
-                state: z.string().nullable(),
-                postalCode: z.string().nullable(),
+                type: z.string(),
+                street: z.string().optional(),
+                number: z.string().optional(),
+                complement: z.string().optional(),
+                district: z.string().optional(),
+                city: z.string().optional(),
+                state: z.string().optional(),
+                zipCode: z.string().optional(),
             }),
             params: z.object({
-                id: z.string()
+                id: z.coerce.number()
             }),
             response: {
                 400: z.object({
@@ -32,43 +36,30 @@ export async function createProject(app: FastifyInstance) {
                         message: z.string(),
                     }),
                 201: z.object({
-                        addressId: z.int()
+                        ownerType: z.string(),
+                        ownerId: z.string(),
+                        type: z.string(),
+                        street: z.string().nullable(),
+                        number: z.string().nullable(),
+                        complement: z.string().nullable(),
+                        district: z.string().nullable(),
+                        city: z.string().nullable(),
+                        state: z.string().nullable(),
+                        zipCode: z.string().nullable(),
                     })
             }
         },
       }, 
       async (request, reply) => {
         const { id } = request.params
-        // const userId = await request.getCurrentUserid()
-        
-        // const { organization, membership } = await request.getUserMembership(slug)
+        const data = updateAddressSchema.parse(request.body);
 
-        // if (!organization) {
-        //     return reply.status(400).send({ message: 'Organização inexistente' })
-        // }
-        
-        // const { cannot } = getUserPermissions(userId, membership.role)
-        
-        // if (cannot('create', 'Project')) {
-        //     return reply.status(401).send({ message: 'Você não tem permissão para criar projetos' })
-        // }  
-      
-        const { street, number, district, city, state, postalCode } = request.body
-
-        // const address = await prisma.address.update({
-        //     data: {
-        //         street,
-        //         number,
-        //         district,
-        //         city,
-        //         state,
-        //         postalCode,
-        //         ownerId: id
-        //     },
-        // })  
-
-        // return reply.status(201).send({
-        //     addressId: address.id,
-        // })
+        const address = await updateAddressService({
+            ...data,
+            id,
+            type: data.type as AddressType,
+        });
+    
+        return reply.status(201).send(address)
       })
 }

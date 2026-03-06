@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { AddressOwnerType } from "./types";
 
-export async function getAddresses(
+export async function getAddressesService(
   ownerType: AddressOwnerType,
   ownerId: string
 ) {
@@ -10,7 +10,7 @@ export async function getAddresses(
       ? { organizationId: ownerId }
       : { memberId: ownerId };
 
-  return prisma.address.findMany({
+return prisma.address.findMany({
     where,
     orderBy: {
       id: "desc",

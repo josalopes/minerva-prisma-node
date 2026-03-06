@@ -22,6 +22,7 @@ import { createOrganizationAction } from "./actions";
 import { updateOrganizationAction } from "./actions";
 import { useOrganizationForm } from "./use-organization-form";
 import { formatCpfCnpj } from "@/utils/formata-cpf-cnpj";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface OrganizationFormProps {
     isUpdating?: boolean,
@@ -153,7 +154,7 @@ export function OrganizationForm({ isUpdating, initialData }: OrganizationFormPr
                     )}
                 </div>
 
-                {/* <div className="space-y-1">
+                <div className="space-y-1">
                     <FormField
                         control={form.control}
                         name="domain"
@@ -175,9 +176,9 @@ export function OrganizationForm({ isUpdating, initialData }: OrganizationFormPr
                             </FormItem>
                         )}
                     />
-                </div> */}
+                </div>
 
-                {/* <div className="space-y-1">
+                <div className="space-y-1">
                     <div className="flex items-baseline space-x-2">
                         <Checkbox
                             name="shouldAttachUsersByDomain"
@@ -197,7 +198,7 @@ export function OrganizationForm({ isUpdating, initialData }: OrganizationFormPr
                             </p>
                         </label>
                     </div>
-                </div> */}
+                </div>
 
                 <Button type="submit" className="w-full" disabled={isPending}>
                     {isPending ? (
