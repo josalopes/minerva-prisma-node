@@ -1,7 +1,5 @@
 import { redirect } from 'next/navigation'
 import { isAuthenticated } from '@/auth/auth'
-import { OrganizationProvider } from '@/contexts/organization-context';
-import { getOrganizationBySlug } from '@/http/get-organization-by-slug';
 
 interface AppLayoutProps {
   children: React.ReactNode

@@ -1,8 +1,8 @@
 'use server'
 
-import { removeMember } from "@/http/remove-member"
-import { revokeInvite } from "@/http/revoke-invite"
-import { updateMember } from "@/http/update-member"
+import { removeMember } from "@/http/members/remove-member"
+import { revokeInvite } from "@/http/invites/revoke-invite"
+import { updateMember } from "@/http/members/update-member"
 import { Role, roleSchema } from "@saas/auth"
 import { revalidateTag } from "next/cache"
 
@@ -10,7 +10,7 @@ import { z } from 'zod'
 import { HTTPError } from 'ky'
 
 import { getCurrentOrg } from '@/auth/auth'
-import { createInvite } from "@/http/create-invite"
+import { createInvite } from "@/http/invites/create-invite"
 
 const inviteSchema = z.object({
     email: z.email({ message: 'E-mail inválido' }),

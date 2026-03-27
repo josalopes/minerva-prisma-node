@@ -1,6 +1,6 @@
 import { ability, auth, getCurrentOrg } from "@/auth/auth"
 import OrganizationAvatarForm from "./organization-logo-form";
-import { getOrganizationBySlug } from "@/http/get-organization-by-slug";
+import { getOrganizationBySlug } from "@/http/organizations/get-organization-by-slug";
 import Header from "@/components/header";
 
 export default async function OrganizationAvatar() {

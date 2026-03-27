@@ -80,16 +80,3 @@ export function useOrganizationForm({ initialValues }: UseOrganizationFormProps 
     }
   });
 }
-
-// export function useOrganizationForm() {
-//     return useForm<OrganizationFormData>({
-//         resolver: zodResolver(organizationSchema),
-//         defaultValues: {
-//             name: "",
-//             cpfCnpj: "",
-//             personType: "JURIDICA",
-//             domain: "",
-//             shouldAttachUsersByDomain: false
-//         }
-//     });
-// }

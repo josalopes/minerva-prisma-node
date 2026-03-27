@@ -4,9 +4,9 @@ import { z } from 'zod'
 import { HTTPError } from 'ky'
 import { cookies } from 'next/headers'
 
-import { signInWithPassword } from '@/http/sign-in-with-password'
-import { signInWithLoginCodePassword } from '@/http/sign-in-with-logincode-password'
-import { acceptInvite } from '@/http/accept-invite'
+import { signInWithPassword } from '@/http/profile/sign-in-with-password'
+import { signInWithLoginCodePassword } from '@/http/profile/sign-in-with-logincode-password'
+import { acceptInvite } from '@/http/invites/accept-invite'
 
 const signInSchema = z.object({
     email: z.email({ message: 'Email inválido' }),

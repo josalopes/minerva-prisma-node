@@ -46,6 +46,7 @@ export const updateAddressSchema = z.object({
     city: z.string().optional(),
     state: z.string().optional(),
     zipCode: z.string().optional(),
+    isPrimary: z.coerce.boolean().default(false),
 })
 
 // export type newAddress = z.infer<typeof newAddressSchema>

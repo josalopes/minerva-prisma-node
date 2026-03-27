@@ -39,9 +39,10 @@ export async function createAccount(app: FastifyInstance) {
             const nextValUserLogin = geradorLoginUsuario?.nextValLogin ?? 10000
             const { name, email, password } = request.body
 
-            const userWithSameEmail = await prisma.user.findUnique({
+            const userWithSameEmail = await prisma.user.findFirst({
                 where: {
-                    email
+                    email,
+                    deletedAt: null,
                 },
             })
 

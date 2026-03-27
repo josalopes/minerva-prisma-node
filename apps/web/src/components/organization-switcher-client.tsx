@@ -106,7 +106,8 @@ export function OrganizationSwitcherClient({
         <DropdownMenuSeparator />
 
         <DropdownMenuItem asChild>
-          <Link href="/create-organization">
+          <Link href="/onboarding">
+          {/* <Link href="/create-organization"> */}
             <PlusCircle className="mr-2 size-4" />
             Nova Organização
           </Link>

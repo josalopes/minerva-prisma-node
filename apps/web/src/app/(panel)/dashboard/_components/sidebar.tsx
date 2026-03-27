@@ -107,6 +107,16 @@ export function SidebarDashboardClient({ children }: { children: React.ReactNode
             router.push(`/org/${currentOrg.slug}/address`)
         })
     }
+    
+    function handleOnboarding() {
+        if (!currentOrg) {
+            return
+        }
+
+        startTransition(() => {
+            router.push(`/onboarding`)
+        })
+    }
 
     return (
         <div className="flex min-h-screen w-full">
@@ -245,6 +255,13 @@ export function SidebarDashboardClient({ children }: { children: React.ReactNode
                             label="Endereços"
                             isCollapsed={isCollapsed}
                             onClick={handleAddress}
+                        />
+                        
+                        <SidebarActionButton
+                            icon={<Store className="w-6 h-6" />}
+                            label="On boarding"
+                            isCollapsed={isCollapsed}
+                            onClick={handleOnboarding}
                         />
 
                         <SidebarNavLink 

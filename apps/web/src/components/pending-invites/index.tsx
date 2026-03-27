@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getPendingInvites } from "@/http/get-pending-invites";
+import { getPendingInvites } from "@/http/invites/get-pending-invites";
 import { useState } from "react";
 import { acceptInviteAction, rejectInviteAction } from "./actions";
 

@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 
 import semFoto from '../../../../../../public/logo-ambiental-reciclagem.png'
 import { env } from '@saas/env';
-import { updateOrganizationLogo } from '@/http/update-organization-logo';
+import { updateOrganizationLogo } from '@/http/organizations/update-organization-logo';
 
 
 interface LogoOrganizationProps {

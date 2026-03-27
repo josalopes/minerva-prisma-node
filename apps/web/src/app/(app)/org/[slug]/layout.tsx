@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { getOrganizationBySlug } from "@/http/get-organization-by-slug";
+import { getOrganizationBySlug } from "@/http/organizations/get-organization-by-slug";
 import { Organization, OrganizationProvider } from "@/contexts/organization-context";
 import { SidebarDashboardClient } from "@/app/(panel)/dashboard/_components/sidebar";
 interface OrgLayoutProps {

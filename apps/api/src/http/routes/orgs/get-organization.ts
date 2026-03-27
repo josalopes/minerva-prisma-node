@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/http/middlewares/auth";
 import { BadRequestError } from "../-errors/bad-request-error";
+import { errorResponseSchema, successResponseSchema } from "@/lib/api-response";
 
 export async function getOrganization(app: FastifyInstance) {
     app
@@ -21,35 +22,36 @@ export async function getOrganization(app: FastifyInstance) {
                         slug: z.string(),
                     }),
                     response: {
-                        400: z.object({
-                            message: z.string(),
-                            }),
-                        200: z.object({
-                            organization: z.object({
-                                id: z.uuid(),
-                                name: z.string(),
-                                slug: z.string(),
-                                domain: z.string().nullable(),
-                                shouldAttachUserByDomain: z.boolean(),
-                                avatarUrl: z.url().nullable(),
-                                logoUrl: z.url().nullable(),
-                                createdAt: z.date(),
-                                updatedAt: z.date().nullable(),
-                                deletedAt: z.date().nullable(),
-                                ownerId: z.uuid().nullable(),
-                                addresses: z.array(
-                                    z.object({
-                                        id: z.int(),
-                                        street: z.string().nullable(),
-                                        number: z.string().nullable(),
-                                        district: z.string().nullable(),
-                                        city: z.string().nullable(),
-                                        state: z.string().nullable(),
-                                        zipCode: z.string().nullable(),
-                                    })
-                                ),
-                            }),
-                        })
+                        400: errorResponseSchema,
+                        200: successResponseSchema(
+                            z.object({
+                                organization: z.object({
+                                    id: z.uuid(),
+                                    name: z.string(),
+                                    slug: z.string(),
+                                    domain: z.string().nullable(),
+                                    personType: z.string(),
+                                    shouldAttachUserByDomain: z.boolean(),
+                                    avatarUrl: z.url().nullable(),
+                                    logoUrl: z.url().nullable(),
+                                    createdAt: z.date(),
+                                    updatedAt: z.date().nullable(),
+                                    deletedAt: z.date().nullable(),
+                                    ownerId: z.uuid().nullable(),
+                                    addresses: z.array(
+                                        z.object({
+                                            id: z.int(),
+                                            street: z.string().nullable(),
+                                            number: z.string().nullable(),
+                                            district: z.string().nullable(),
+                                            city: z.string().nullable(),
+                                            state: z.string().nullable(),
+                                            zipCode: z.string().nullable(),
+                                        })
+                                    ),
+                                }),
+                            })
+                        )
                     },                
                 },
             }, 
@@ -61,6 +63,7 @@ export async function getOrganization(app: FastifyInstance) {
                     name: true,
                     slug: true,
                     domain: true,
+                    personType: true,
                     shouldAttachUserByDomain: true,
                     avatarUrl: true,
                     logoUrl: true,
@@ -87,9 +90,12 @@ export async function getOrganization(app: FastifyInstance) {
                     throw new BadRequestError('Organização não encontrada')
                 }
 
-                return reply.status(200).send(
-                    {organization}
-                )
+                return reply.status(200).send({
+                    success: true,
+                    data: {
+                        organization
+                    }
+                })
             }
         )
     }

@@ -25,20 +25,18 @@ interface Address {
   isPrimary: boolean
 }
 
-interface Addresses {
-    addresses: {
-        id: number
-        street: string
-        number: string
-        complement: string
-        district: string
-        city: string
-        state: string
-        zipCode: string
-        country: string
-        isPrimary: boolean
-    }[]
-}
+// type Addresses = {
+//         id: number
+//         street: string
+//         number: string
+//         complement: string
+//         district: string
+//         city: string
+//         state: string
+//         zipCode: string
+//         country: string
+//         isPrimary: boolean
+// }[];
 
 interface Props {
   ownerType: string
@@ -46,11 +44,11 @@ interface Props {
 }
 
 export function AddressList({ ownerType, ownerId }: Props) {
-  const [addresses, setAddresses] = useState<Addresses['addresses']>([])
+  const [addresses, setAddresses] = useState<Address[]>([])
 
   async function load() {
     const data = await getAddresses(ownerType, ownerId)
-    setAddresses(data.addresses)
+    setAddresses(data)
   }
 
 //   async function handleDelete(id: string) {
@@ -90,27 +88,6 @@ export function AddressList({ ownerType, ownerId }: Props) {
         />
       <CarouselKitDots />
     </>
-    // <CarouselKit
-    //     items={addresses}
-    //     snap="center"
-    //     fade
-    //     // autoplay
-    //     gradient
-    //     wheelScroll
-    //     itemClassName="
-    //     basis-full
-    //     sm:basis-1/2
-    //     md:basis-1/3
-    //     lg:basis-1/4
-    //     "
-    //     renderItem={(address) => (
-    //         <AddressCard address={address}
-    //             onEdit={(id) => console.log("Editar", id)}
-    //             onDelete={(id) => console.log("Deletar", id)}
-    //         />
-    //     )}
-    // />
-    
   )
         
 }

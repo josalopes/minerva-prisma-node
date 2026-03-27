@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { getProfile } from '@/http/get-profile'
-import { getMembership } from '@/http/get-membership'
+import { getProfile } from '@/http/profile/get-profile'
+import { getMembership } from '@/http/members/get-membership'
 import { defineAbilityFor } from '@saas/auth'
 
 export async function isAuthenticated() {

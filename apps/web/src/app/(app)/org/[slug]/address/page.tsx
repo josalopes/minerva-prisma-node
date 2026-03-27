@@ -1,7 +1,7 @@
 import { ability, auth } from "@/auth/auth"
 import { AddressList } from "@/services/addresses/address-list";
 import Header from "@/components/header";
-import { getOrganizationBySlug } from "@/http/get-organization-by-slug";
+import { getOrganizationBySlug } from "@/http/organizations/get-organization-by-slug";
 
 interface AddressProps {
   params: Promise<{

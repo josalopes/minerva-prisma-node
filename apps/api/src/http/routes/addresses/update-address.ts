@@ -6,12 +6,15 @@ import { auth } from "@/http/middlewares/auth";
 import { updateAddressSchema } from "@/http/schemas";
 import { AddressType } from "@prisma/client";
 import { updateAddressService } from "@/services/addresses/update-address";
+import { addressEntitySchema } from './../../../../../../packages/contracts/address/address.entity';
+import { errorResponseSchema, successResponseSchema } from "@/lib/api-response";
+
 
 export async function updateAddress(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
       .register(auth)
-      .put('/address/entity/:id', {
+      .patch('/address/entity/:id', {
         schema: {
             tags: ['Adrdresses'],
             summary: 'Atualiza o endereço de uma entidade',
@@ -24,29 +27,15 @@ export async function updateAddress(app: FastifyInstance) {
                 city: z.string().optional(),
                 state: z.string().optional(),
                 zipCode: z.string().optional(),
+                isPrimary: z.coerce.boolean().default(false),
             }),
             params: z.object({
                 id: z.coerce.number()
             }),
             response: {
-                400: z.object({
-                        message: z.string(),
-                    }),
-                401: z.object({
-                        message: z.string(),
-                    }),
-                201: z.object({
-                        ownerType: z.string(),
-                        ownerId: z.string(),
-                        type: z.string(),
-                        street: z.string().nullable(),
-                        number: z.string().nullable(),
-                        complement: z.string().nullable(),
-                        district: z.string().nullable(),
-                        city: z.string().nullable(),
-                        state: z.string().nullable(),
-                        zipCode: z.string().nullable(),
-                    })
+                400: errorResponseSchema,
+                401: errorResponseSchema,
+                201: successResponseSchema(addressEntitySchema)
             }
         },
       }, 
@@ -58,8 +47,11 @@ export async function updateAddress(app: FastifyInstance) {
             ...data,
             id,
             type: data.type as AddressType,
-        });
+        }) as any;
     
-        return reply.status(201).send(address)
+        return reply.status(201).send({
+            success: true,
+            data: address
+        })
       })
 }

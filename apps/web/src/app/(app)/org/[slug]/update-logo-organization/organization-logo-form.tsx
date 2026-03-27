@@ -2,7 +2,7 @@
 
 import { LogoOrganizationFormData, useLogoOrganizationForm } from "./logo-form";
 import { Button } from "@/components/ui/button";
-import { updateOrganizationLogo } from "@/http/update-organization-logo";
+import { updateOrganizationLogo } from "@/http/organizations/update-organization-logo";
 import { LogoOrganization } from "./organization-logo";
 
 import { 

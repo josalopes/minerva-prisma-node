@@ -7,7 +7,7 @@ import { Loader, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
 import semFoto from '../../../../public/DSC_5886.png'
-import { updateProfile } from '@/http/update-profile';
+import { updateProfile } from '@/http/profile/update-profile';
 import { env } from '@saas/env';
 
 

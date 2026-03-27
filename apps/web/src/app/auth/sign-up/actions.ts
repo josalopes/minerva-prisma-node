@@ -4,7 +4,7 @@ import { HTTPError } from 'ky'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-import { signUp } from '@/http/sign-up'
+import { signUp } from '@/http/profile/sign-up'
 
 const signUpSchema = z.object({
     name: z.string().refine((value) => value.split(' ').length > 1, {

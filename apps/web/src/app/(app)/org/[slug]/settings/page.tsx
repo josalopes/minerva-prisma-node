@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { OrganizationForm } from "../../organization-form"
 import { Divide } from "lucide-react"
 import { ShutdownOrganization } from "./shutdown-organization-button"
-import { getOrganization } from "@/http/get-organization"
+import { getOrganization } from "@/http/organizations/get-organization"
 import { Billing } from "./billing"
 
 export default async function Settings() {

@@ -12,9 +12,11 @@ interface CreateAddressRequest {
   state?: string
   zipCode?: string
   country?: string
+  isPrimary?: boolean
   type?: AddressType
 }
 interface CreateAddressResponse {
+  id: number;
   ownerType: string;
   ownerId: string;
   street: string | null;
@@ -26,9 +28,10 @@ interface CreateAddressResponse {
   zipCode: string | null;
   country: string | null;
   type: AddressType;
-  organizationId: string | null;
-  memberId: string | null;
-  customerId: string | null;
+  // organizationId: string | null;
+  // memberId: string | null;
+  // customerId: string | null;
+  isPrimary: boolean;
 }
 
 export async function createAddressService(data: CreateAddressRequest): Promise<CreateAddressResponse> {
@@ -46,6 +49,7 @@ export async function createAddressService(data: CreateAddressRequest): Promise<
       city: data.city,
       state: data.state,
       zipCode: data.zipCode,
+      isPrimary: data.isPrimary,
       ownerId: data.ownerId,
       ownerType: data.ownerType,
       type: data.type,

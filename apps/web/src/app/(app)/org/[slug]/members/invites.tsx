@@ -1,6 +1,6 @@
 import { ability, getCurrentOrg } from "@/auth/auth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getInvites } from "@/http/get-invites"
+import { getInvites } from "@/http/invites/get-invites"
 
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 

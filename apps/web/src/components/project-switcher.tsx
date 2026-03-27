@@ -16,7 +16,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
-import { getProjects } from "@/http/get-projects"
+import { getProjects } from "@/http/projects/get-projects"
 import { Skeleton } from "./ui/skeleton";
 
 export function ProjectSwitcher() {

@@ -4,10 +4,15 @@ import { z } from 'zod'
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/http/middlewares/auth";
-import { createSlug } from "@/utils/create-slug";
-import { BadRequestError } from "../-errors/bad-request-error";
 import { gerarNextVal } from "@/utils/generate-next-sequence";
-import { personTypeSchema } from "../../../http/schemas";
+import { apiError } from "@/lib/http-error";
+
+import { errorResponseSchema, successResponseSchema } from "@/lib/api-response";
+import { createOrganizationSchema     
+  } from "../../../../../../packages/contracts/organization/organization.input"
+
+  import { organizationEntitySchema     
+  } from "../../../../../../packages/contracts/organization/organization.entity"
 
 export async function createOrganization(app: FastifyInstance) {
     app
@@ -17,21 +22,11 @@ export async function createOrganization(app: FastifyInstance) {
         schema: {
             tags: ['Organizations'],
             summary: 'Cria uma nova organização',
-            securiry: [{ bearerAuth: [] }],
-            body: z.object({
-                name: z.string(),
-                cpfCnpj: z.string(),
-                domain: z.string().nullish(),
-                shouldAttachUserByDomain: z.boolean().optional(),
-                personType: personTypeSchema
-            }),
+            security: [{ bearerAuth: [] }],
+            body: createOrganizationSchema,
             response: {
-                400: z.object({
-                        message: z.string(),
-                    }),
-                201: z.object({
-                        organizationId: z.uuid()
-                    })
+                400: errorResponseSchema,
+                201: successResponseSchema(organizationEntitySchema)                 
             }
         },
       }, 
@@ -39,14 +34,16 @@ export async function createOrganization(app: FastifyInstance) {
         const userId = await request.getCurrentUserid()
         const { name, domain, shouldAttachUserByDomain, cpfCnpj, personType } = request.body
 
-        const user = await prisma.user.findFirst({
+        const user = await prisma.user.findUnique({
             where: {
                 id: userId
             }
         })
 
         if (!user) {
-            throw new BadRequestError('Usuário não encontrado')
+            return reply.status(400).send(
+                    apiError("Usuário não encontrado", "USER_NOT_FOUND")
+                )
         }
 
         if (domain) {
@@ -57,7 +54,9 @@ export async function createOrganization(app: FastifyInstance) {
             })
 
             if (organizationByDomain) {
-                throw new BadRequestError('Já existe uma organização com este domínio')
+                return reply.status(400).send(
+                    apiError("Domínio já existe", "DOMAIN_EXISTS")
+                )
             }
         }
 
@@ -69,21 +68,11 @@ export async function createOrganization(app: FastifyInstance) {
             })
 
             if (organizationByCnpj) {
-                throw new BadRequestError('Já existe uma organização com este CPF/CNPJ')
+                return reply.status(400).send(
+                    apiError("CPF/CNPJ já existe", "CPF_CNPJ EXISTS")
+                )
             }
         }
-
-        // const slug = createSlug(name)
-
-        // const organizationBySlug = await prisma.organization.findUnique({
-        //     where: {
-        //         slug
-        //     },
-        // })
-
-        // if (organizationBySlug) {
-        //     throw new BadRequestError('Já existe uma organização com este slug')
-        // }
         
         const geradorCodigoEmpresa = await prisma.seedOrganization.findFirst({
             where: {
@@ -93,27 +82,31 @@ export async function createOrganization(app: FastifyInstance) {
 
         const nextValOrg = geradorCodigoEmpresa?.nextValOrg ?? 100000
 
-        const organization = await prisma.organization.create({
-            data: {
-                name,
-                domain,
-                cpfCnpj,
-                shouldAttachUserByDomain,
-                personType,
-                slug: (await gerarNextVal('seed_org') + BigInt(nextValOrg)).toString(),
-                ownerId: userId,
-                members: {
-                    create: {
-                        email: user.email,
-                        userId,
-                        role: 'ADMIN',
+        const organization = await prisma.$transaction(async (tx) => {
+            const organization = await tx.organization.create({
+                data: {
+                    name,
+                    domain,
+                    cpfCnpj,
+                    shouldAttachUserByDomain: shouldAttachUserByDomain ?? false,
+                    personType,
+                    slug: (await gerarNextVal('seed_org') + BigInt(nextValOrg)).toString(),
+                    ownerId: userId,
+                    members: {
+                        create: {
+                            email: user.email,
+                            userId,
+                            role: 'ADMIN',
+                        },
                     },
                 },
-            },
+            })
+            return organization
         })
 
         return reply.status(201).send({
-            organizationId: organization.id,
+            success: true,
+            data: organization
         })
-      })
+    })
 }

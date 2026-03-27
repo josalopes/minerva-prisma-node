@@ -2,7 +2,7 @@
 
 import { ProfileFormData, useProfileForm } from "./profile-form";
 import { Button } from "@/components/ui/button";
-import { updateProfile } from "@/http/update-profile";
+import { updateProfile } from "@/http/profile/update-profile";
 import { AvatarProfile } from "./profile-avatar";
 
 import { 

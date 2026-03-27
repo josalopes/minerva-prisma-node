@@ -1,6 +1,6 @@
 import { getCurrentOrg } from "@/auth/auth";
 import { Button } from "@/components/ui/button";
-import { shutdownOrganization } from "@/http/shutdown-organization";
+import { shutdownOrganization } from "@/http/organizations/shutdown-organization";
 import { XCircle } from "lucide-react";
 import { redirect } from "next/navigation";
 

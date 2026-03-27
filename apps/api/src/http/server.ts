@@ -1,4 +1,3 @@
-// import { createAddress } from '@/services/addresses';
 import {fastify} from 'fastify'
 import fastifyCors from '@fastify/cors'
 import fastifyJwt from '@fastify/jwt'
@@ -34,7 +33,6 @@ import { updateOrganizationLogo } from './routes/orgs/update-organization-logo'
 import { shutdownOrganization } from './routes/orgs/shutdown-organization'
 import { transferOrganization } from './routes/orgs/transfer-organization'
 
-// import { addressRoutes } from './routes/addresses/address-routes'
 import { createAddress } from './routes/addresses/create-address'
 import { updateAddress } from './routes/addresses/update-address'
 import { getAddresses } from './routes/addresses/get-address'

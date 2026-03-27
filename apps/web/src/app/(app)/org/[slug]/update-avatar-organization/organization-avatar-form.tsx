@@ -2,7 +2,7 @@
 
 import { AvatarOrganizationFormData, useAvatarOrganizationForm } from "./avatar-form";
 import { Button } from "@/components/ui/button";
-import { updateOrganizationAvatar } from "@/http/update-organization-avatar";
+import { updateOrganizationAvatar } from "@/http/organizations/update-organization-avatar";
 import { AvatarOrganization } from "./organization-avatar";
 
 import { 

@@ -184,7 +184,7 @@ export function OrganizationForm({ isUpdating, initialData }: OrganizationFormPr
                             name="shouldAttachUsersByDomain"
                             id="shouldAttachUsersByDomain"
                             className=" translate-y-0.5"
-                            defaultChecked={initialData?.shouldAttachUsersByDomain}
+                            defaultChecked={initialData?.shouldAttachUserByDomain}
                         />
                         <label 
                             htmlFor="shouldAttachUsersByDomain" 
