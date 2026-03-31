@@ -10,9 +10,9 @@ cloudinary.config({
 export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get("file") as File;
-    const userId = formData.get("userId") as string;
+    const organizationId = formData.get("organizationId") as string;
 
-    if (!userId || userId === "") {
+    if (!organizationId || organizationId === "") {
         return NextResponse.json({ error: "Falha ao alterar a imagem" }, { status: 401 });
     }
     
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
 
     const results = await new Promise((resolve, reject) => {
         cloudinary.uploader.upload_stream({
-            tags: [`${userId}`],
+            tags: [`${organizationId}`],
             public_id: file.name,
             resource_type: "image",
         }, (error, result) => {

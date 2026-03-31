@@ -7,9 +7,10 @@ import { auth } from "@/http/middlewares/auth";
 import { apiError } from "@/lib/http-error";
 
 import { errorResponseSchema, successResponseSchema } from "@/lib/api-response";
+import { updateOrganizationSchema, organizationEntitySchema } from "@saas/contracts/organization"
 
-import { updateOrganizationSchema, organizationEntitySchema    
-   } from "../../../../../../packages/contracts/organization"
+// import { updateOrganizationSchema, organizationEntitySchema    
+//    } from "../../../../../../packages/contracts/organization"
 
 export async function updateOrganization(app: FastifyInstance) {
     app
@@ -27,7 +28,7 @@ export async function updateOrganization(app: FastifyInstance) {
                 400: errorResponseSchema,
                 401: errorResponseSchema,
                 200: successResponseSchema(organizationEntitySchema),                    
-            }
+            },
         },
       }, 
       async (request, reply) => {
@@ -49,8 +50,8 @@ export async function updateOrganization(app: FastifyInstance) {
 
             if (organizationByDomain) {
                 return reply.status(400).send(
-                        apiError("Domínio já existe", "DOMAIN_EXISTS")
-                    )
+                   apiError("Domínio já existe", "DOMAIN_EXISTS")
+                )
             }
         }
 

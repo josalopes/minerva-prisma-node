@@ -14,12 +14,12 @@ import { updateOrganizationAvatar } from '@/http/organizations/update-organizati
 interface AvatarOrganizationProps {
   organizationId: string;
   avatarUrl: string | null;
-  userId: string;
+  // userId: string;
   slug: string
   
 }
 
-export function AvatarOrganization({ organizationId, avatarUrl, userId, slug }: AvatarOrganizationProps) {
+export function AvatarOrganization({ organizationId, avatarUrl, slug }: AvatarOrganizationProps) {
   const [previewImage, setPreviewImage] = useState(avatarUrl)
   const [loading, setLoading] = useState(false);
   const router = useRouter()
@@ -68,7 +68,7 @@ export function AvatarOrganization({ organizationId, avatarUrl, userId, slug }: 
 
       formData.append("file", image)
       formData.append("slug", slug)
-      formData.append("userId", userId)
+      // formData.append("userId", userId)
 
       const response = await fetch(`${env.NEXT_PUBLIC_URL}/api/image/upload`, {
         method: "POST",

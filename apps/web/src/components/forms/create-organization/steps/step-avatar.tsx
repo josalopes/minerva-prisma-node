@@ -1,27 +1,17 @@
-"use client"
+import OrganizationAvatarForm from "@/app/(app)/org/[slug]/update-avatar-organization/organization-avatar-form";
+interface OrganizationLogoContentProps {
+  id: string;
+  name: string;
+  slug: string;
+  avatarUrl: string | null;
+  logoUrl: string | null;
+}
 
-import { UseFormReturn } from "react-hook-form"
-import { CreateOrganizationFormData } from "@/schemas/create-organization-form"
-
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-
-export function Step4Avatar({
-  form
-}: {
-  form: UseFormReturn<CreateOrganizationFormData>
-}) {
+export function Step3Avatar(organization: OrganizationLogoContentProps) {
   return (
     <div className="space-y-4">
-      <Label>Avatar da organização</Label>
-
-      <Input
-        type="file"
-        accept="image/*"
-        onChange={(e) =>
-          form.setValue("avatar", e.target.files?.[0])
-        }
-      />
+      <h1>Logo da organização</h1>
+      <OrganizationAvatarForm organization={organization}  />
     </div>
   )
 }

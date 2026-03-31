@@ -29,7 +29,6 @@ export async function getOrganizations(app: FastifyInstance) {
                                         slug: z.string().describe('O nome abreviado da organização'),
                                         avatarUrl: z.url().nullable().describe('O avatar da organização'),
                                         logoUrl: z.url().nullable().describe('O avatar da organização'),
-                                        // role: roleSchema.describe('O papel dos membros da organização'),
                                         shouldAttachUserByDomain: z.boolean().describe('Vinculação automática de membros por domínio'),
                                         personType: z.string().describe('Indica se a Organizaçãoé Pessoa Físia ou Jurídica'),
                                         addresses: z.array(

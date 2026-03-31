@@ -26,7 +26,8 @@ export default async function OrganizationAvatar() {
     <div className="space-y-4">
       <Header />
         {/* {permissions?.can('create', 'Project') && ( */}
-            {organization && <OrganizationAvatarForm organization={organization} user={user}  />}
+            {organization && <OrganizationAvatarForm organization={organization}  />}
+            {/* {organization && <OrganizationAvatarForm organization={organization} user={user}  />} */}
         {/* )} */}
     </div>
   )

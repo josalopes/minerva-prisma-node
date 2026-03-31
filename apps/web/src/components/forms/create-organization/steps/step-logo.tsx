@@ -1,30 +1,17 @@
-"use client"
+import OrganizationLogoForm from "@/app/(app)/org/[slug]/update-logo-organization/organization-logo-form"
+interface OrganizationLogoContentProps {
+  id: string;
+  name: string;
+  slug: string;
+  avatarUrl: string | null;
+  logoUrl: string | null;
+}
 
-import { UseFormReturn } from "react-hook-form"
-import { CreateOrganizationFormData } from "@/schemas/create-organization-form"
-
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-
-export function Step3Logo({
-  form
-}: {
-  form: UseFormReturn<CreateOrganizationFormData>
-}) {
-
+export function Step2Logo(organization: OrganizationLogoContentProps) {
   return (
     <div className="space-y-4">
-
-      <Label>Logo da organização</Label>
-
-      <Input
-        type="file"
-        accept="image/*"
-        onChange={(e) =>
-          form.setValue("logo", e.target.files?.[0])
-        }
-      />
-
+      <h1>Logo da organização</h1>
+      <OrganizationLogoForm organization={organization}  />
     </div>
   )
 }

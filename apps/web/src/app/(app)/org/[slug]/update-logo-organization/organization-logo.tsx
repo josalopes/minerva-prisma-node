@@ -14,12 +14,13 @@ import { updateOrganizationLogo } from '@/http/organizations/update-organization
 interface LogoOrganizationProps {
   organizationId: string;
   logoUrl: string | null;
-  userId: string;
+  // userId: string;
   slug: string
   
 }
 
-export function LogoOrganization({ organizationId, logoUrl, userId, slug }: LogoOrganizationProps) {
+// export function LogoOrganization({ organizationId, logoUrl, userId, slug }: LogoOrganizationProps) {
+export function LogoOrganization({ organizationId, logoUrl, slug }: LogoOrganizationProps) {
   const [previewImage, setPreviewImage] = useState(logoUrl)
   const [loading, setLoading] = useState(false);
   const router = useRouter()
@@ -68,7 +69,7 @@ export function LogoOrganization({ organizationId, logoUrl, userId, slug }: Logo
 
       formData.append("file", image)
       formData.append("slug", slug)
-      formData.append("userId", userId)
+      // formData.append("userId", userId)
 
       const response = await fetch(`${env.NEXT_PUBLIC_URL}/api/image/upload`, {
         method: "POST",

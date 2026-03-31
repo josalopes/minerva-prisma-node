@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { Address, AddressType } from '@prisma/client'
+import { AddressType } from '@prisma/client'
 
 interface CreateAddressRequest {
   ownerType: string
@@ -28,9 +28,6 @@ interface CreateAddressResponse {
   zipCode: string | null;
   country: string | null;
   type: AddressType;
-  // organizationId: string | null;
-  // memberId: string | null;
-  // customerId: string | null;
   isPrimary: boolean;
 }
 
@@ -60,30 +57,3 @@ export async function createAddressService(data: CreateAddressRequest): Promise<
 
   return address
 }
-
-// import { prisma } from "@/lib/prisma";
-// import { CreateAddressInput } from "./types";
-
-// export async function createAddress(data: CreateAddressInput) {
-//   const ownerField =
-//     data.ownerType === "organization"
-//       ? { organizationId: data.ownerId }
-//       : { memberId: data.ownerId };
-
-//   const address = await prisma.address.create({
-//     data: {
-//       ownerType: data.ownerType,
-//       ownerId: data.ownerId,
-//       street: data.street,
-//       complement: data.complement,
-//       number: data.number,
-//       district: data.district,
-//       city: data.city,
-//       state: data.state,
-//       zipCode: data.zipCode,
-//       ...ownerField,
-//     },
-//   });
-
-//   return address;
-// }

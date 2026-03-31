@@ -16,7 +16,7 @@ import { Form } from "@/components/ui/form";
 import router from "next/router";
 import { Separator } from "@/components/ui/separator";
 
-interface OrganizationAvatarContentProps {
+interface OrganizationLogoContentProps {
     organization: {
         id: string;
         name: string;
@@ -24,14 +24,14 @@ interface OrganizationAvatarContentProps {
         avatarUrl: string | null;
         logoUrl: string | null;
     },
-    user: {
-        id: string;
-        name: string | null;
-        avatarUrl: string | null;
-    }
+    // user: {
+    //     id: string;
+    //     name: string | null;
+    //     avatarUrl: string | null;
+    // }
 }
 
-export default function OrganizationAvatarForm({ organization, user }: OrganizationAvatarContentProps) {
+export default function OrganizationAvatarForm({ organization }: OrganizationLogoContentProps) {
     const form = useAvatarOrganizationForm({
         avatarUrl: organization.avatarUrl
     });
@@ -58,7 +58,7 @@ export default function OrganizationAvatarForm({ organization, user }: Organizat
                                             organizationId={organization.id} 
                                             avatarUrl={organization.avatarUrl} 
                                             slug={organization.slug} 
-                                            userId={user.id} 
+                                            // userId={user.id} 
                                         />
                                     </div>
                                 </div>

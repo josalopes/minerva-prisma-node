@@ -22,7 +22,6 @@ export const baseOrganizationSchema = z.object({
 
     domain: z
         .string()
-        .nullable()
         .optional()
         .refine((value) => {
         if (!value) return true

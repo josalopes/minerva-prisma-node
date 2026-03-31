@@ -1,18 +1,23 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { z } from 'zod'
 
 import { prisma } from "@/lib/prisma";
+import { apiError } from "@/lib/http-error";
 import { auth } from "@/http/middlewares/auth";
 import { gerarNextVal } from "@/utils/generate-next-sequence";
-import { apiError } from "@/lib/http-error";
 
 import { errorResponseSchema, successResponseSchema } from "@/lib/api-response";
-import { createOrganizationSchema     
-  } from "../../../../../../packages/contracts/organization/organization.input"
+import { createOrganizationSchema } from "@saas/contracts/organization/organization.input"
+import { organizationEntitySchema } from "@saas/contracts/organization/organization.entity"
+import { createOrganizationService } from "@/services/organizations/create-organization"
 
-  import { organizationEntitySchema     
-  } from "../../../../../../packages/contracts/organization/organization.entity"
+// import { createOrganizationSchema     
+//   } from "../../../../../../packages/contracts/organization/organization.input"
+
+//   import { organizationEntitySchema     
+//   } from "../../../../../../packages/contracts/organization/organization.entity"
+
+
 
 export async function createOrganization(app: FastifyInstance) {
     app
@@ -32,7 +37,8 @@ export async function createOrganization(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const userId = await request.getCurrentUserid()
-        const { name, domain, shouldAttachUserByDomain, cpfCnpj, personType } = request.body
+        const { domain, cpfCnpj } = request.body
+        const org = createOrganizationSchema.parse(request.body);
 
         const user = await prisma.user.findUnique({
             where: {
@@ -82,27 +88,14 @@ export async function createOrganization(app: FastifyInstance) {
 
         const nextValOrg = geradorCodigoEmpresa?.nextValOrg ?? 100000
 
-        const organization = await prisma.$transaction(async (tx) => {
-            const organization = await tx.organization.create({
-                data: {
-                    name,
-                    domain,
-                    cpfCnpj,
-                    shouldAttachUserByDomain: shouldAttachUserByDomain ?? false,
-                    personType,
-                    slug: (await gerarNextVal('seed_org') + BigInt(nextValOrg)).toString(),
-                    ownerId: userId,
-                    members: {
-                        create: {
-                            email: user.email,
-                            userId,
-                            role: 'ADMIN',
-                        },
-                    },
-                },
-            })
-            return organization
-        })
+        const slug = await gerarNextVal('seed_org') + BigInt(nextValOrg).toString()
+
+        const organization = await createOrganizationService(
+            slug,
+            userId,
+            user.email,
+            org,
+        );
 
         return reply.status(201).send({
             success: true,

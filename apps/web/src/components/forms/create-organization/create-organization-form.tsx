@@ -5,23 +5,21 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-import { createOrganizationSchema } from "../../../../../../packages/contracts/organization"
 import { createOrganizationAction, updateOrganizationAction } from "@/app/(app)/org/actions";
 import { createAddressAction, updateAddressAction } from "@/http/address/actions";
 import { Stepper } from "./stepper"
 import { usePersistedForm } from "./use-persisted-form"
 
-import { Step1BasicInfo } from "./steps/step-basic-info"
-import { Step2Address } from "./steps/step-address"
-import { Step3Logo } from "./steps/step-logo"
-import { Step4Avatar } from "./steps/step-avatar"
+import { Step0BasicInfo } from "./steps/step-basic-info"
+import { Step1Address } from "./steps/step-address"
+import { Step2Logo } from "./steps/step-logo"
+import { Step3Avatar } from "./steps/step-avatar"
 
 import { Button } from "@/components/ui/button"
-import { Form } from "@/components/ui/form"
 import { toast } from "sonner"
-import { handleServerActionResult } from "@/lib/show-action-toast"
 import { createOrganizationFormSchema } from "@/schemas/create-organization-form"
 import { createAddressFormSchema } from "@/schemas/create-address-form"
+import { useFormFlow } from "@/hooks/use-form-flow"
 
 const steps = [
   "Informações",
@@ -30,14 +28,28 @@ const steps = [
   "Avatar"
 ]
 
+interface User {
+    id: string;
+    name: string | null;
+    email: string;
+    login: string;
+    avatarUrl: string | null;
+}
+
 export function CreateOrganizationForm() {
-  const [step, setStep] = useState(1)
-  const [organizationId, setOrganizationId] = useState<string | null>(null)
-  const [slug, setSlug] = useState<string | undefined>(undefined)
-  const [isSaving, setIsSaving] = useState(false)
-  const [addressId, setAddressId] = useState(0)
-  const [isNewAddress, setIsNewAddress] = useState(0)
-  const [editAddress, setEditAddress] = useState(0)
+  const [step, setStep] = useState(0)
+  const [organizationId, setOrganizationId] = useState<string>("")
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [logoUrl, setLogoUrl] = useState<string | null>(null)
+  const [name, setName] = useState<string>("")
+  const [slug, setSlug] = useState<string>("")
+  // const [isSaving, setIsSaving] = useState(false)
+  // const [addressId, setAddressId] = useState(0)
+
+  const emptyForm = {
+    trigger: async () => true,
+    getValues: () => ({})
+  }
 
   const orgForm = useForm({
     resolver: zodResolver(createOrganizationFormSchema),
@@ -62,145 +74,187 @@ export function CreateOrganizationForm() {
     addressForm.setValue
   )
 
-  function next() {
-    setStep((s) => Math.min(s + 1, 4))
-  }
-
-  function back() {
-    setStep((s) => Math.max(s - 1, 1))
-    if (step === 2) {
-      setIsNewAddress(0)
-      setEditAddress(1)
+  interface OrganizationLogoContentProps {
+    // organization: {
+      id: string;
+      name: string;
+      slug: string;
+      avatarUrl: string | null;
+      logoUrl: string | null;
     }
-  }
+    // user: {
+    //   id: string;
+    //   name: string | null;
+    //   avatarUrl: string | null;
+    // }
+  // }
 
-  async function onSubmit(data: any) {
-    console.log(data)
-  }
+  let organizationData = null
+  
 
-  async function handleNext() {
-    if (step === 1) {  
-      const isValid = await orgForm.trigger()
+  const flow = useFormFlow([
+    {
+      id: "organization",
+      form: orgForm,
 
-      if (!isValid) return
+      onSubmit: async (values, ctx) => {
+        const organizationId = ctx.get("organizationId")
+        const slug = ctx.get("slug")
 
-      const values = orgForm.getValues()
-
-      if (!organizationId) {
-          setIsSaving(true)
-
+        // CREATE
+        if (!organizationId) {
           const result = await createOrganizationAction(values)
 
-          if (!handleServerActionResult(result)) {
-            setIsSaving(false)
-            return
+          if (!result.success) {
+            throw new Error(result.message ?? "Erro desconhecido")
           }
-          
-          setOrganizationId(result.data?.id!)
-          setSlug(result.data?.slug)
-                      
-          toast.success("Organização salva com sucesso")
 
-          setStep(2)                
-      } else {
-          if (slug) {
-            setIsSaving(true)
-            const result = await updateOrganizationAction({
-                ...values,
-                slug
-            })
-
-            if (!handleServerActionResult(result)) return
-
-            toast.success("Organização atualizada com sucesso")
-            setStep(2)
+          return {
+            type: "create",
+            data: result.data
           }
         }
-      setIsSaving(false)
-      return
-    }
 
-    if (step === 2) {
-      if (!organizationId) {
-        toast.error("Organização não criada")
-        return
-      }
-
-      const isValid = await addressForm.trigger()
-      
-      if (!isValid) return
-
-      const values = addressForm.getValues()
-      
-      if (addressId === 0) {
-        setIsSaving(true)
-
-        const { isNew, ...valuesWithoutIsNew } = values
-
-        const result = await createAddressAction({
-          ...valuesWithoutIsNew,
-          ownerId: organizationId,
-          ownerType: "organization",
+        // UPDATE
+        const result = await updateOrganizationAction({
+          ...values,
+          slug
         })
 
-        if (!handleServerActionResult(result)) {
-          setIsSaving(false)
-          return
+        if (!result.success) {
+          throw new Error(result.message)
         }
-          
-        setAddressId(result.data?.id!)
 
-        toast.success("Endereço criado com sucesso")
-        setStep(3)
-      } else {
-        const { isNew, ...valuesWithoutIsNew } = values
+        return {
+          type: "update",
+          data: result.data
+        }                                                                                                     
+      },
 
-        if (values.isNew === 'new') {
-          setIsSaving(true)
-          const result1 = await createAddressAction({
-            ...valuesWithoutIsNew,
+      onSuccess: (res, ctx) => {
+        if (res.type === "create") {
+          ctx.set("organizationId", res.data.id)
+          ctx.set("slug", res.data.slug)
+          setSlug(res.data.slug)
+          setName(res.data.name)
+          setOrganizationId(res.data.id)
+          setAvatarUrl(res.data.avatarUrl)
+          setLogoUrl(res.data.logoUrl)
+
+          toast.success("Organização criada")
+        } else {
+          toast.success("Organização atualizada")
+        }
+      }
+    },
+
+    {
+      id: "address",
+      form: addressForm,
+
+      onSubmit: async (values, ctx) => {
+        const organizationId = ctx.get("organizationId")
+        const addressId = ctx.get("addressId")
+
+        if (!organizationId) {
+          throw new Error("Organização não criada")
+        }
+
+        const { isNew, ...payload } = values
+
+        // CREATE (primeira vez)
+        if (!addressId) {
+          const result = await createAddressAction({
+            ...payload,
             ownerId: organizationId,
-            ownerType: "organization",
+            ownerType: "organization"
           })
 
-          if (!handleServerActionResult(result1)) {
-            setIsSaving(false)
-            return
+          if (!result.success) {
+            throw new Error(result.message ?? "Erro desconhecido")
           }
 
-          toast.success("Endereço criado com sucesso")
-          setStep(3)
-
-          setIsSaving(false)
-          return
+          return {
+            type: "create",
+            data: result.data
+          }
         }
 
-        const result2 = await updateAddressAction({
-          ...valuesWithoutIsNew,
+        // CREATE NOVO
+        if (isNew === "new") {
+          const result = await createAddressAction({
+            ...payload,
+            ownerId: organizationId,
+            ownerType: "organization"
+          })
+
+          if (!result.success) {
+            throw new Error(result.message ?? "Erro desconhecido")
+          }
+
+          return {
+            type: "create-new",
+            data: result.data
+          }
+        }
+
+        // UPDATE
+        const result = await updateAddressAction({
+          ...payload,
           id: addressId
         })
 
-        if (!handleServerActionResult(result2)) {
-          setIsSaving(false)
-          return
+        if (!result.success) {
+          throw new Error(result.message)
         }
 
-        toast.success("Endereço atualizado com sucesso")
-          setStep(3)
+        return {
+          type: "update",
+          data: result.data
+        }
+      },
+
+      onSuccess: (res, ctx) => {
+        if (res.type === "create" || res.type === "create-new") {
+          ctx.set("addressId", res.data.id)
+          toast.success("Endereço criado")
+        } else {
+          toast.success("Endereço atualizado")
+        }
       }
-      
-      setIsSaving(false)
-      return
-    }
+    },
 
-    // if (step === 3) {
-    //     await uploadLogo(organizationId!, values.logo)
+    {
+      id: "logo",
+      onSubmit: async (_, ctx) => {
+        const orgId = ctx.get("organizationId")
 
-    //     setStep(4)
-    //     return
-    // }
+        const organization = {
+          id: orgId,
+          name,
+          slug,
+          avatarUrl,
+          logoUrl        
+        }
+        
+      },
+    },
 
-  }
+    {
+      id: "avatar",
+      onSubmit: async (_, ctx) => {
+        const orgId = ctx.get("organizationId")
+
+        const organization = {
+          id: orgId,
+          name,
+          slug,
+          avatarUrl,
+          logoUrl        
+        }
+      }
+    }    
+  ])
 
   return (
     <div className="max-w-xl mx-auto">
@@ -213,41 +267,37 @@ export function CreateOrganizationForm() {
               exit={{ opacity: 0, x: -30 }}
             >
 
-              {step === 1 && <Step1BasicInfo form={orgForm}/>}
-              {step === 2 && <Step2Address form={addressForm}/>}
-              {/* {step === 3 && <Step3Logo form={orgForm}/>} */}
-              {/* {step === 4 && <Step4Avatar/>} */}
-
+              {flow.step === 0 && <Step0BasicInfo form={orgForm}/>}
+              {flow.step === 1 && <Step1Address form={addressForm}/>}
+              {flow.step === 2 && Step2Logo({id: organizationId, name, slug, avatarUrl, logoUrl})}
+              {flow.step === 3 && Step3Avatar({id: organizationId, name, slug, avatarUrl, logoUrl})}
             </motion.div>
           </AnimatePresence>
 
           <div className="flex justify-between mt-4 mb-4">
-            {step > 1 && (
-              <Button
-                variant="outline"
-                type="button"
-                onClick={back}
-              >
-                Voltar
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              type="button"
+              onClick={flow.back}
+              disabled={flow.step === 0}
+            >
+              Voltar
+            </Button>
 
-            {step < 4 && (
-              <Button
-                type="button"
-                onClick={handleNext}
-                disabled={isSaving}
-              >
-                {isSaving ? "Salvando..." : "Próximo"}
-              </Button>
-            )}
+            <Button
+              type="button"
+              onClick={flow.next}
+              disabled={flow.isLoading}
+            >
+              {flow.isLoading ? "Salvando..." : "Próximo"}
+            </Button>
 
             {step === 4 && (
               <Button type="submit">
                 Criar organização
               </Button>
             )}
-          </div>
+        </div>
     </div>
   )
 }

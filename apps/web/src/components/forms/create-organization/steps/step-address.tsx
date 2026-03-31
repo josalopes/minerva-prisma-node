@@ -28,11 +28,11 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 
-interface Step2AddressProps {
+interface Step1AddressProps {
   form: UseFormReturn<CreateAddressFormData>
 }
 
-export function Step2Address({ form }: Step2AddressProps) {
+export function Step1Address({ form }: Step1AddressProps) {
   const [isLoadingCep, setIsLoadingCep] = useState(false)
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
   const [checked, setChecked] = useState(false)
@@ -88,41 +88,7 @@ export function Step2Address({ form }: Step2AddressProps) {
     }
   }
 
-  const handleValueChange = (value: string) => {
-    if (value === "edit") {
-      setChecked(true);
-    } else {
-      setChecked(false)
-    }
-    setSelectedValue(value);
-    console.log("New value selected:", value);
-    console.log("selectedValue:", selectedValue);
-    console.log("checked:", checked);
-    // Perform any other logic here
-  };
-  
   return (
-    <>
-      {/* <div className="mb-4">
-        <RadioGroup 
-          value={selectedValue}
-          onValueChange={setSelectedValue}
-          // onValueChange={handleValueChange}
-          defaultValue="new" 
-          className="flex flex-row"
-        >
-          <div className="flex items-center gap-3">
-            <RadioGroupItem value="new" id="new" />
-            <Label htmlFor="new">Novo endereço</Label>
-          </div>
-          <div className="flex items-center gap-3">
-            <RadioGroupItem value="edit" id="edit" />
-            <Label htmlFor="edit">Editar atual</Label>
-          </div>
-        </RadioGroup>
-      </div> */}
-    
-
     <Form {...form}>
       <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
@@ -358,26 +324,7 @@ export function Step2Address({ form }: Step2AddressProps) {
             </FormItem>
           )}
         />
-
-
-      {/* <FieldGroup className="mt-4 mb-4">
-          <Field orientation="horizontal">
-            <Checkbox 
-              id="primary" 
-              name="primary"
-              checked={field.value}
-                onCheckedChange={field.onChange}
-            
-            />
-            <FieldLabel htmlFor="terms-checkbox-basic">
-              Considerar como endereço principal
-            </FieldLabel>
-          </Field>
-        </FieldGroup> */}
-
-
       </form>
     </Form>
-    </>
   )
 }
