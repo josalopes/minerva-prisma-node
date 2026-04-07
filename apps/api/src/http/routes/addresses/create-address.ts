@@ -7,10 +7,7 @@ import { AddressType } from "@prisma/client";
 
 import { errorResponseSchema, successResponseSchema } from "@/lib/api-response";
 import { addressEntitySchema } from '@saas/contracts/address';
-// import { addressEntitySchema } from './../../../../../../packages/contracts/address/address.entity';
 import { createAddressSchema } from "@saas/contracts"
-// import { createAddressSchema     
-//   } from "../../../../../../packages/contracts/address/address.input"
 
 export async function createAddress(app: FastifyInstance) {
     app

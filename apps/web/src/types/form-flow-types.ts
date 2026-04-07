@@ -6,6 +6,9 @@ export type FlowStep<TFormValues, TResponse = any> = {
     getValues: () => TFormValues
   }
 
+  optional?: boolean
+  label: string
+
   onSubmit?: (
     values: TFormValues,
     context: FlowContext

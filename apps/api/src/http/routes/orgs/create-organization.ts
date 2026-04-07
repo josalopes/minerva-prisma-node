@@ -10,14 +10,7 @@ import { errorResponseSchema, successResponseSchema } from "@/lib/api-response";
 import { createOrganizationSchema } from "@saas/contracts/organization/organization.input"
 import { organizationEntitySchema } from "@saas/contracts/organization/organization.entity"
 import { createOrganizationService } from "@/services/organizations/create-organization"
-
-// import { createOrganizationSchema     
-//   } from "../../../../../../packages/contracts/organization/organization.input"
-
-//   import { organizationEntitySchema     
-//   } from "../../../../../../packages/contracts/organization/organization.entity"
-
-
+import { createSlug } from "@/utils/create-slug";
 
 export async function createOrganization(app: FastifyInstance) {
     app
@@ -88,7 +81,7 @@ export async function createOrganization(app: FastifyInstance) {
 
         const nextValOrg = geradorCodigoEmpresa?.nextValOrg ?? 100000
 
-        const slug = await gerarNextVal('seed_org') + BigInt(nextValOrg).toString()
+        const slug = createSlug(org.name) + "-" + await gerarNextVal('seed_org') + BigInt(nextValOrg).toString()
 
         const organization = await createOrganizationService(
             slug,

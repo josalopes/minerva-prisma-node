@@ -10,7 +10,7 @@ interface OrganizationLogoContentProps {
 export function Step3Avatar(organization: OrganizationLogoContentProps) {
   return (
     <div className="space-y-4">
-      <h1>Logo da organização</h1>
+      <h1>Avatar da organização</h1>
       <OrganizationAvatarForm organization={organization}  />
     </div>
   )

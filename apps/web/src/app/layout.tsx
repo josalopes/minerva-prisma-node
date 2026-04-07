@@ -25,8 +25,8 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="pt">
-      <body>
+    <html lang="pt" suppressHydrationWarning>
+      <body className="h-screen overflow-hidden bg-background antialiased">
         <Providers>
           {organization ? (
           <OrganizationProvider organization={organization}>

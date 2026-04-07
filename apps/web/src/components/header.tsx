@@ -7,25 +7,18 @@ import { OrganizationSwitcher } from "./organization-switcher"
 import { ability, auth } from "@/auth/auth"
 import { Separator } from "./ui/separator"
 import { ThemeSwitcher } from "./theme/theme-switcher"
+import { HeaderContainer } from "./header-container"
 
 export default async function Header() {
     const { user } = await auth()    
     const permissions = await ability()
 
     return (
-        <>
-            <div className="mx-auto flex max-w-[1200px] items-center justify-between">
+        <HeaderContainer>
+            <div className="h-16 mx-auto flex max-w-[1200px] items-center justify-between">
                 <div className="flex items-center gap-3">
-                    {/* <Image 
-                        src={ambientalIcon} 
-                        alt="Ambiental Reciclagem Icon" 
-                        className="size-6 dark:invert" 
-                    />
-                    <Slash className="size-3 -rotate-[24deg] text-border" /> */}
-
                     <OrganizationSwitcher />
                 </div>
-
 
                 <div className="flex items-center gap-4">
                     {/* <PendingInvites /> */}
@@ -34,9 +27,9 @@ export default async function Header() {
                     <ProfileButton />
                 </div>
             </div>
-            <div className="py-2">
+            {/* <div className="py-2">
                 <Separator />
-            </div>
-        </>
+            </div> */}
+        </HeaderContainer>
     )
 }

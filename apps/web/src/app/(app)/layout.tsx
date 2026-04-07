@@ -16,8 +16,8 @@ export default async function AppLayout({
 
   return (
     <>
-          {children}
-          {sheet}
+      {children}
+      {sheet}
     </>
   )
 }

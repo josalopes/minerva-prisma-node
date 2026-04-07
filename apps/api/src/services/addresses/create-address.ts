@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { AddressType } from '@prisma/client'
+import { setPrimaryAddress } from './update-primary-address'
 
 interface CreateAddressRequest {
   ownerType: string
@@ -54,6 +55,8 @@ export async function createAddressService(data: CreateAddressRequest): Promise<
       ...ownerField
     },
   })
+
+  setPrimaryAddress(address.ownerType, address.ownerId, address.id)
 
   return address
 }

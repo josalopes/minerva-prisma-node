@@ -14,16 +14,9 @@ import { createAddressSchema, updateAddressSchema
   import { Address     
   } from "../../../../../packages/contracts/address"
 
-
-
-// import { createOrganizationSchema, updateOrganizationSchema, Organization     
-//   } from "../../../../../../packages/contracts/src/organization.schema"
-
 import { addressesClient } from '@/http/modules/addresses/addresses.client'
-// import { organizationsClient } from '@/http/modules/organizations/organizations.client'
 
 export async function createAddressAction(data: unknown): Promise<ActionResult<Address>> {
-    console.log('DATA: ', data)
     const result = createAddressSchema.safeParse(data)
 
     if (!result.success) {

@@ -1,7 +1,5 @@
 "use server"
 
-import { z } from 'zod'
-
 import { revalidateTag } from 'next/cache'
 
 import { validarCPF } from '@/utils/cpf-utils'
@@ -9,10 +7,15 @@ import { validarCNPJ } from '@/utils/cnpj-utils'
 import { ActionResult } from '@/types/action-result'
 
 import { createOrganizationSchema, updateOrganizationSchema     
-  } from "../../../../../../packages/contracts/organization"
+  } from "@saas/contracts/organization"
 
-  import { Organization     
-  } from "../../../../../../packages/contracts/organization"
+// import { createOrganizationSchema, updateOrganizationSchema     
+//   } from "../../../../../../packages/contracts/organization"
+
+  import { Organization } from "@saas/contracts/organization"
+  
+//   import { Organization     
+//   } from "../../../../../../packages/contracts/organization"
 
 
 

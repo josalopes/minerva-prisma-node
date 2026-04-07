@@ -21,7 +21,7 @@ export function Step0BasicInfo({ form }: { form: UseFormReturn<CreateOrganizatio
                     <FormInput
                         control={form.control}
                         name="name"
-                        label="Organização"
+                        label="Nome"
                         placeholder="Digite o nome da organização"
                     />
                 </div>
@@ -66,10 +66,5 @@ export function Step0BasicInfo({ form }: { form: UseFormReturn<CreateOrganizatio
                 </div>
             </form>
         </Form>
-        // <div className="space-y-8">
-
-
-                
-        // </div>
   )
 }

@@ -43,43 +43,4 @@ export async function addressRoutes(app: FastifyInstance) {
     return { addresses };
   });
 
-  // app.withTypeProvider<ZodTypeProvider>()
-  // .put("/addresses/:id", async (request) => {
-  //   const paramsSchema = z.object({
-  //     id: z.coerce.number(),
-  //   });
-
-  //   const bodySchema = z.object({
-  //     street: z.string().optional(),
-  //     number: z.string().optional(),
-  //     complement: z.string().optional(),
-  //     district: z.string().optional(),
-  //     city: z.string().optional(),
-  //     state: z.string().optional(),
-  //     zipCode: z.string().optional(),
-  //   });
-
-  //   const { id } = paramsSchema.parse(request.params);
-  //   const data = bodySchema.parse(request.body);
-
-  //   const address = await updateAddressService({
-  //   //   addressId: id,
-  //     id,
-  //     ...data,
-  //   });
-
-  //   return { address };
-  // });
-
-  // app.delete("/addresses/:id", async (request) => {
-  //   const paramsSchema = z.object({
-  //     id: z.coerce.number(),
-  //   });
-
-  //   const { id } = paramsSchema.parse(request.params);
-
-  //   await deleteAddress(id);
-
-  //   return { success: true };
-  // });
 }
