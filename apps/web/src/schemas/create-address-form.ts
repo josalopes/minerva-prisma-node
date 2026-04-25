@@ -1,16 +1,24 @@
 import z from "zod"
 
+import {
+  requiredString,
+  cep,
+  optionalBoolean,
+  optionalString
+} from "@/lib/validation-helpers"
+
+
 export const createAddressFormSchema = z.object({
-  type: z.string(),
-  street: z.string().optional(),
-  number: z.string().optional(),
-  complement: z.string().optional(),
-  district: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zipCode: z.string().optional(),
-  isPrimary: z.boolean().optional(),
-  isNew: z.string().optional(),
+  type: requiredString("Tipo de endereço"),
+  street: optionalString(),
+  number: optionalString(),
+  complement: optionalString(),
+  district: optionalString(),
+  city: optionalString(),
+  state: optionalString(),
+  zipCode: cep(),
+  isPrimary: optionalBoolean(),
+  isNew: optionalString(),
 })
 
 export type CreateAddressFormData =

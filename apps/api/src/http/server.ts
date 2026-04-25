@@ -38,6 +38,9 @@ import { updateAddress } from './routes/addresses/update-address'
 import { getAddresses } from './routes/addresses/get-address'
 import { deleteAddress } from './routes/addresses/delete-address'
 
+import { getCnpjCache } from './routes/cnpj/get-cnpj-cache'
+import { createCnpjCache } from './routes/cnpj/create-cnpj-cache'
+
 import { createProject } from './routes/projects/create-project'
 import { deleteProject } from './routes/projects/delete-project'
 import { getProject } from './routes/projects/get-project'
@@ -132,6 +135,9 @@ app.register(createAddress)
 app.register(updateAddress)
 app.register(getAddresses)
 app.register(deleteAddress)
+
+app.register(getCnpjCache)
+app.register(createCnpjCache)
 
 app.register(createProject)
 app.register(deleteProject)

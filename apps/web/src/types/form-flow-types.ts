@@ -1,4 +1,8 @@
-export type FlowStep<TFormValues, TResponse = any> = {
+export type FlowStep<
+TFormValues,
+TContext = Record<string, any>, 
+TResponse = any
+> = {
   id: string
 
   form?: {
@@ -11,17 +15,24 @@ export type FlowStep<TFormValues, TResponse = any> = {
 
   onSubmit?: (
     values: TFormValues,
-    context: FlowContext
+    context: FlowContext<TContext>
   ) => Promise<TResponse>
 
   onSuccess?: (
     response: TResponse,
-    context: FlowContext
+    context: FlowContext<TContext>
   ) => void
 }
 
-export type FlowContext = {
-  data: Record<string, any>
-  set: (key: string, value: any) => void
-  get: (key: string) => any
+export type FlowContext<TContext = Record<string, any>> = {
+  data: TContext
+
+  set: <K extends keyof TContext>(
+    key: K,
+    value: TContext[K]
+  ) => void
+
+  get: <K extends keyof TContext>(
+    key: K
+  ) => TContext[K]
 }

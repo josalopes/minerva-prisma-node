@@ -1,46 +1,73 @@
-import { FlowStep } from "@/types/form-flow-types"
+import { FlowStep, FlowContext } from "@/types/form-flow-types"
 import { useEffect, useState, useRef } from "react"
 import { toast } from "sonner"
-import { loadPersistence, savePersistence } from "./persistence"
 
+type Options = {
+  storageKey?: string
+}
 
-export function useFormFlow(
-  steps: FlowStep<any, any>[],
-  options?: {
-    storageKey?: string
-  }) {
+export function useFormFlow<TContext = Record<string, any>>(
+  steps: FlowStep<any, TContext>[],
+  options?: Options
+) {
   const STORAGE_KEY = options?.storageKey ?? "form-flow"
+
   const [currentStep, setCurrentStep] = useState(0)
-  const [contextData, setContextData] = useState<Record<string, any>>({})
+  const [contextData, setContextData] = useState<TContext>({} as TContext)
   const [isLoading, setIsLoading] = useState(false)
+
+  const [stepErrors, setStepErrors] = useState<Record<number, boolean>>({})
   const isSubmittingRef = useRef(false)
   const lastCallRef = useRef(0)
 
   // 🔥 carregar do localStorage
-
   useEffect(() => {
-    const parsed = loadPersistence(STORAGE_KEY)
+    const saved = localStorage.getItem(STORAGE_KEY)
 
-    if (parsed) {
+    if (saved) {
+      const parsed = JSON.parse(saved)
       setCurrentStep(parsed.step ?? 0)
       setContextData(parsed.context ?? {})
     }
-  }, [])
+  }, [STORAGE_KEY])
 
   // 🔥 salvar automaticamente
   useEffect(() => {
-    savePersistence(STORAGE_KEY, {
-      step: currentStep,
-      context: contextData
-    })
-  }, [currentStep, contextData])
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        step: currentStep,
+        context: contextData
+      })
+    )
+  }, [currentStep, contextData, STORAGE_KEY])
 
-  const context = {
+  const context: FlowContext<TContext> = {
     data: contextData,
-    set: (key: string, value: any) => {
-      setContextData((prev) => ({ ...prev, [key]: value }))
+
+    set: (key, value) => {
+      setContextData((prev) => ({
+        ...prev,
+        [key]: value
+      }))
     },
-    get: (key: string) => contextData[key]
+
+    get: (key) => {
+      return contextData[key]
+    }
+  }
+
+  function setStepError(stepIndex: number, hasError: boolean) {
+    setStepErrors((prev) => ({
+      ...prev,
+      [stepIndex]: hasError
+    }))
+  }
+
+  async function finish() {
+    localStorage.removeItem(STORAGE_KEY)
+    setCurrentStep(0)
+    setContextData({}as TContext)
   }
 
   async function next() {
@@ -71,10 +98,13 @@ export function useFormFlow(
         const isValid = await step.form.trigger()
 
         if (!isValid) {
+          // setStepError(currentStep, true)
           isSubmittingRef.current = false
           setIsLoading(false)
           return
         }
+        
+        // setStepError(currentStep, false)
 
         values = step.form.getValues()
       }
@@ -107,6 +137,10 @@ export function useFormFlow(
 
   function goTo(stepIndex: number) {
     setCurrentStep(stepIndex)
+    // const step = steps[stepIndex]
+
+    // step?.form?.trigger()
+    
   }
 
   function skip() {
@@ -129,7 +163,7 @@ export function useFormFlow(
   function reset() {
     localStorage.removeItem(STORAGE_KEY)
     setCurrentStep(0)
-    setContextData({})
+    setContextData({} as TContext)
   }
 
   return {
@@ -140,7 +174,10 @@ export function useFormFlow(
     back,
     skip,
     reset,
+    finish,
     context,
-    steps
+    steps,
+    stepErrors,
+    setStepError
   }
 }

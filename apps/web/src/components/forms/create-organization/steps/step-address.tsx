@@ -1,107 +1,152 @@
 "use client"
 
+import { useEffect, useRef, useState } from "react"
 import { UseFormReturn } from "react-hook-form"
-import { CreateAddressFormData } from "@/schemas/create-address-form"
 
-import { Home, Truck, Receipt, Search, Loader2 } from "lucide-react"
+import { Home, Truck, Receipt } from "lucide-react"
+import clsx from "clsx"
+
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
-import { useEffect, useState } from "react"
-
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage
-} from "@/components/ui/form"
-
+import { Form } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import {
-  ToggleGroup,
-  ToggleGroupItem
-} from "@/components/ui/toggle-group"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { useFormFlowContext } from "@/lib/form-flow-context"
 
+import { CreateAddressFormData } from "@/schemas/create-address-form"
+import { useFocusFirstError } from "@/hooks/use-focus-first-error"
+import { AppFormField } from "@/components/app-form-field"
+
+import { masks } from "@/utils/input-masks"
+import { useAsyncField } from "@/hooks/use-async-field"
+import { FormFieldUniversal } from "@/lib/form-field-universal"
+import { useFormFlow } from "@/lib/use-form-flow"
+import { CreateOrgContext } from "@/types/create-org-flow"
+
+export type CreateOrgFlow = ReturnType<
+  typeof useFormFlow<CreateOrgContext>
+>
 interface Step1AddressProps {
   form: UseFormReturn<CreateAddressFormData>
+  flow: CreateOrgFlow
 }
 
-export function Step1Address({ form }: Step1AddressProps) {
-  const flow  = useFormFlowContext()
-  const [isLoadingCep, setIsLoadingCep] = useState(false)
-  const [isCep, setIsCep] = useState(false)
-  const [mode, setMode] = useState<"new" | "edit">("new")
+export function Step1Address({ 
+  form,
+  flow
+}: Step1AddressProps
+) {
+
+  // const [isCep, setIsCep] = useState(false)
+  const [isEditable, setIsEditable] = useState(true)
+  const [mode, setMode] = useState<string>("new")
+
+  const addressFromCnpj = flow.context.get("addressFromCnpj")
+  const source = flow.context.get("addressSource")
+
+  const lastZipRef = useRef("")
+  const zipCode = form.watch("zipCode")
+
+  const [cepPreview, setCepPreview] = useState<{
+    street: string
+    district: string
+    city: string
+    state: string
+  } | null>(null)
+
+  const cepField = useAsyncField({
+    form,
+    name: "zipCode",
+    validate: async (value) => {
+      const clean = value.replace(/\D/g, "")
+
+    if (clean.length !== 8) return "CEP inválido"
+
+    const res = await fetch(`https://viacep.com.br/ws/${clean}/json`)
+    const data = await res.json()
+
+    if (data.erro) return "CEP não encontrado"
+
+    flow.context.set("addressSource", "cep")
+    setIsEditable(false)
+
+    // 🔥 guarda preview
+    setCepPreview({
+      street: data.logradouro,
+      district: data.bairro,
+      city: data.localidade,
+      state: data.uf
+    })
+
+    return null
+    }
+  })
+
+  function updateStep1(data: Partial<CreateOrgContext["step1"]>) {
+    const current = flow.context.get("step1") || {}
+
+    flow.context.set("step1", {
+      ...current,
+      ...data
+    })
+  }
 
   useEffect(() => {
-    const saved = flow.context.get("addressMode") ?? "new"
+    if (!addressFromCnpj) return
+
+    flow.context.set("addressSource", "cnpj")
+    
+    form.setValue("street", addressFromCnpj.street)
+    form.setValue("complement", addressFromCnpj.complement)
+    form.setValue("district", addressFromCnpj.district)
+    form.setValue("city", addressFromCnpj.city)
+    form.setValue("state", addressFromCnpj.state)
+    form.setValue("zipCode", addressFromCnpj.zipCode ?? "")
+    
+    lastZipRef.current = addressFromCnpj.zipCode ?? ""
+
+    setIsEditable(false)
+
+    flow.context.set("addressFromCnpj", undefined)
+  }, [addressFromCnpj])
+
+  useEffect(() => {
+    const saved = flow.context.get("step1").addressMode ?? "new"
     setMode(saved)
   }, [])
 
-  async function fetchCep(cep: string) {
-  // 1️⃣ tenta ViaCEP
-  try {
-    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
-    const data = await res.json()
+  useEffect(() => {
+    const clean = zipCode?.replace(/\D/g, "")
+    const source = flow.context.get("addressSource")
 
-    if (!data.erro) return data
-  } catch {}
+    if (source === "cnpj") return
 
-  // 2️⃣ fallback (sua API)
-  try {
-    const res = await fetch(`/api/cep/${cep}`)
-    const data = await res.json()
+    if (!clean || clean.length !== 8) return
+    if (clean === lastZipRef.current) return
 
-    return data
-  } catch {}
+    lastZipRef.current = clean
 
-  return null
-}
+    const timeout = setTimeout(() => {
+      cepField.onBlurAsync(zipCode)
+    }, 500)
 
-  async function handleSearchCep(cepInput?: string) {
-    const rawCep = cepInput ?? form.getValues("zipCode")
-    const cep = rawCep?.replace(/\D/g, "")
+    return () => clearTimeout(timeout)
+  }, [zipCode])
 
-    if (!cep || cep.length !== 8) return
-
-    setIsLoadingCep(true)
-
-    try {
-      const data = await fetchCep(cep)
-
-      if (!data) {
-        toast.error("CEP não encontrado")
-        return
-      }
-
-      form.setValue("street", data.logradouro || "")
-      form.setValue("district", data.bairro || "")
-      form.setValue("city", data.localidade || "")
-      form.setValue("state", data.uf || "")
-
-      toast.success("Endereço preenchido automaticamente")
-      setIsCep(true)
-
-    } catch {
-      toast.error("Erro ao buscar CEP")
-    } finally {
-      setIsLoadingCep(false)
-    }
-  }
+  useFocusFirstError(form, flow.step)
 
   return (
     <>
-      <RadioGroup 
+      {/* MODE */}
+      <RadioGroup
         className="flex flex-row mb-6"
         value={mode}
         onValueChange={(v) => {
           const value = v as "new" | "edit"
           setMode(value)
-          flow.context.set("addressMode", value)
+
+          updateStep1({ addressMode: value })
         }}
       >
         <div className="flex items-center gap-3">
@@ -116,217 +161,205 @@ export function Step1Address({ form }: Step1AddressProps) {
       </RadioGroup>
 
       <Form {...form}>
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-4">          
-          {/* Tipo */}
-          <FormField
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          {/* Tipo (mantido com FormField padrão - mais complexo) */}
+          <div className="col-span-2 space-y-2">
+            <Label>Tipo de endereço</Label>
+
+            <ToggleGroup
+              type="single"
+              value={form.watch("type")}
+              onValueChange={(value) => {
+                if (value) form.setValue("type", value as any)
+              }}
+              className="grid grid-cols-3"
+            >
+              <ToggleGroupItem value="GENERAL" className="flex gap-2 h-12 border">
+                <Home className="w-4 h-4" />
+                Geral
+              </ToggleGroupItem>
+
+              <ToggleGroupItem value="SHIPPING" className="flex gap-2 h-12 border">
+                <Truck className="w-4 h-4" />
+                Entrega
+              </ToggleGroupItem>
+
+              <ToggleGroupItem value="BILLING" className="flex gap-2 h-12 border">
+                <Receipt className="w-4 h-4" />
+                Cobrança
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+
+          {/* CEP */}
+          <FormFieldUniversal
             control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem className="col-span-2">
-                  <FormLabel>Tipo de endereço</FormLabel>
-                    <FormControl>
-                      <ToggleGroup
-                        type="single"
-                        value={field.value}
-                        onValueChange={(value) => {
-                          if (value) field.onChange(value)
-                        }}
-                        className="grid grid-cols-3"
-                      >
-                        <ToggleGroupItem value="GENERAL" className="flex gap-2 h-12 border-1">
-                          <Home className="w-4 h-4" />
-                          Geral
-                        </ToggleGroupItem>
-
-                        <ToggleGroupItem value="SHIPPING" className="flex gap-2 h-12 border-1">
-                          <Truck className="w-4 h-4" />
-                          Entrega
-                        </ToggleGroupItem>
-
-                        <ToggleGroupItem value="BILLING" className="flex gap-2 h-12 border-1">
-                          <Receipt className="w-4 h-4" />
-                          Cobrança
-                        </ToggleGroupItem>
-                      </ToggleGroup>
-                        {/* <Input placeholder="Ex: SHIPPING" {...field} /> */}
-                    </FormControl>
-                    <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
+            form={form}
             name="zipCode"
-            render={({ field }) => (
-              <FormItem className="col-span-2">
-                <FormLabel>CEP</FormLabel>
+            label="CEP"
+            className="col-span-1 md:col-span-2"
+            placeholder="00000-000"
+            transform={masks.cep}
+            asyncField={cepField}
+            action={
+              <Button 
+                  type="button"
+                  disabled={form.getValues("zipCode")?.replace(/\D/g, "").length !== 8}
+                  onClick={() => {
+                    const value = form.getValues("zipCode") ?? ""
+                    const clean = value.replace(/\D/g, "")
 
-                <div className="flex gap-2">
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="00000-000"
-                      onChange={(e) => {
-                        let value = e.target.value.replace(/\D/g, "")
-                        value = value.replace(/^(\d{5})(\d)/, "$1-$2")
-                        field.onChange(value)
-                      }}
-                      onBlur={() => handleSearchCep()}
-                    />
-                  </FormControl>
-
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => handleSearchCep()}
-                    disabled={isLoadingCep}
-                  >
-                    {isLoadingCep ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <>
-                        <Search className="w-4 h-4 mr-1" />
-                        Buscar
-                      </>
-                    )}
-                  </Button>
-                </div>
-
-                <FormMessage />
-              </FormItem>
-            )}
+                    if (clean.length === 8) {
+                      cepField.onBlurAsync(value)
+                    }
+                  }} 
+              >
+                  Buscar
+              </Button>
+            }
           />
+          {source === "cnpj" && (
+            <div className="text-xs text-muted-foreground">
+              Endereço preenchido automaticamente pelo CNPJ
+            </div>
+          )}
+          {cepPreview && source === "cep" && (
+            <div className="rounded-md border p-3 bg-muted/50 text-sm space-y-1">
 
+              <div className="font-medium text-foreground">
+                Endereço encontrado pelo CEP:
+              </div>
+
+              <div>{cepPreview.street}</div>
+              <div>{cepPreview.district}</div>
+              <div>{cepPreview.city} - {cepPreview.state}</div>
+
+              <button
+                type="button"
+                className="text-primary text-xs mt-2 underline"
+                onClick={() => {
+                  form.setValue("street", cepPreview.street)
+                  form.setValue("district", cepPreview.district)
+                  form.setValue("city", cepPreview.city)
+                  form.setValue("state", cepPreview.state)
+
+                  setCepPreview(null)
+                  flow.context.set("addressSource", "manual")
+                }}
+              >
+                Usar este endereço
+              </button>
+            </div>
+          )}
+          
           {/* Rua */}
-          <FormField
-            control={form.control}
-            name="street"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Rua</FormLabel>
-                <FormControl>
-                  <Input {...field}
-                      placeholder="Rua..." 
-                      disabled={isCep}                     
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+          <AppFormField 
+            control={form.control} 
+            name="street" 
+            label="Rua"
+          >
+            {(field, fieldState) => (
+              <Input
+                {...field}
+                placeholder="Rua..."
+                disabled={!isEditable}
+                className={clsx(
+                  fieldState.error && "field-error",
+                  !fieldState.error && field.value && "border-success"
+                )}
+              />
             )}
-          />
+          </AppFormField>
 
           {/* Número */}
-          <FormField
-            control={form.control}
-            name="number"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Número</FormLabel>
-                <FormControl>
-                  <Input {...field} 
-                      placeholder="Número..."
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+          <AppFormField control={form.control} name="number" label="Número">
+            {(field, fieldState) => (
+              <Input
+                {...field}
+                placeholder="Número..."
+                className={clsx(
+                  fieldState.error && "field-error",
+                  !fieldState.error && field.value && "border-success"
+                )}
+              />
             )}
-          />
+          </AppFormField>
 
           {/* Complemento */}
-          <FormField
-            control={form.control}
-            name="complement"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Complemento</FormLabel>
-                <FormControl>
-                  <Input {...field}
-                    placeholder="Complemento..."
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+          <AppFormField control={form.control} name="complement" label="Complemento">
+            {(field, fieldState) => (
+              <Input
+                {...field}
+                placeholder="Complemento..."
+                className={clsx(
+                  fieldState.error && "field-error",
+                  !fieldState.error && field.value && "border-success"
+                )}
+              />
             )}
-          />
+          </AppFormField>
 
           {/* Bairro */}
-          <FormField
-            control={form.control}
-            name="district"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Bairro</FormLabel>
-                <FormControl>
-                  <Input {...field} 
-                    placeholder="Bairro..."
-                    disabled={isCep}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+          <AppFormField control={form.control} name="district" label="Bairro">
+            {(field, fieldState) => (
+              <Input
+                {...field}
+                placeholder="Bairro..."
+                disabled={!isEditable}
+                className={clsx(
+                  fieldState.error && "field-error",
+                  !fieldState.error && field.value && "border-success"
+                )}
+              />
             )}
-          />
+          </AppFormField>
 
           {/* Cidade */}
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Cidade</FormLabel>
-                <FormControl>
-                  <Input {...field} 
-                    placeholder="Cidade..."
-                    disabled={isCep}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+          <AppFormField control={form.control} name="city" label="Cidade">
+            {(field, fieldState) => (
+              <Input
+                {...field}
+                placeholder="Cidade..."
+                disabled={!isEditable}
+                className={clsx(
+                  fieldState.error && "field-error",
+                  !fieldState.error && field.value && "border-success"
+                )}
+              />
             )}
-          />
+          </AppFormField>
 
           {/* Estado */}
-          <FormField
-            control={form.control}
-            name="state"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Estado</FormLabel>
-                <FormControl>
-                  <Input {...field}
-                    placeholder="UF..."
-                    disabled={isCep}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+          <AppFormField control={form.control} name="state" label="Estado">
+            {(field, fieldState) => (
+              <Input
+                {...field}
+                placeholder="UF..."
+                disabled={!isEditable}
+                className={clsx(
+                  fieldState.error && "field-error",
+                  !fieldState.error && field.value && "border-success"
+                )}
+              />
             )}
-          />
+          </AppFormField>
 
-          <FormField
-            control={form.control}
-            name="isPrimary"
-            render={({ field }) => (
-              <FormItem className="space-y-3">
-                <FormControl>
-                  <div className="flex items-start space-x-3">
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
+          {/* Checkbox */}
+          <AppFormField control={form.control} name="isPrimary">
+            {(field) => (
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
 
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>
-                        Considerar como endereço principal
-                      </FormLabel>
-                    </div>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                <Label>
+                  Considerar como endereço principal
+                </Label>
+              </div>
             )}
-          />
+          </AppFormField>
         </form>
       </Form>
     </>

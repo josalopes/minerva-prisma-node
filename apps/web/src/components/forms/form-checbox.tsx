@@ -1,66 +1,111 @@
 "use client"
 
-import { Control } from "react-hook-form"
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage
-} from "@/components/ui/form"
+import { Control, FieldValues, Path } from "react-hook-form"
+import { AppFormField } from "@/components/app-form-field"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { FieldStatusIcon } from "@/lib/field-status-icon"
+import { useFieldStatus } from "@/hooks/use-field-status"
 
-interface FormCheckboxProps {
-  control: Control<any>
-  name: string
+interface Props<T extends FieldValues> {
+  control: Control<T>
+  name: Path<T>
   label: string
   description?: string
 }
 
-export function FormCheckbox({
+export function FormCheckbox<T extends FieldValues>({
   control,
   name,
   label,
   description
-}: FormCheckboxProps) {
-
+}: Props<T>) {
   return (
-    <FormField
-      control={control}
-      name={name}
-      render={({ field }) => (
+    <AppFormField control={control} name={name}>
+      {(field, fieldState) => {
+        const status = useFieldStatus({
+          value: field.value,
+          error: fieldState.error
+        })
 
-        <FormItem className="space-y-3">
+        return (
+          <div className="flex items-start gap-3 leading-none">
 
-          <FormControl>
-            <div className="flex items-start space-x-3">
+            <Checkbox
+              id={name}
+              checked={field.value}
+              onCheckedChange={field.onChange}
+            />
 
-              <Checkbox
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
+            <div className="space-y-1">
 
-              <div className="space-y-1 leading-none">
+              <Label
+                htmlFor={name}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                {label}
 
-                <FormLabel>
-                  {label}
-                </FormLabel>
+                <FieldStatusIcon
+                  isValid={status.isValid}
+                  hasError={status.hasError}
+                  isLoading={status.isLoading}
+                />
+              </Label>
 
-                {description && (
-                  <p className="text-sm text-muted-foreground">
-                    {description}
-                  </p>
-                )}
-
-              </div>
+              {description && (
+                <p className="text-sm text-muted-foreground">
+                  {description}
+                </p>
+              )}
 
             </div>
-          </FormControl>
-
-          <FormMessage />
-
-        </FormItem>
-      )}
-    />
+          </div>
+        )
+      }}
+    </AppFormField>
   )
 }
+
+// "use client"
+
+// import { Control, FieldValues, Path } from "react-hook-form"
+// import { AppFormField } from "@/components/app-form-field"
+// import { Checkbox } from "@/components/ui/checkbox"
+// import { Label } from "@/components/ui/label"
+
+// interface Props<T extends FieldValues> {
+//   control: Control<T>
+//   name: Path<T>
+//   label: string
+//   description?: string
+// }
+
+// export function FormCheckbox<T extends FieldValues>({
+//   control,
+//   name,
+//   label,
+//   description
+// }: Props<T>) {
+//   return (
+//     <AppFormField control={control} name={name}>
+//       {(field) => (
+//         <div className="flex items-start space-x-3">
+//           <Checkbox
+//             checked={field.value}
+//             onCheckedChange={field.onChange}
+//           />
+
+//           <div className="space-y-1">
+//             <Label>{label}</Label>
+//             {description && (
+//               <p className="text-sm text-muted-foreground">
+//                 {description}
+//               </p>
+//             )}
+//           </div>
+//         </div>
+//       )}
+//     </AppFormField>
+//   )
+// }
+

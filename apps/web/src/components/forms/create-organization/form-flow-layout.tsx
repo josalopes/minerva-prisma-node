@@ -20,6 +20,7 @@ interface FormFlowLayoutProps {
   children: ReactNode
   saveStatus?: "idle" | "saving" | "saved"
   variant?: "vertical" | "horizontal" | "auto"
+  stepErrors?: Record<number, boolean>
 }
 
 export function FormFlowLayout({
@@ -30,7 +31,8 @@ export function FormFlowLayout({
   footer,
   children,
   saveStatus,
-  variant
+  variant,
+  stepErrors
 }: FormFlowLayoutProps) {
 
   const [justCompleted, setJustCompleted] = useState(false)
@@ -115,6 +117,7 @@ export function FormFlowLayout({
           <SmartStepper
             steps={steps}
             currentStep={currentStep}
+            stepErrors={stepErrors}                       
             onStepClick={onStepClick}
             variant={
               resolvedVariant === "horizontal"

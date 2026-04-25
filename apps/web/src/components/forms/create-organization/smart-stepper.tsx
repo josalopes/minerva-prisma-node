@@ -20,14 +20,18 @@ interface SmartStepperProps {
    * responsive → mobile horizontal / desktop vertical
    */
   variant?: "vertical" | "horizontal" | "responsive"
+  stepErrors?: Record<number, boolean>
 }
 
 export function SmartStepper({
   steps,
   currentStep,
   onStepClick,
-  variant = "responsive"
+  variant = "responsive",
+  stepErrors
 }: SmartStepperProps) {
+
+  
 
   // ===============================
   // 🔥 STATUS
@@ -62,6 +66,7 @@ export function SmartStepper({
         const status = getStatus(index)
         const isCompleted = status === "completed"
         const isCurrent = status === "current"
+        const hasError = stepErrors?.[index]
 
         return (
           <div
@@ -89,13 +94,14 @@ export function SmartStepper({
                   // tamanhos
                   "w-8 h-8",
 
-                  isCompleted && "bg-primary text-white border-primary",
-                  isCurrent && "border-primary text-primary",
-                  !isCompleted && !isCurrent && "border-border text-muted-foreground"
+                  isCompleted && !hasError && "bg-green-500/90 hover:bg-green-500 text-white border-green-500",
+                  isCurrent && !hasError && "border-primary text-primary",
+                  !isCompleted && !isCurrent && !hasError && "border-border text-muted-foreground"
                 )}
               >
                 {isCompleted ? (
-                  <Check className="animate-in zoom-in duration-200" size={16} />
+                  <Check className="text-white" size={16} />
+                  // <Check className="animate-in zoom-in duration-200" size={16} />
                 ) : (
                   index + 1
                 )}
@@ -110,6 +116,11 @@ export function SmartStepper({
 
             {/* ================= LABEL ================= */}
             <div className="flex flex-col">
+              {hasError && (
+                <span className="text-xs text-red-500">
+                  Erro
+                </span>
+              )}
 
               <span
                 className={clsx(

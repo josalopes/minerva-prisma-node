@@ -1,27 +1,26 @@
 import { z } from "zod"
 
+import {
+  requiredString,
+  requiredEnum,
+  cpfCnpj,
+  domain,
+  cep,
+  optionalBoolean,
+  optionalString
+} from "@/lib/validation-helpers"
+
 export const createOrganizationFormSchema = z.object({
-  name: z.string().min(4, "O nome deve ter no mínimo 4 caracteres"),
-  cpfCnpj: z.string(),
-  personType: z.enum(["FISICA", "JURIDICA"]),
-  domain: z.string().optional(),
-  shouldAttachUserByDomain: z.boolean().optional(),
+  name: requiredString("Nome"),
+  cpfCnpj: cpfCnpj(),
+  personType: requiredEnum(
+      ["FISICA", "JURIDICA"],
+      "Selecione o tipo de pessoa"
+    ),
+  domain: optionalString(), 
+  shouldAttachUserByDomain: optionalBoolean(),
 
-  // STEP 2
-  type: z.string().optional(),
-  street: z.string().optional(),
-  number: z.string().optional(),
-  complement: z.string().optional(),
-  district: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zipCode: z.string().optional(),
-
-  // STEP 3
-  logo: z.string().optional(),
-
-  // STEP 4
-  avatar: z.string().optional()
+  
 })
 
 export type CreateOrganizationFormData =

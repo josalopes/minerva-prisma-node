@@ -294,6 +294,15 @@ model TransactionItems {
   @@map("transaction_items")
 }
 
+model CnpjCache {
+  cnpj      String   @id
+  data      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("cnpj_cache")
+}
+
 enum TokenType {
   PASSWORD_RECOVER
 }
