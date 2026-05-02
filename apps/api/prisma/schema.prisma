@@ -118,7 +118,9 @@ model Organization {
   domain                   String?    @unique
   shouldAttachUserByDomain Boolean    @default(false) @map("should_attach_user_by_domain")
   avatarUrl                String?    @map("avatar_url")
+  avatarPublicId           String?    @map("avatar_public_id")
   logoUrl                  String?    @map("logo_url")
+  logoPublicId             String?    @map("logo_public_id")
   personType               PersonType @default(JURIDICA) @map("tipo_pessoa")
   stripeCustomerId         String?    @map("stripe_customer_id")
   email                    String?    @map("email")
