@@ -36,3 +36,15 @@ export type FlowContext<TContext = Record<string, any>> = {
     key: K
   ) => TContext[K]
 }
+
+export type FlowController<TContext = Record<string, any>> = {
+  step: number
+
+  context: FlowContext<TContext>
+
+  next: () => Promise<void>
+  back: () => void
+  goTo: (index: number) => void
+
+  isLoading?: boolean
+}

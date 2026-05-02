@@ -3,17 +3,19 @@ import { api } from "../api-client";
 
 interface UpdateOrganizationAvatarRequest {
     avatarUrl?: string,
+    avatarPublicId?: string,
     slug: string
 }
 
 export async function updateOrganizationAvatar({
     avatarUrl,
+    avatarPublicId,
     slug
 }: UpdateOrganizationAvatarRequest) {
-    console.log('AVATAR e SLUG: ', avatarUrl, slug)
-    const response = await api.put(`organization/${slug}/avatar`, {
+    const response = await api.patch(`organization/${slug}/avatar`, {
         json: { 
             avatarUrl,
+            avatarPublicId
         },
     })
 

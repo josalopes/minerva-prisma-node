@@ -114,7 +114,7 @@ export function FormFieldUniversal<T extends FieldValues>({
                 className={clsx(
                   "pr-10",
                   status.hasError && "field-error",
-                  status.isValid && "border-success focus-visible:ring-success"
+                  isValid && "border-success focus-visible:ring-success"
                 )}
               />
 

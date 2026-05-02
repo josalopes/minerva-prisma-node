@@ -23,6 +23,9 @@ import { useAsyncField } from "@/hooks/use-async-field"
 import { FormFieldUniversal } from "@/lib/form-field-universal"
 import { useFormFlow } from "@/lib/use-form-flow"
 import { CreateOrgContext } from "@/types/create-org-flow"
+import { useStepController } from "@/hooks/use-step-controller"
+import { autoFill } from "@/utils/auto-fill-form"
+import { formatZipCode } from "@/utils/format-zip"
 
 export type CreateOrgFlow = ReturnType<
   typeof useFormFlow<CreateOrgContext>
@@ -38,7 +41,6 @@ export function Step1Address({
 }: Step1AddressProps
 ) {
 
-  // const [isCep, setIsCep] = useState(false)
   const [isEditable, setIsEditable] = useState(true)
   const [mode, setMode] = useState<string>("new")
 
@@ -47,12 +49,16 @@ export function Step1Address({
 
   const lastZipRef = useRef("")
   const zipCode = form.watch("zipCode")
+  
+  const step1 = useStepController<CreateOrgContext, "step1">(flow, "step1")
 
   const [cepPreview, setCepPreview] = useState<{
     street: string
     district: string
+    complement: string
     city: string
     state: string
+    zipCode: string
   } | null>(null)
 
   const cepField = useAsyncField({
@@ -75,8 +81,10 @@ export function Step1Address({
     setCepPreview({
       street: data.logradouro,
       district: data.bairro,
+      complement: data.complemento,
       city: data.localidade,
-      state: data.uf
+      state: data.uf,
+      zipCode: data.cep
     })
 
     return null
@@ -84,11 +92,8 @@ export function Step1Address({
   })
 
   function updateStep1(data: Partial<CreateOrgContext["step1"]>) {
-    const current = flow.context.get("step1") || {}
-
-    flow.context.set("step1", {
-      ...current,
-      ...data
+    step1.mutate(draft => {
+      Object.assign(draft, data)
     })
   }
 
@@ -96,14 +101,16 @@ export function Step1Address({
     if (!addressFromCnpj) return
 
     flow.context.set("addressSource", "cnpj")
-    
-    form.setValue("street", addressFromCnpj.street)
-    form.setValue("complement", addressFromCnpj.complement)
-    form.setValue("district", addressFromCnpj.district)
-    form.setValue("city", addressFromCnpj.city)
-    form.setValue("state", addressFromCnpj.state)
-    form.setValue("zipCode", addressFromCnpj.zipCode ?? "")
-    
+
+    autoFill(form, {
+      street: addressFromCnpj.street,
+      complement: addressFromCnpj.complement,
+      district: addressFromCnpj.district,
+      city: addressFromCnpj.city,
+      state: addressFromCnpj.state,
+      zipCode: formatZipCode(addressFromCnpj.zipCode)
+    })
+        
     lastZipRef.current = addressFromCnpj.zipCode ?? ""
 
     setIsEditable(false)
@@ -160,7 +167,6 @@ export function Step1Address({
         </div>
       </RadioGroup>
 
-      <Form {...form}>
         <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
           {/* Tipo (mantido com FormField padrão - mais complexo) */}
@@ -220,7 +226,7 @@ export function Step1Address({
             }
           />
           {source === "cnpj" && (
-            <div className="text-xs text-muted-foreground">
+            <div className="col-span-2 text-xs text-muted-foreground">
               Endereço preenchido automaticamente pelo CNPJ
             </div>
           )}
@@ -239,11 +245,14 @@ export function Step1Address({
                 type="button"
                 className="text-primary text-xs mt-2 underline"
                 onClick={() => {
-                  form.setValue("street", cepPreview.street)
-                  form.setValue("district", cepPreview.district)
-                  form.setValue("city", cepPreview.city)
-                  form.setValue("state", cepPreview.state)
-
+                  autoFill(form, {
+                    street: cepPreview.street,
+                    district: cepPreview.district,
+                    city: cepPreview.city,
+                    state: cepPreview.state,
+                    zipCode: cepPreview,
+                  })
+                  
                   setCepPreview(null)
                   flow.context.set("addressSource", "manual")
                 }}
@@ -263,7 +272,7 @@ export function Step1Address({
               <Input
                 {...field}
                 placeholder="Rua..."
-                disabled={!isEditable}
+                // disabled={!isEditable}
                 className={clsx(
                   fieldState.error && "field-error",
                   !fieldState.error && field.value && "border-success"
@@ -306,7 +315,7 @@ export function Step1Address({
               <Input
                 {...field}
                 placeholder="Bairro..."
-                disabled={!isEditable}
+                // disabled={!isEditable}
                 className={clsx(
                   fieldState.error && "field-error",
                   !fieldState.error && field.value && "border-success"
@@ -321,7 +330,7 @@ export function Step1Address({
               <Input
                 {...field}
                 placeholder="Cidade..."
-                disabled={!isEditable}
+                // disabled={!isEditable}
                 className={clsx(
                   fieldState.error && "field-error",
                   !fieldState.error && field.value && "border-success"
@@ -336,7 +345,7 @@ export function Step1Address({
               <Input
                 {...field}
                 placeholder="UF..."
-                disabled={!isEditable}
+                // disabled={!isEditable}
                 className={clsx(
                   fieldState.error && "field-error",
                   !fieldState.error && field.value && "border-success"
@@ -361,7 +370,6 @@ export function Step1Address({
             )}
           </AppFormField>
         </form>
-      </Form>
     </>
   )
 }

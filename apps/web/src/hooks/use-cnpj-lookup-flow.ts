@@ -5,7 +5,6 @@ import { CnpjData } from "@/types/cnpj"
 import { api } from "@/http/api-client"
 import { useCompanyPreview } from "@/hooks/use-company-preview"
 
-type CompanyPreviewController = ReturnType<typeof useCompanyPreview>
 
 type Props = {
   flow: any
@@ -27,7 +26,6 @@ export function useCnpjLookupFlow({
   const [data, setData] = useState<CnpjData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  // const [open, setOpen] = useState(false)
 
   const lastCnpj = useRef("")
   const debounceRef = useRef<number | null>(null)
@@ -61,7 +59,6 @@ export function useCnpjLookupFlow({
     if (flow.step !== stepIndex) {
       cleanup()
 
-      // setOpen(false)
       setData(null)
       setError(null)
       setIsLoading(false)
@@ -125,12 +122,6 @@ export function useCnpjLookupFlow({
 
   }, [cnpj, handled, flow.step])
 
-  // =========================
-  // 🔥 APPLY / CLOSE / RESET
-  // =========================
-  // function close() {
-  //   setOpen(false)
-  // }
 
   function reset() {
     cleanup()
@@ -138,7 +129,6 @@ export function useCnpjLookupFlow({
     setData(null)
     setError(null)
     setIsLoading(false)
-    // setOpen(false)
 
     lastCnpj.current = ""
   }
@@ -156,8 +146,6 @@ export function useCnpjLookupFlow({
     data,
     isLoading,
     error,
-    // open,
-    // close,
     reset
   }
 }

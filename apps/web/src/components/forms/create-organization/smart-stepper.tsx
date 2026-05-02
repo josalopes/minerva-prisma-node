@@ -13,6 +13,7 @@ interface SmartStepperProps {
   steps: Step[]
   currentStep: number
   onStepClick?: (index: number) => void
+  isFinished?: boolean
 
   /**
    * vertical → sempre vertical
@@ -27,6 +28,7 @@ export function SmartStepper({
   steps,
   currentStep,
   onStepClick,
+  isFinished,
   variant = "responsive",
   stepErrors
 }: SmartStepperProps) {
@@ -37,8 +39,25 @@ export function SmartStepper({
   // 🔥 STATUS
   // ===============================
   const getStatus = (index: number) => {
-    if (index < currentStep) return "completed"
-    if (index === currentStep) return "current"
+    // if (index < currentStep) return "completed"
+    // if (index === currentStep) return "current"
+    // 🔥 completed anteriores
+    if (index < currentStep) {
+      return "completed"
+    }
+
+    // 🔥 último step finalizado
+    if (
+      isFinished &&
+      index === steps.length - 1
+    ) {
+      return "completed"
+    }
+
+    // 🔥 atual
+    if (index === currentStep) {
+      return "current"
+    }
     return "pending"
   }
 
@@ -61,7 +80,6 @@ export function SmartStepper({
 
   return (
     <div className={containerClass}>
-
       {steps.map((step, index) => {
         const status = getStatus(index)
         const isCompleted = status === "completed"
@@ -149,7 +167,6 @@ export function SmartStepper({
                 )}
               />
             )}
-
           </div>
         )
       })}

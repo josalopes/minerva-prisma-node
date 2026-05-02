@@ -37,6 +37,9 @@ export function AppFormField<T extends FieldValues>({
           error: fieldState.error,
         })
 
+        const isSuccess =
+          !fieldState.invalid &&
+          !!field.value
 
         return (
           <FormItem className={clsx("space-y-2", className)}>
@@ -44,14 +47,14 @@ export function AppFormField<T extends FieldValues>({
               <FormLabel className="flex items-center gap-2">
                 {label}
 
-                <FieldStatusIcon
-                  isValid={status.isValid}
+                {/* <FieldStatusIcon
+                  isValid={isSuccess}
                   hasError={status.hasError}
                   isLoading={status.isLoading}
-                />
+                /> */}
 
                 {/* ✔ SUCCESS ICON */}
-                {/* {status.isValid && (
+                {/* {isSuccess && (
                   <Check className="text-success w-4 h-4" />
                 )} */}
               </FormLabel>
@@ -63,16 +66,10 @@ export function AppFormField<T extends FieldValues>({
                 <div className="relative">
                   {children(field, fieldState)}
 
-                  <FieldStatusIcon
-                    isValid={status.isValid}
-                    hasError={status.hasError}
-                    isLoading={status.isLoading}
-                  />
-
                   {/* ✔ CHECK INLINE */}
-                  {/* {status.isValid && (
+                  {isSuccess && (
                     <Check className="absolute right-3 top-1/2 -translate-y-1/2 text-success w-4 h-4" />
-                  )} */}
+                  )}
                 </div>
               </FormControl>
 

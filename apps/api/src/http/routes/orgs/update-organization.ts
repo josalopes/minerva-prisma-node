@@ -9,9 +9,6 @@ import { apiError } from "@/lib/http-error";
 import { errorResponseSchema, successResponseSchema } from "@/lib/api-response";
 import { updateOrganizationSchema, organizationEntitySchema } from "@saas/contracts/organization"
 
-// import { updateOrganizationSchema, organizationEntitySchema    
-//    } from "../../../../../../packages/contracts/organization"
-
 export async function updateOrganization(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()

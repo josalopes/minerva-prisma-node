@@ -17,8 +17,6 @@ export async function apiRequest<T>(
     const response = await request
     const json = await response.json()
 
-    // console.log("API RAW RESPONSE:", json)
-
     const parsed = schema.parse(json)
 
     return parsed.data

@@ -9,8 +9,6 @@ export async function getCnpjData(cnpj: string): Promise<CnpjData> {
     where: { cnpj }
   })
 
-  console.log('cache:', cached)
-
   if (cached) {
     return cnpjSchema.parse(cached.data)
   }
@@ -21,24 +19,12 @@ export async function getCnpjData(cnpj: string): Promise<CnpjData> {
       `https://www.receitaws.com.br/v1/cnpj/${cnpj}`
     )
     
-    // const res = await fetch(
-    //   `https://brasilapi.com.br/api/cnpj/v1/${cnpj}`,
-    //   {
-    //     headers: {
-    //       "User-Agent": "Mozilla/5.0",
-    //       Accept: "application/json"
-    //     }
-    //   }
-    // )
-
     if (!res.ok) throw new Error()
 
     const raw = await res.json()
 
     const mapped = mapReceitaWS(raw)
     
-    // const mapped = mapBrasilApi(raw)
-
     await prisma.cnpjCache.upsert({
       where: { cnpj },
       update: { data: mapped },
@@ -59,15 +45,10 @@ export async function getCnpjData(cnpj: string): Promise<CnpjData> {
       }
     )
 
-    // const res = await fetch(
-    //   `https://www.receitaws.com.br/v1/cnpj/${cnpj}`
-    // )
-
     if (!res.ok) throw new Error()
 
     const raw = await res.json()
 
-    // const mapped = mapReceitaWS(raw)
     const mapped = mapBrasilApi(raw)
 
     await prisma.cnpjCache.upsert({

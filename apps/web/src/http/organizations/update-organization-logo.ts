@@ -3,16 +3,19 @@ import { api } from "../api-client";
 
 interface UpdateOrganizationLogoRequest {
     logoUrl?: string,
+    logoPublicId?: string,
     slug: string
 }
 
 export async function updateOrganizationLogo({
     logoUrl,
+    logoPublicId,
     slug
 }: UpdateOrganizationLogoRequest) {
-    const response = await api.put(`organization/${slug}/logo`, {
+    const response = await api.patch(`organization/${slug}/logo`, {
         json: { 
-            logoUrl
+            logoUrl,
+            logoPublicId
         },
     })
 

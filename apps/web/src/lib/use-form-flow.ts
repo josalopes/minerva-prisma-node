@@ -15,6 +15,7 @@ export function useFormFlow<TContext = Record<string, any>>(
   const [currentStep, setCurrentStep] = useState(0)
   const [contextData, setContextData] = useState<TContext>({} as TContext)
   const [isLoading, setIsLoading] = useState(false)
+  const [isFinished, setIsFinished] = useState(false)
 
   const [stepErrors, setStepErrors] = useState<Record<number, boolean>>({})
   const isSubmittingRef = useRef(false)
@@ -66,8 +67,9 @@ export function useFormFlow<TContext = Record<string, any>>(
 
   async function finish() {
     localStorage.removeItem(STORAGE_KEY)
-    setCurrentStep(0)
+    // setCurrentStep(0)
     setContextData({}as TContext)
+    setIsFinished(true)
   }
 
   async function next() {
@@ -98,14 +100,11 @@ export function useFormFlow<TContext = Record<string, any>>(
         const isValid = await step.form.trigger()
 
         if (!isValid) {
-          // setStepError(currentStep, true)
           isSubmittingRef.current = false
           setIsLoading(false)
           return
         }
         
-        // setStepError(currentStep, false)
-
         values = step.form.getValues()
       }
 
@@ -137,10 +136,6 @@ export function useFormFlow<TContext = Record<string, any>>(
 
   function goTo(stepIndex: number) {
     setCurrentStep(stepIndex)
-    // const step = steps[stepIndex]
-
-    // step?.form?.trigger()
-    
   }
 
   function skip() {
@@ -169,6 +164,7 @@ export function useFormFlow<TContext = Record<string, any>>(
   return {
     step: currentStep,
     isLoading,
+    isFinished,
     goTo,
     next,
     back,

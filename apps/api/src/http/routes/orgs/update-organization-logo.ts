@@ -12,12 +12,13 @@ export async function updateOrganizationLogo(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
       .register(auth)
-      .put('/organization/:slug/logo', {
+      .patch('/organization/:slug/logo', {
         schema: {
             tags: ['Organizations'],
             summary: 'Atualiza a imagem do logo da organização',
             body: z.object({
                 logoUrl: z.string().optional(),
+                logoPublicId: z.string().optional(),
             }),
             params: z.object({
                 slug: z.string()
@@ -34,7 +35,7 @@ export async function updateOrganizationLogo(app: FastifyInstance) {
         },
       }, 
       async (request, reply) => {
-        const { logoUrl } = request.body
+        const { logoUrl, logoPublicId } = request.body
         const { slug } = request.params
         const userId = await request.getCurrentUserid()
         const { membership, organization } = await request.getUserMembership(slug)
@@ -66,6 +67,7 @@ export async function updateOrganizationLogo(app: FastifyInstance) {
             },
             data: {
                 logoUrl,
+                logoPublicId
             }
         })
 

@@ -1,17 +1,27 @@
-import OrganizationLogoForm from "@/app/(app)/org/[slug]/update-logo-organization/organization-logo-form"
-interface OrganizationLogoContentProps {
-  id: string;
-  name: string;
-  slug: string;
-  avatarUrl: string | null;
-  logoUrl: string | null;
-}
+"use client"
 
-export function Step2Logo(organization: OrganizationLogoContentProps) {
+import { CreateOrgContext } from "@/types/create-org-flow"
+import { useUploadStep } from "@/hooks/use-upload-step"
+import { UploadField } from "@/components/upload-field"
+
+export function Step2Logo({ flow }: any) {
+  const upload = useUploadStep<CreateOrgContext, "step3">({
+    flow,
+    stepKey: "step3"
+  })
+  
   return (
-    <div className="space-y-4">
-      <h1>Logo da organização</h1>
-      <OrganizationLogoForm organization={organization}  />
-    </div>
+    <UploadField
+      preview={upload.preview}
+
+      onSelect={upload.selectFile}
+      onRemove={upload.removeFile}
+
+      title="Logo da organização"
+      description="Envie uma imagem para representar sua empresa"
+
+      rounded={false}
+      size={160}
+    />
   )
 }

@@ -21,6 +21,7 @@ interface FormFlowLayoutProps {
   saveStatus?: "idle" | "saving" | "saved"
   variant?: "vertical" | "horizontal" | "auto"
   stepErrors?: Record<number, boolean>
+  isFinished?: boolean
 }
 
 export function FormFlowLayout({
@@ -32,7 +33,8 @@ export function FormFlowLayout({
   children,
   saveStatus,
   variant,
-  stepErrors
+  stepErrors,
+  isFinished
 }: FormFlowLayoutProps) {
 
   const [justCompleted, setJustCompleted] = useState(false)
@@ -119,6 +121,7 @@ export function FormFlowLayout({
             currentStep={currentStep}
             stepErrors={stepErrors}                       
             onStepClick={onStepClick}
+            isFinished={isFinished}
             variant={
               resolvedVariant === "horizontal"
                 ? "horizontal"

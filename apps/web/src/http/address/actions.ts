@@ -1,11 +1,8 @@
 "use server"
 
-import { z } from 'zod'
 
 import { revalidateTag } from 'next/cache'
 
-import { validarCPF } from '@/utils/cpf-utils'
-import { validarCNPJ } from '@/utils/cnpj-utils'
 import { ActionResult } from '@/types/action-result'
 
 import { createAddressSchema, updateAddressSchema     
@@ -30,7 +27,6 @@ export async function createAddressAction(data: unknown): Promise<ActionResult<A
         ...result.data,
     }
 
-    console.log(result.data)
     try {
         const addresses = await addressesClient.create(result.data) 
 

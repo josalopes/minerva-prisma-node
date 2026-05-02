@@ -12,12 +12,13 @@ export async function updateOrganizationAvatar(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
       .register(auth)
-      .put('/organization/:slug/avatar', {
+      .patch('/organization/:slug/avatar', {
         schema: {
             tags: ['Organizations'],
             summary: 'Atualiza a imagem de avatar da organização',
             body: z.object({
                 avatarUrl: z.string().optional(),
+                avatarPublicId: z.string().optional(),
             }),
             params: z.object({
                 slug: z.string()
@@ -34,7 +35,7 @@ export async function updateOrganizationAvatar(app: FastifyInstance) {
         },
       }, 
       async (request, reply) => {
-        const { avatarUrl } = request.body
+        const { avatarUrl, avatarPublicId } = request.body
         const { slug } = request.params
         const userId = await request.getCurrentUserid()
         const { membership, organization } = await request.getUserMembership(slug)
@@ -66,6 +67,7 @@ export async function updateOrganizationAvatar(app: FastifyInstance) {
             },
             data: {
                 avatarUrl,
+                avatarPublicId
             }
         })
 

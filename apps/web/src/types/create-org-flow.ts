@@ -1,15 +1,15 @@
 export type CreateOrgContext = {
   step1: {
+    organizationId: string
+    slug: string
     name?: string
     city?: string
-    slug: string
-    organizationId: string
     addressId?: number
     addressMode: string
     companyHandled?: boolean
   }
-
-  addressFromCnpj?: {
+      
+  step2?: {
     street?: string
     complement?: string
     district?: string
@@ -17,6 +17,19 @@ export type CreateOrgContext = {
     state?: string
     zipCode?: string
   }
-
+    
+  step3?: {
+    file?: File | null
+    preview?: string | null
+    logoUrl?: string | null
+  }
+  
+  step4?: {
+    file?: File | null
+    preview?: string | null
+    avatarUrl?: string | null
+  }
+  
+  addressFromCnpj?: any
   addressSource?: "cnpj" | "cep" | "manual" | null
 }
