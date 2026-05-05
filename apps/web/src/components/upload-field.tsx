@@ -145,7 +145,7 @@ export function UploadField({
               className={clsx(
                 "absolute -top-2 -right-2 rounded-full p-1.5",
                 "bg-destructive text-white shadow-md",
-                "hover:scale-105 transition"
+                "hover:scale-105 transition cursor-pointer"
               )}
             >
               <X className="w-4 h-4" />

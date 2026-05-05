@@ -22,10 +22,8 @@ export default async function OrganizationAvatar() {
 
   return (
     <div className="space-y-4">
-      {/* <Header /> */}
         {/* {permissions?.can('create', 'Project') && ( */}
             {organization && <OrganizationLogoForm organization={organization}  />}
-            {/* {organization && <OrganizationAvatarForm organization={organization} user={user}  />} */}
         {/* )} */}
     </div>
   )

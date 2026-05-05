@@ -81,9 +81,9 @@ export function AddressList({ ownerType, ownerId }: Props) {
           "
           renderItem={(address) => (
               <AddressCard address={address}
-              onEdit={(id) => console.log("Editar", id)}
-                  onDelete={(id) => console.log("Deletar", id)}
-                  />
+                onEdit={(id) => console.log("Editar", id)}
+                onDelete={(id) => console.log("Deletar", id)}
+              />
           )}
         />
       <CarouselKitDots />

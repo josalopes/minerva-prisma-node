@@ -81,7 +81,7 @@ export async function createOrganization(app: FastifyInstance) {
 
         const nextValOrg = geradorCodigoEmpresa?.nextValOrg ?? 100000
 
-        const slug = createSlug(org.name) + "-" + await gerarNextVal('seed_org') + BigInt(nextValOrg).toString()
+        const slug = createSlug(org.name) + "-" + (await gerarNextVal('seed_org') + BigInt(nextValOrg)).toString()
 
         const organization = await createOrganizationService(
             slug,

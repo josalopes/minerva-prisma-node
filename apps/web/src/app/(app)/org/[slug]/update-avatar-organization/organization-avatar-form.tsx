@@ -147,6 +147,7 @@ export default function OrganizationAvatarForm({ organization }: OrganizationAva
       <div className="flex justify-between">
         <div className="flex gap-4 mt-4">
           <Button
+            className="cursor-pointer"
             variant="outline"
             type="button"
             onClick={async () => {                          
@@ -159,7 +160,7 @@ export default function OrganizationAvatarForm({ organization }: OrganizationAva
           </Button>
 
           <Button
-            className="transition-all active:scale-95" 
+            className="transition-all active:scale-95 cursor-pointer" 
             variant="outline" 
             type="button"
             onClick={async () => { 
@@ -176,6 +177,7 @@ export default function OrganizationAvatarForm({ organization }: OrganizationAva
 
         <div className="flex gap-2 mt-4">                  
           <Button
+            className="cursor-pointer"
             onClick={async () => {                          
                 router.push(`/org/${slug}`)
             }}
