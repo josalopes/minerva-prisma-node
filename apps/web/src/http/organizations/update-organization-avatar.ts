@@ -2,8 +2,8 @@ import { api } from "../api-client";
 
 
 interface UpdateOrganizationAvatarRequest {
-    avatarUrl?: string,
-    avatarPublicId?: string,
+    avatarUrl: string | null,
+    avatarPublicId: string | null,
     slug: string
 }
 

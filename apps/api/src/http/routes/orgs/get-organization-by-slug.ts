@@ -30,7 +30,9 @@ export async function getOrganizationBySlug(app: FastifyInstance) {
                                 name: z.string(),
                                 slug: z.string(),
                                 avatarUrl: z.url().nullable(),
+                                avatarPublicId: z.string().nullable(),
                                 logoUrl: z.url().nullable(),
+                                logoPublicId: z.string().nullable(),
                             }),
                         })
                     },                
@@ -51,7 +53,9 @@ export async function getOrganizationBySlug(app: FastifyInstance) {
                     name: org?.name,
                     slug: org.slug,
                     avatarUrl: org.avatarUrl,
+                    avatarPublicId: org.avatarPublicId,
                     logoUrl: org.logoUrl,
+                    logoPublicId: org.logoPublicId,
                 }
 
                 return reply.status(200).send(

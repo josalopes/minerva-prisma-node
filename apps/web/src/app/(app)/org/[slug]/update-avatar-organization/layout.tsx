@@ -1,19 +1,19 @@
-import Header from "@/components/header"
-import { ReactNode } from "react"
-
-interface OrganizationAvatarLayoutProps {
-  children: ReactNode;
-}
+import Header from "@/components/header";
 
 export default async function OrganizationAvatarLayout({
     children,
-}: OrganizationAvatarLayoutProps) {
+}: {
+  children: React.ReactNode
+}) {
     return (
-        <div>
-          {/* <div className="pt-6"><Header /></div> */}
-          <main className="mx-auto w-[600px] max-w-[1200px] py-4">
-              {children}
-          </main>                
+      <>
+        <div className="shrink-0">
+            <Header />
         </div>
+
+        <main className="mx-auto w-[600px] max-w-[1200px] py-4">
+            {children}
+        </main>
+      </>
     )
 }

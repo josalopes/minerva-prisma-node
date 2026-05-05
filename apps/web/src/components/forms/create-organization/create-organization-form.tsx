@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form"
 import { toast } from "sonner"
@@ -145,6 +144,8 @@ export function CreateOrganizationForm() {
     const cloudinary = await uploadToCloudinary(newFile, orgId, type)
     const urlImage = cloudinary.secure_url
     const publicId = cloudinary.public_id
+
+    console.log('publicId:', publicId)
 
     if (!urlImage || urlImage === "") {
       toast.error("Falha no upload da imagem");
@@ -502,7 +503,6 @@ export function CreateOrganizationForm() {
                         <Step1Address 
                           form={addressForm} 
                           flow={flow} 
-                          // preview={preview}
                         />
                       </FormProvider>
                     )}

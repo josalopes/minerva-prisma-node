@@ -17,8 +17,8 @@ export async function updateOrganizationAvatar(app: FastifyInstance) {
             tags: ['Organizations'],
             summary: 'Atualiza a imagem de avatar da organização',
             body: z.object({
-                avatarUrl: z.string().optional(),
-                avatarPublicId: z.string().optional(),
+                avatarUrl: z.string().nullable(),
+                avatarPublicId: z.string().nullable(),
             }),
             params: z.object({
                 slug: z.string()

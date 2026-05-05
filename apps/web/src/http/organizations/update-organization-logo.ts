@@ -2,8 +2,8 @@ import { api } from "../api-client";
 
 
 interface UpdateOrganizationLogoRequest {
-    logoUrl?: string,
-    logoPublicId?: string,
+    logoUrl: string | null,
+    logoPublicId: string | null,
     slug: string
 }
 

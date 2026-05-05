@@ -6,7 +6,9 @@ interface GetOrganizationBySlugResponse {
         name: string;
         slug: string;
         avatarUrl: string | null;
+        avatarPublicId: string;
         logoUrl: string | null;
+        logoPublicId: string | null;
     }
 }
 

@@ -32,7 +32,8 @@ export async function POST(request: Request) {
     const result = await new Promise<any>((resolve, reject) => {
         cloudinary.uploader.upload_stream({
             tags: [`${organizationId}`],
-            public_id: `organizations/${organizationId}/${type}`,
+            folder: `organizations/${organizationId}`,
+            public_id: type,
             overwrite: true,
             unique_filename: false,
             use_filename: false,
@@ -53,6 +54,7 @@ export async function POST(request: Request) {
         public_id: result.public_id,
     });
 }
+
 
 export async function DELETE(request: Request) {
   try {
@@ -84,6 +86,9 @@ export async function DELETE(request: Request) {
         resource_type: "image"
       }
     )
+
+    console.log('Result from Cloudinary:', result)
+    console.log('publicId:', public_id)
 
     // =========================
     // 🔥 NOT FOUND

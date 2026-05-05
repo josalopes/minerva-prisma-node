@@ -17,8 +17,8 @@ export async function updateOrganizationLogo(app: FastifyInstance) {
             tags: ['Organizations'],
             summary: 'Atualiza a imagem do logo da organização',
             body: z.object({
-                logoUrl: z.string().optional(),
-                logoPublicId: z.string().optional(),
+                logoUrl: z.string().nullable(),
+                logoPublicId: z.string().nullable(),
             }),
             params: z.object({
                 slug: z.string()
