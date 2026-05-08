@@ -22,15 +22,15 @@ interface Organization {
 }
 
 interface Membership {
-   id: string,
+//    id: string,
    role: Role,
-   organizationId: string,
-   createdAt: Date,
-   updatedAt: Date,
-   deletedAt: Date | null,
-   email: string | null,
-   userId: string,
-   cpf: string | null, 
+//    organizationId: string,
+//    createdAt: Date,
+//    updatedAt: Date,
+//    deletedAt: Date | null,
+//    email: string | null,
+//    userId: string,
+//    cpf: string | null, 
 }
 
 interface Product {

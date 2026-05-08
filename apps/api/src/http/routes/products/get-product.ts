@@ -45,7 +45,7 @@ export async function getProduct(app: FastifyInstance) {
 
         const product = await getProductService(
             userId, 
-            organization, 
+            organization.id, 
             membership,
             productCode
         )

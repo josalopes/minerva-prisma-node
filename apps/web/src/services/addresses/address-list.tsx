@@ -1,16 +1,10 @@
 'use client'
 
-import { Key, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getAddresses } from '@/services/addresses/index'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { formatZipCode } from '@/utils/format-zip'
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
-import { SmartCarousel } from '@/components/ui/smart-carousel'
 import { AddressCard } from '@/components/address/address-card'
 import { CarouselKit } from '@/components/carousel-kit/carousel-kit'
 import { CarouselKitDots } from '@/components/carousel-kit/carousel-kit-dots'
-import { CarouselKitProvider } from '@/components/carousel-kit/carousel-kit.context'
 
 interface Address {
   id: number

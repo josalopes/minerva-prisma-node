@@ -38,6 +38,8 @@ import { updateAddress } from './routes/addresses/update-address'
 import { getAddresses } from './routes/addresses/get-address'
 import { deleteAddress } from './routes/addresses/delete-address'
 
+import { createCustomer } from './routes/customers/create-customer'
+
 import { getCnpjCache } from './routes/cnpj/get-cnpj-cache'
 import { createCnpjCache } from './routes/cnpj/create-cnpj-cache'
 
@@ -53,6 +55,7 @@ import { getProduct } from './routes/products/get-product'
 import { getProducts } from './routes/products/get-products'
 import { deleteProduct } from './routes/products/delete-product'
 import { enableProduct } from './routes/products/enable-product'
+import { updateProductStock } from './routes/products/update-stock'
 
 import { getMembers } from './routes/members/get-members'
 import { getMember } from './routes/members/get-member'
@@ -68,6 +71,10 @@ import { revokeInvite } from './routes/invites/revoke-invite'
 import { getPendingInvites } from './routes/invites/get-pending-invites'
 import { getOrganizationBilling } from './routes/billing/get-organization-billing'
 import { errorHandler } from './error-handler'
+
+import { createTransaction } from './routes/transactions/create-transaction'
+import { cancelTransaction } from './routes/transactions/cancel-transaction'
+
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -130,11 +137,12 @@ app.register(updateOrganizationLogo)
 app.register(shutdownOrganization)
 app.register(transferOrganization)
 
-// app.register(addressRoutes)
 app.register(createAddress)
 app.register(updateAddress)
 app.register(getAddresses)
 app.register(deleteAddress)
+
+app.register(createCustomer)
 
 app.register(getCnpjCache)
 app.register(createCnpjCache)
@@ -151,6 +159,7 @@ app.register(getProduct)
 app.register(getProducts)
 app.register(deleteProduct)
 app.register(enableProduct)
+app.register(updateProductStock)
 
 app.register(getMembers)
 app.register(getMember)
@@ -165,6 +174,9 @@ app.register(rejectInvite)
 app.register(revokeInvite)
 app.register(getPendingInvites)
 app.register(getOrganizationBilling)
+
+app.register(createTransaction)
+app.register(cancelTransaction)
 
 app.listen({ port: env.PORT, host:'0.0.0.0'}).then(() => {
     console.log('HTTP server running!')

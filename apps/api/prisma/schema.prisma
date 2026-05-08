@@ -39,6 +39,7 @@ model User {
   member_on          Member[]
   owns_organizations Organization[]
   owns_projects      Project[]
+  transactions       Transaction[]
 
   @@map("user")
 }
@@ -196,6 +197,7 @@ model Project {
   owner   User   @relation(fields: [ownerId], references: [id])
   ownerId String @map("owner_id")
 
+  @@index([organizationId])
   @@map("project")
 }
 
@@ -220,6 +222,7 @@ model Product {
   code        String
   name        String
   price       Int
+  stock       Int         @default(0)
   measureUnit ProductUnit @default(kilo) @map("measure_unit")
   imageUrl    String?     @map("image_url")
 
@@ -238,7 +241,7 @@ model Product {
 
 model Customer {
   id             String       @id @default(uuid())
-  name           String?
+  name           String
   cpfCnpj        String?      @map("cpf_cnpj")
   code           String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -248,8 +251,7 @@ model Customer {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  transactions Transaction[]
-  addresses    Address[]
+  addresses Address[]
 
   @@unique([organizationId, cpfCnpj])
   @@index([organizationId, name])
@@ -257,15 +259,18 @@ model Customer {
 }
 
 model Transaction {
-  id              String          @id @default(uuid())
+  id              String            @id @default(uuid())
   date            DateTime
-  transactionType TransactionType
-  totalValue      Int
-  customer        Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  customerId      String          @map("customer_id")
+  transactionType TransactionType   @map("transaction_type")
+  totalValue      Int               @map("total_value")
+  cpfCnpj         String?           @map("cpf_cnpj")
+  status          TransactionStatus @default(ACTIVE)
 
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String       @map("organization_id")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -274,14 +279,13 @@ model Transaction {
   transactionItems TransactionItems[]
 
   @@index([organizationId])
-  @@index([customerId])
   @@map("transaction")
 }
 
 model TransactionItems {
-  id       Int @id @default(autoincrement())
-  quantity Int
-  value    Int
+  id        Int @id @default(autoincrement())
+  quantity  Int
+  unitPrice Int @map("unit_price")
 
   transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
   transactionId String      @map("transaction_id")
@@ -293,6 +297,7 @@ model TransactionItems {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
+  @@index([transactionId])
   @@map("transaction_items")
 }
 
@@ -312,6 +317,11 @@ enum TokenType {
 enum TransactionType {
   COMPRA
   VENDA
+}
+
+enum TransactionStatus {
+  ACTIVE
+  CANCELED
 }
 
 enum ProductUnit {

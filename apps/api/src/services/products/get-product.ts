@@ -3,46 +3,28 @@ import { Role } from "@prisma/client";
 import { getUserPermissions } from "@/utils/get-user-permissions";
 import { BadRequestError } from "../../http/routes/-errors/bad-request-error";
 
-interface Organization {
-    id: string,
-    name: string,
-    cpfCnpj: string,
-    slug: string,
-    domain: string | null,
-    shouldAttachUserByDomain: boolean,
-    avatarUrl: string | null,
-    logoUrl: string | null,
-    personType: string,
-    stripeCustomerId: string | null,
-    email: string | null,
-    createdAt: Date,
-    updatedAt: Date,
-    deletedAt: Date | null,
-    ownerId: string | null,
-}
-
 interface Membership {
-   id: string,
+//    id: string,
    role: Role,
-   organizationId: string,
-   createdAt: Date,
-   updatedAt: Date,
-   deletedAt: Date | null,
-   email: string | null,
-   userId: string,
-   cpf: string | null, 
+//    organizationId: string,
+//    createdAt: Date,
+//    updatedAt: Date,
+//    deletedAt: Date | null,
+//    email: string | null,
+//    userId: string,
+//    cpf: string | null, 
 }
 
 export async function getProductService(
     userId: string, 
-    organization: Organization, 
+    organizationId: string, 
     membership: Membership,
     productCode: string
 ) {
     
-    if (!organization) {
-        throw new BadRequestError('Organização inexistente')
-    }
+    // if (!organization) {
+    //     throw new BadRequestError('Organização inexistente')
+    // }
         
     const { cannot } = getUserPermissions(userId, membership.role)
     
@@ -61,7 +43,7 @@ export async function getProductService(
         },
         where: {
             code: productCode,
-            organizationId: organization.id,
+            organizationId,
             deletedAt: null
         }
     })

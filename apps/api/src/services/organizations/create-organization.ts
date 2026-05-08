@@ -36,9 +36,9 @@ export async function createOrganizationService(
             ownerId: userId,
             members: {
                 create: {
-                    email: userEmail,
-                    userId,
-                    role: 'ADMIN',
+                  email: userEmail,
+                  userId,
+                  role: 'ADMIN',
                 },
             },
         },

@@ -4,21 +4,18 @@ import { z } from 'zod'
 
 // import { productSchema } from '@saas/auth';
 import { auth } from "@/http/middlewares/auth";
-import { productUnitSchema } from "@/http/schemas";
-import { updateProductService } from "@/services/products/update-product";
+import { updateStockService } from "@/services/products/update-stock";
 
-export async function updateProduct(app: FastifyInstance) {
+export async function updateProductStock(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
       .register(auth)
-      .patch('/organization/:slug/product/:id', {
+      .patch('/organization/:slug/productId/:id/stock', {
         schema: {
             tags: ['Products'],
-            summary: 'Atualiza dados de um produto da organização',
+            summary: 'Atualiza o estoque de um produto da organização',
             body: z.object({
-                name: z.string(),
-                price: z.int(),
-                measureUnit: productUnitSchema,
+                stock: z.int(),
             }),
             params: z.object({
                 slug: z.string(),
@@ -41,13 +38,13 @@ export async function updateProduct(app: FastifyInstance) {
         const userId = await request.getCurrentUserid()
         const { membership } = await request.getUserMembership(slug)
         
-        const { name, price, measureUnit } = request.body
+        const { stock } = request.body
 
-        const product = await updateProductService(
+        const product = await updateStockService(
             userId,
             id, 
             membership,
-            { name, price, measureUnit }
+            { stock }
         )
         
         return reply.status(204).send()
