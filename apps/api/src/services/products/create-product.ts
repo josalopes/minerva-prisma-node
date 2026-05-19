@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { ProductUnit, Role } from "@prisma/client";
 import { getUserPermissions } from "@/utils/get-user-permissions";
 import { BadRequestError } from "../../http/routes/-errors/bad-request-error";
+import { toCents } from "@/utils/money";
 
 interface Organization {
     id: string,
@@ -85,7 +86,7 @@ export async function createProductService(
         data: {
             name,
             code,
-            price,
+            price: toCents(price),
             organizationId: organization.id,
             measureUnit,
         },

@@ -2,17 +2,10 @@ import { prisma } from "@/lib/prisma";
 import { Role } from "@prisma/client";
 import { getUserPermissions } from "@/utils/get-user-permissions";
 import { BadRequestError } from "../../http/routes/-errors/bad-request-error";
+import { fromCents } from "@/utils/money";
 
 interface Membership {
-//    id: string,
    role: Role,
-//    organizationId: string,
-//    createdAt: Date,
-//    updatedAt: Date,
-//    deletedAt: Date | null,
-//    email: string | null,
-//    userId: string,
-//    cpf: string | null, 
 }
 
 export async function getProductService(
@@ -22,10 +15,6 @@ export async function getProductService(
     productCode: string
 ) {
     
-    // if (!organization) {
-    //     throw new BadRequestError('Organização inexistente')
-    // }
-        
     const { cannot } = getUserPermissions(userId, membership.role)
     
     if (cannot('create', 'Project')) {
@@ -52,5 +41,9 @@ export async function getProductService(
         throw new BadRequestError('Produto não encontrado nesta organização')
     }
 
-    return product
+    return {
+      ...product,
+      price: fromCents(product.price)
+
+    }
 }

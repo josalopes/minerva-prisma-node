@@ -4,11 +4,15 @@ import { ZodTypeProvider } from "fastify-type-provider-zod"
 
 import { auth } from "@/http/middlewares/auth"
 import {
-  createTransactionSchema,
-  transactionResponseSchema
+  createTransactionSchema 
 } from "@saas/contracts/transaction/create-transaction-schema"
+import {
+  transactionResponseSchema
+} from "@saas/contracts/transaction/transaction"
 
 import { createTransactionService } from "@/services/transactions/create-transaction-service"
+import { successResponseSchema } from "@/lib/api-response"
+import { fromCents } from "@/utils/money"
 
 export async function createTransaction(app: FastifyInstance) {
   app
@@ -23,15 +27,12 @@ export async function createTransaction(app: FastifyInstance) {
 
           params: z.object({
             slug: z.string()
-          }) , //createParamsSchema(),
+          }),
 
           body: createTransactionSchema,
 
           response: {
-            201: z.object({
-              success: z.literal(true),
-              data: transactionResponseSchema
-            })
+            201: successResponseSchema(transactionResponseSchema)
           }
         }
       },
@@ -54,7 +55,18 @@ export async function createTransaction(app: FastifyInstance) {
 
         return reply.status(201).send({
           success: true,
-          data: transaction
+          data: {
+            id: transaction.id,
+            totalValue: transaction.totalValue,
+            date: transaction.date.toISOString(),
+
+            transactionItems: transaction.transactionItems.map(item => ({
+              productId: item.productId,
+              productName: item.product.name,
+              weight: item.quantity,
+              unitPrice: fromCents(item.value)
+            }))
+          }
         })
       }
     )

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { ProductUnit, Role } from "@prisma/client";
 import { getUserPermissions } from "@/utils/get-user-permissions";
 import { BadRequestError } from "../../http/routes/-errors/bad-request-error";
+import { toCents } from "@/utils/money";
 interface Membership {
    role: Role,
 }
@@ -41,7 +42,7 @@ export async function updateProductService(userId: string, id: string, membershi
       },
       data: {
         name,
-        price,
+        price: toCents(price),
         measureUnit
       }
     })

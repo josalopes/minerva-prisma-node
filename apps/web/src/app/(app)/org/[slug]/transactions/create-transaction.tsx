@@ -1,24 +1,85 @@
 "use client"
 
-import { useRef } from "react"
-import { useTransaction } from "@/hooks/useTransaction"
-// import { useTransaction } from "./useTransaction"
+import { useRef, useState } from "react"
+import { useTransaction } from "@/hooks/use-transaction"
+import { ReceiptModal } from "./receipt-modal"
+import { TransactionResponse } from "@/types/transaction"
+import { useCreateTransaction } from "./use-create-transaction"
+import { useProductsCache } from "@/hooks/use-products-cache"
+import { ProductSearch } from "./product-search"
+import { formatCurrency } from "@/utils/format"
 
-export function TransactionScreen({ products, transactionType }) {
+type Product = {
+  id: string
+  code: string
+  name: string
+  price: number
+  measureUnit: string
+  status: boolean
+}
+
+type Props = {
+  organizationId: string
+  organizationName: string
+  cpfCnpj: string
+  slug: string
+  products: Product[]
+  transactionType: "COMPRA" | "VENDA"
+}
+
+export function TransactionScreen({ slug, products, transactionType, organizationName, cpfCnpj }: Props) {
   const {
     selectedProduct,
-    weight,
     items,
     total,
     currentTotal,
+    weightInput,
     setProduct,
-    setWeight,
     addItem,
     removeItem,
-    finish
+    reset
   } = useTransaction({ products, transactionType })
+  const productSearchRef = useRef<HTMLInputElement>(null)
 
   const weightRef = useRef<HTMLInputElement>(null)
+  const cachedProducts = useProductsCache(products)
+  const mutation = useCreateTransaction()
+
+  const [receiptOpen, setReceiptOpen] = useState(false)
+  const [lastTransaction, setLastTransaction] = useState<TransactionResponse | null>(null)
+
+  async function handleFinish() {
+    try {
+      const data = await mutation.mutateAsync({
+        slug,
+        transactionType,
+        items: items.map(i => ({
+          productId: i.productId,
+          quantity: i.weight
+        }))
+      })
+
+      setLastTransaction(data)
+      setReceiptOpen(true)
+
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  function handleAddItem() {
+    const success = addItem()
+
+    if (success) {
+      productSearchRef.current?.focus()
+    }
+  }
+
+  function handleCloseReceipt() {
+    reset()
+    setLastTransaction(null)
+    setReceiptOpen(false)
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-4">
@@ -27,52 +88,65 @@ export function TransactionScreen({ products, transactionType }) {
       <div className="bg-white p-4 rounded-xl shadow space-y-3">
 
         <div className="grid grid-cols-4 gap-3">
-
           {/* Produto */}
-          <select
-            className="border rounded p-2"
-            onChange={(e) => {
-              setProduct(e.target.value)
-              setTimeout(() => weightRef.current?.focus(), 100)
-            }}
-          >
-            <option value="">Selecione</option>
-            {products.map(p => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
+          <div className="col-span-4">
+            <ProductSearch
+              ref={productSearchRef}
+              products={cachedProducts}
+              onSelect={(product) => {
+                setProduct(product.id)
+
+                setTimeout(() => {
+                  weightRef.current?.focus()
+                }, 50)
+              }}
+            />
+          </div>
+
+          <input
+            className="border rounded p-2 bg-gray-100 col-span-2"
+            value={selectedProduct?.name ?? ""}
+            readOnly
+          />
 
           {/* Preço */}
           <input
-            className="border rounded p-2 bg-gray-100"
-            value={selectedProduct?.price ?? ""}
+            className="border rounded p-2 bg-gray-100 col-span-2"
+            value={formatCurrency(selectedProduct?.price ?? 0)}
             readOnly
           />
 
           {/* Peso */}
           <input
             ref={weightRef}
-            type="number"
-            step="0.01"
-            placeholder="Peso (kg)"
-            className="border rounded p-2"
-            value={weight}
-            onChange={(e) => setWeight(Number(e.target.value))}
+            type="text"
+            inputMode="decimal"
+            placeholder="0,000 kg"
+
+            className="
+              border rounded-lg 
+              h-14 px-4 text-lg 
+              col-span-2
+            "
+            value={weightInput.value}
+            onChange={weightInput.onChange}
+
             onKeyDown={(e) => {
-              if (e.key === "Enter") addItem()
+              if (e.key === "Enter") {
+                handleAddItem()
+              }
             }}
           />
 
           {/* Total atual */}
-          <div className="flex items-center justify-center font-bold">
-            {currentTotal.toFixed(2)}
+          <div className="flex items-center justify-center font-bold col-span-2">
+            {formatCurrency(currentTotal)}
+            {/* {formatCurrency(total)} */}
           </div>
         </div>
 
         <button
-          onClick={addItem}
+          onClick={handleAddItem}
           className="w-full bg-blue-600 text-white py-2 rounded"
         >
           Adicionar item
@@ -97,9 +171,9 @@ export function TransactionScreen({ products, transactionType }) {
             {items.map((item, i) => (
               <tr key={i} className="border-b">
                 <td>{item.productName}</td>
-                <td>{item.weight} kg</td>
-                <td>{item.unitPrice}</td>
-                <td>{item.total.toFixed(2)}</td>
+                <td>{item.weight.toFixed(3).toString().replace(".", ",")} kg</td>
+                <td>{formatCurrency(item.unitPrice)}</td>
+                <td>{formatCurrency(item.total)}</td>
                 <td>
                   <button onClick={() => removeItem(i)}>
                     ❌
@@ -112,16 +186,23 @@ export function TransactionScreen({ products, transactionType }) {
 
         <div className="mt-4 flex justify-between font-bold text-lg">
           <span>Total</span>
-          <span>{total.toFixed(2)}</span>
+          <span>{formatCurrency(total)}</span>
         </div>
 
         <button
-          onClick={finish}
+          onClick={handleFinish}
           className="mt-4 w-full bg-green-600 text-white py-3 rounded text-lg"
         >
           Finalizar transação
         </button>
       </div>
-    </div>
-  )
+      <ReceiptModal
+        open={receiptOpen}
+        onClose={handleCloseReceipt}
+        transaction={lastTransaction}
+        organizationName={organizationName}
+        cpfCnpj={cpfCnpj}
+      />
+    </div>    
+  )  
 }

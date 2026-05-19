@@ -17,7 +17,7 @@ export async function createProduct(app: FastifyInstance) {
             body: z.object({
                 name: z.string(),
                 code: z.string(),
-                price: z.int(),
+                price: z.number(),
                 measureUnit: productUnitSchema
             }),
             params: z.object({

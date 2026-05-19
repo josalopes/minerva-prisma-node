@@ -108,13 +108,13 @@ export function SidebarDashboardClient({ children }: { children: React.ReactNode
         })
     }
     
-    function handleOnboarding() {
+    function handleTransaction() {
         if (!currentOrg) {
             return
         }
 
         startTransition(() => {
-            router.push(`/onboarding`)
+            router.push(`/org/${currentOrg.slug}/transactions`)
         })
     }
 
@@ -259,9 +259,9 @@ export function SidebarDashboardClient({ children }: { children: React.ReactNode
                         
                         <SidebarActionButton
                             icon={<Store className="w-6 h-6" />}
-                            label="On boarding"
+                            label="Transação"
                             isCollapsed={isCollapsed}
-                            onClick={handleOnboarding}
+                            onClick={handleTransaction}
                         />
 
                         <SidebarNavLink 

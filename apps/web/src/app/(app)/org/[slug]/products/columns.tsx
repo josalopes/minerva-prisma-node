@@ -25,7 +25,7 @@ import { deleteProductAction } from "./actions"
 import { formatCurrency } from "@/utils/formatCurrency"
 
 export type Product = {
-  id: number
+  id: string
   name: string
   code: string
   price: number

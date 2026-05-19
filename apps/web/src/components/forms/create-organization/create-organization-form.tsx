@@ -271,9 +271,6 @@ export function CreateOrganizationForm() {
             "slug": res.data.slug,
             "addressMode": "new"
           })
-          // setName(res.data.name)
-          // setAvatarUrl(res.data.avatarUrl)
-          // setLogoUrl(res.data.logoUrl)
 
           toast.success("Organização criada")
         } else {

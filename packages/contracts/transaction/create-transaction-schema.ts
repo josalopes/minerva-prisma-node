@@ -2,12 +2,11 @@ import { z } from "zod"
 
 export const transactionItemSchema = z.object({
   productId: z.string(),
-  quantity: z.number().int().positive(),
-  price: z.number().int().positive(), // valor unitário
+  quantity: z.number(),
+  // quantity: z.int(),
 })
 
 export const createTransactionSchema = z.object({
-  organizationId: z.string(),
   cpfCnpj: z.string().nullish(),
   items: z.array(transactionItemSchema).min(1),
   transactionType: z.enum(["VENDA", "COMPRA"]),

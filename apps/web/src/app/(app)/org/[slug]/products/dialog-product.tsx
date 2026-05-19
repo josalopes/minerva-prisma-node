@@ -39,7 +39,7 @@ import { createProductAction, updateProductAction } from './actions';
 interface DialogProductProps {
     closeModal: () => void;
     isUpdating?: boolean;
-    productId?: number;
+    productId?: string;
     initialValues?: ProductSchema
 }
 

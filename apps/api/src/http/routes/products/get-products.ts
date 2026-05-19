@@ -30,7 +30,7 @@ export async function getProducts(app: FastifyInstance) {
                             id: z.string(),
                             name: z.string(),
                             code: z.string(),
-                            price: z.int(),
+                            price: z.number(),
                             organizationId: z.uuid(),
                             measureUnit: productUnitSchema,
                         }),
@@ -49,6 +49,7 @@ export async function getProducts(app: FastifyInstance) {
             organization, 
             membership,
         )
+        console.log('PRODUCTS',products)
 
         return reply.send({ products })
       })

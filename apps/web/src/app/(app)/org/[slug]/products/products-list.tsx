@@ -21,7 +21,7 @@ import { DataTable } from '@/components/data-table';
 import { useProductColumns } from './columns';
 
 type Product = {
-  id: number
+  id: string
   name: string
   code: string
   price: number
@@ -31,7 +31,7 @@ type Product = {
 
 type ListProps = {
     productList: {
-        id: number;
+        id: string;
         code: string;
         name: string;
         price: number;

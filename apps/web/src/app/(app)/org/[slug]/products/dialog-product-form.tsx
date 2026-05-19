@@ -15,7 +15,7 @@ export interface UseDialogProductFormProps {
 }
 
 const formSchema = z.object({
-    id: z.int().optional(),
+    id: z.string(),
     name: z.string().min(1, { message: 'O nome do produto é obrigatório'}),
     code: z.string().min(1, { message: 'O código do produto é obrigatório'}),
     price: z.string().min(1, { message: 'O valor do produto é obrigatório'}),

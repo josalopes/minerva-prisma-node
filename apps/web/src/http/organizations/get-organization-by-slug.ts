@@ -1,3 +1,4 @@
+import { cpfCnpj } from './../../lib/validation-helpers';
 import { api } from "../api-client";
 
 interface GetOrganizationBySlugResponse {
@@ -5,6 +6,7 @@ interface GetOrganizationBySlugResponse {
         id: string;
         name: string;
         slug: string;
+        cpfCnpj: string;
         avatarUrl: string | null;
         avatarPublicId: string;
         logoUrl: string | null;

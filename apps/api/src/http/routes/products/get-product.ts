@@ -30,7 +30,7 @@ export async function getProduct(app: FastifyInstance) {
                             id: z.string(),
                             name: z.string(),
                             code: z.string(),
-                            price: z.int(),
+                            price: z.number(),
                             organizationId: z.uuid(),
                             measureUnit: productUnitSchema,
                         })

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { ProductUnit, Role } from "@prisma/client";
 import { getUserPermissions } from "@/utils/get-user-permissions";
 import { BadRequestError } from "../../http/routes/-errors/bad-request-error";
+import { fromCents } from "@/utils/money";
 
 interface Organization {
     id: string,
@@ -33,12 +34,12 @@ interface Membership {
 //    cpf: string | null, 
 }
 
-interface Product {
-    name: string,
-    code: string,
-    price: number,
-    measureUnit: ProductUnit
-}
+// interface Product {
+//     name: string,
+//     code: string,
+//     price: number,
+//     measureUnit: ProductUnit
+// }
 
 export async function getProductsService(
     userId: string, 
@@ -55,7 +56,7 @@ export async function getProductsService(
         throw new BadRequestError('Você não tem permissão para visualizar produtos')
     }
 
-    const products = await prisma.product.findMany({
+    const productsRaw = await prisma.product.findMany({
         select: {
             id: true,
             name: true,
@@ -72,6 +73,11 @@ export async function getProductsService(
             createdAt: 'desc',
         }
     })
+
+    const products = productsRaw.map(product => ({
+        ...product,
+        price: fromCents(product.price)
+    }))
 
     return products
 }

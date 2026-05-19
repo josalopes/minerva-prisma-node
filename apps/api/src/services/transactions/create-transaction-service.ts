@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma"
 import { BadRequestError } from "@/http/routes/-errors/bad-request-error"
+import { fromMiligrams, toMiligrams } from "@/utils/weight"
+import { fromCents, toCents } from "@/utils/money"
 
 interface TransactionItemInput {
   productId: string
   quantity: number
-  price: number
 }
 
 interface CreateTransactionInput {
@@ -72,8 +73,8 @@ export async function createTransactionService(
 
       return {
         productId: item.productId,
-        quantity: item.quantity,
-        unitPrice: product.price // 🔥 snapshot do preço
+        quantity: toMiligrams(item.quantity),
+        value: product.price // 🔥 snapshot do preço
       }
     })
 
@@ -98,7 +99,7 @@ export async function createTransactionService(
     // 🔥 CALCULAR TOTAL
     // =========================
     const totalValue = itemsWithPrice.reduce(
-      (acc, item) => acc + item.quantity * item.unitPrice,
+      (acc, item) => acc + fromMiligrams(item.quantity) * fromCents(item.value),
       0
     )
 
@@ -109,7 +110,7 @@ export async function createTransactionService(
       data: {
         date: new Date(),
         transactionType: data.transactionType,
-        totalValue,
+        totalValue: toCents(totalValue),
 
         organizationId: params.organizationId,
         userId: params.userId,
@@ -121,7 +122,20 @@ export async function createTransactionService(
       },
       select: {
         id: true,
-        totalValue: true
+        totalValue: true,
+        date: true,
+        transactionItems: {
+          select: {
+            productId: true,
+            quantity: true,
+            value: true,
+            product: {
+              select: {
+                name: true
+              }
+            }
+          }
+        }
       }
     })
 

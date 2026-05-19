@@ -9,19 +9,8 @@ import { ActionResult } from '@/types/action-result'
 import { createOrganizationSchema, updateOrganizationSchema     
   } from "@saas/contracts/organization"
 
-// import { createOrganizationSchema, updateOrganizationSchema     
-//   } from "../../../../../../packages/contracts/organization"
-
-  import { Organization } from "@saas/contracts/organization"
+import { Organization } from "@saas/contracts/organization"
   
-//   import { Organization     
-//   } from "../../../../../../packages/contracts/organization"
-
-
-
-// import { createOrganizationSchema, updateOrganizationSchema, Organization     
-//   } from "../../../../../../packages/contracts/src/organization.schema"
-
 import { organizationsClient } from '@/http/modules/organizations/organizations.client'
 
 export async function createOrganizationAction(data: unknown): Promise<ActionResult<Organization>> {

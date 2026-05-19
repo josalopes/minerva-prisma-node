@@ -236,6 +236,7 @@ model Product {
   transactionItems TransactionItems[]
 
   @@unique([organizationId, code])
+  @@unique([organizationId])
   @@map("product")
 }
 
@@ -283,9 +284,9 @@ model Transaction {
 }
 
 model TransactionItems {
-  id        Int @id @default(autoincrement())
-  quantity  Int
-  unitPrice Int @map("unit_price")
+  id       Int @id @default(autoincrement())
+  quantity Int // peso (ex: gramas)
+  value    Int // preço unitário no momento da transação
 
   transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
   transactionId String      @map("transaction_id")
@@ -298,6 +299,7 @@ model TransactionItems {
   deletedAt DateTime? @map("deleted_at")
 
   @@index([transactionId])
+  @@index([productId])
   @@map("transaction_items")
 }
 

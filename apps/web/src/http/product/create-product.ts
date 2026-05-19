@@ -3,7 +3,7 @@ interface CreateProductRequest {
     org: string,
     name: string,
     code: string,
-    price: number,
+    price: Number,
     measureUnit: string
 }
 

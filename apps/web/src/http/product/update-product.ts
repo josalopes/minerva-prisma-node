@@ -2,7 +2,7 @@ import { api } from "../api-client";
 
 
 interface UpdateProductRequest {
-    productId: number
+    productId: string
     org: string;
     name: string,
     code: string,
