@@ -20,6 +20,7 @@ import { getProfile } from './routes/auth/get-profile'
 import { updateProfile } from './routes/auth/update-profile'
 import { requestPasswordRecovery } from './routes/auth/request-password-recover'
 import { resetPassword } from './routes/auth/reset-password'
+import { changePassword } from './routes/auth/change-password'
 import { authenticateWithGithub } from './routes/auth/authenticate-with-github'
 
 import { createOrganization } from './routes/orgs/create-organization'
@@ -125,6 +126,7 @@ app.register(getProfile)
 app.register(updateProfile)
 app.register(requestPasswordRecovery)
 app.register(resetPassword)
+app.register(changePassword)
 
 app.register(createOrganization)
 app.register(getMembership)

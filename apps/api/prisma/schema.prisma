@@ -26,12 +26,15 @@ model User {
   name         String?
   email        String
   login        String  @unique
-  passwordHash String? @map("password_hash")
+  passwordHash String  @map("password_hash")
   avatarUrl    String? @map("avatar_url")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  passwordChangedAt  DateTime? @map("password_changed_at")
+  mustChangePassword Boolean   @default(false)
 
   tokens             Token[]
   accounts           Account[]
@@ -73,18 +76,21 @@ model Invite {
   email String
   role  Role
 
-  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  authorId String? @map("author_id")
+  invitedById String? @map("author_id")
 
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId String       @map("organization_id")
+  organizationId String @map("organization_id")
 
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+  token String @unique
 
-  @@unique([email, organizationId])
-  @@index([email])
+  acceptedAt DateTime?
+  expiresAt  DateTime
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  invitedBy    User?        @relation(fields: [invitedById], references: [id], onDelete: SetNull)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@map("invite")
 }
 
@@ -92,10 +98,8 @@ model Member {
   id   String @id @default(uuid())
   role Role   @default(MEMBER)
 
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId String       @map("organization_id")
+  organizationId String @map("organization_id")
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @map("user_id")
 
   createdAt DateTime  @default(now()) @map("created_at")
@@ -105,6 +109,9 @@ model Member {
   email     String?
   cpf       String?
   addresses Address[]
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([organizationId])
   @@index([userId])
@@ -165,18 +172,14 @@ model Address {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  organization   Organization? @relation(fields: [organizationId], references: [id])
   organizationId String?
+  memberId       String?
+  customerId     String?
 
-  member   Member? @relation(fields: [memberId], references: [id])
-  memberId String?
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  member       Member?       @relation(fields: [memberId], references: [id])
+  customer     Customer?     @relation(fields: [customerId], references: [id])
 
-  customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
-
-  // @@index([organizationId])
-  // @@index([memberId])
-  // @@index([customerId])
   @@index([ownerType, ownerId])
   @@map("address")
 }
@@ -191,11 +194,12 @@ model Project {
   updatedAt   DateTime  @updatedAt @map("updated_at")
   deletedAt   DateTime? @map("deleted_at")
 
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId String       @map("organization_id")
+  organizationId String @map("organization_id")
 
-  owner   User   @relation(fields: [ownerId], references: [id])
   ownerId String @map("owner_id")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  owner        User         @relation(fields: [ownerId], references: [id])
 
   @@index([organizationId])
   @@map("project")
@@ -236,7 +240,6 @@ model Product {
   transactionItems TransactionItems[]
 
   @@unique([organizationId, code])
-  @@unique([organizationId])
   @@map("product")
 }
 

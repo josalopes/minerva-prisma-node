@@ -1,7 +1,6 @@
 'use client'
 
 import Link from "next/link";
-// import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,6 @@ import { Separator } from "@/components/ui/separator";
 
 import { Loader2, AlertTriangle } from "lucide-react";
 
-// import githubIcon from "@/assets/github-icon.svg"
 import { signInWithEmailAndPassword } from './actions'
 import { useFormState } from '@/hooks/use-form-state'
 import { signInWithCode } from "../actions";
@@ -60,11 +58,10 @@ export function SignInForm() {
                     )}
 
                 </div>
+                <div className="space-x-4">
                     <Link href="/auth/forgot-password" className="text-xs text-foreground hover:underline">
                         Esqueceu sua senha?
                     </Link>
-                <div>
-
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isPending}>
@@ -82,7 +79,7 @@ export function SignInForm() {
                 </Button>
 
             </form>    
-            <Separator />
+            {/* <Separator />
 
             <form action={signInWithCode}>
                 <Button 
@@ -91,7 +88,7 @@ export function SignInForm() {
                 >
                     Entrar com código
                 </Button>
-            </form>
+            </form> */}
         </div>
     )
 }

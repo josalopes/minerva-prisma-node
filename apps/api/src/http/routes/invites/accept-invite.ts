@@ -1,21 +1,23 @@
-import { auth } from './../../middlewares/auth';
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
+import { hash } from 'bcryptjs'
 
+import { auth } from './../../middlewares/auth';
 import { prisma } from "@/lib/prisma";
 import { roleSchema } from "@saas/auth";
+import { gerarNextVal } from "@/utils/generate-next-sequence";
 
 export async function acceptInvite(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
       .register(auth)
-      .post('/invite/:inviteId/accept', {
+      .post('/invite/:token', {
         schema: {
             tags: ['Invites'],
             summary: 'Aceitar convite de uma organização',
             params: z.object({
-                inviteId: z.string()
+                token: z.string()
             }),
             response: {
                 400: z.object({
@@ -26,12 +28,23 @@ export async function acceptInvite(app: FastifyInstance) {
         },
       }, 
       async (request, reply) => {
-        const { inviteId } = request.params
-        const userId = await request.getCurrentUserid()
+        const { token } = request.params
+        // const userId = await request.getCurrentUserid()
+
+        // const passwordHash = await hash('123456', 1)
+
+        const geradorLoginUsuario = await prisma.seedUserLogin.findFirst({
+          where: {
+            id: 1,
+          }
+        })
+
+        const nextValUserLogin = geradorLoginUsuario?.nextValLogin ?? 10000
 
         const invite = await prisma.invite.findUnique({
             where: {
-                id: inviteId
+                token
+                // id: inviteId
             },
         }) 
 
@@ -39,24 +52,37 @@ export async function acceptInvite(app: FastifyInstance) {
             return reply.status(400).send({ message: 'Convite inexistente ou expirado' })
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            id: userId,
-          },
+        // const user = await prisma.user.findUnique({
+        //   where: {
+        //     id: userId,
+        //   },
+        // })
+
+        // if (!user) {
+        //   return reply.status(400).send({ message: 'Usuário não encontrado' })
+        // }
+
+        // if (user.email !== invite.email) {
+        //   return reply.status(400).send({ message: 'Este convite pertence a outro usuário' })
+        // }
+
+        const code = (await gerarNextVal('seed_login') + BigInt(nextValUserLogin)).toString()
+
+        const user = await prisma.user.create({
+          data: {
+            email: invite.email,
+            passwordChangedAt: null,
+            mustChangePassword: true,
+            login: code,
+            passwordHash: await hash(code, 1)
+          }
         })
 
-        if (!user) {
-          return reply.status(400).send({ message: 'Usuário não encontrado' })
-        }
-
-        if (user.email !== invite.email) {
-          return reply.status(400).send({ message: 'Este convite pertence a outro usuário' })
-        }
-
         await prisma.$transaction([
+
           prisma.member.create({
             data: {
-              userId,
+              userId: user.id,
               organizationId: invite.organizationId,
               role: invite.role,
             },
@@ -64,7 +90,7 @@ export async function acceptInvite(app: FastifyInstance) {
 
           prisma.invite.delete({
             where: {
-              id: invite.id,
+              token,
             },
           }),
         ])

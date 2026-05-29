@@ -43,7 +43,7 @@ export async function ProfileButton() {
                     </a>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                    <a href="/api/auth/reset-password">
+                    <a href="/account/reset-password">
                     <LogOut className="mr-2 size-4" />
                         Trocar senha
                     </a>

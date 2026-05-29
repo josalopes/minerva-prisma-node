@@ -8,6 +8,8 @@ interface SignInWithPasswordRequest {
 
 interface SignInWithPasswordResponse {
     token: string,
+    mustChangePassword: boolean,
+    passwordChangedAt?: Date
 }
 
 export async function signInWithPassword({

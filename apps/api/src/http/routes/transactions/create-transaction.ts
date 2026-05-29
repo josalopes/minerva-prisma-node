@@ -10,7 +10,7 @@ import {
   transactionResponseSchema
 } from "@saas/contracts/transaction/transaction"
 
-import { createTransactionService } from "@/services/transactions/create-transaction-service"
+import { createTransactionService } from "@/services/transactions/create-transaction"
 import { successResponseSchema } from "@/lib/api-response"
 import { fromCents } from "@/utils/money"
 

@@ -4,6 +4,9 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { useRouter } from "next/navigation"
+
+import { useChangePassword }from "@/hooks/use-change-password"
 
 import {
   Form,
@@ -21,31 +24,53 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
 
 import { resetPasswordFormSchema } from '@/lib/validation-schemas'
+import { ApiError } from '@/lib/api-error'
+import { deleteToken } from './action'
 
 const formSchema = resetPasswordFormSchema
 
 export default function ResetPasswordPreview() {
+  const router = useRouter()
+  const mutation = useChangePassword()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      password: '',
+      currentPassword: '',
+      newPassword: '',
       confirmPassword: '',
     },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {    
     try {
-      // Assuming an async reset password function
+      await mutation.mutateAsync({
+        currentPassword:
+          values.currentPassword,
+
+        newPassword:
+          values.newPassword,
+      })
       toast.success(
-        'Password reset successful. You can now log in with your new password.',
+        'Senha alterada com sucesso. Efetue novo login.',
       )
+      deleteToken()
+      router.push("/auth/sign-in")
+
     } catch (error) {
-      console.error('Error resetting password', error)
-      toast.error('Failed to reset the password. Please try again.')
+       if (error instanceof ApiError) {
+        toast.error(
+          `${error.message}`
+        )
+
+        return
+      }
+      toast.error(
+        "Erro inesperado"
+      )
     }
   }
 
@@ -53,25 +78,45 @@ export default function ResetPasswordPreview() {
     <div className="flex min-h-[50vh] h-full w-full items-center justify-center px-4">
       <Card className="mx-auto max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Reset Password</CardTitle>
+          <CardTitle className="text-2xl">Trocar senha</CardTitle>
           <CardDescription>
-            Enter your new password to reset your password.
+            Entre com uma nova senha e faça sua confirmação
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <div className="grid gap-4">
+                {/* Current Password Field */}
+                <FormField
+                  control={form.control}
+                  name="currentPassword"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-2">
+                      <FormLabel htmlFor="currentPassword">Senha atual</FormLabel>
+                      <FormControl>
+                        <PasswordInput
+                          id="currentPassword"
+                          placeholder="******"
+                          autoComplete="new-password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
                 {/* New Password Field */}
                 <FormField
                   control={form.control}
-                  name="password"
+                  name="newPassword"
                   render={({ field }) => (
                     <FormItem className="grid gap-2">
-                      <FormLabel htmlFor="password">New Password</FormLabel>
+                      <FormLabel htmlFor="newPassword">Nova senha</FormLabel>
                       <FormControl>
                         <PasswordInput
-                          id="password"
+                          id="newPassword"
                           placeholder="******"
                           autoComplete="new-password"
                           {...field}
@@ -89,7 +134,7 @@ export default function ResetPasswordPreview() {
                   render={({ field }) => (
                     <FormItem className="grid gap-2">
                       <FormLabel htmlFor="confirmPassword">
-                        Confirm Password
+                        Confirmar senha
                       </FormLabel>
                       <FormControl>
                         <PasswordInput
@@ -105,7 +150,7 @@ export default function ResetPasswordPreview() {
                 />
 
                 <Button type="submit" className="w-full">
-                  Reset Password
+                  Alterar
                 </Button>
               </div>
             </form>

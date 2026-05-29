@@ -1,3 +1,4 @@
+// import { router } from 'next/router';
 import { compare } from 'bcryptjs';
 import type { FastifyInstance } from 'fastify';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
@@ -23,7 +24,9 @@ export async function authenticateWithPassword(app: FastifyInstance) {
                         message: z.string(),
                     }),
                     201: z.object({
-                        token: z.string()
+                        token: z.string(),
+                        mustCChangePassword: z.boolean(),
+                        passwordChangedAt: z.date().nullable(),
                     })
                 }
             }, 
@@ -54,6 +57,10 @@ export async function authenticateWithPassword(app: FastifyInstance) {
                 throw new BadRequestError('E-mail/senha inválido.')
             }
 
+            if (!userFromEmail.passwordChangedAt) {
+                //  router.push("/change-password")
+            }
+
             const token = await reply.jwtSign(
                 {
                     sub: userFromEmail.id,
@@ -65,7 +72,13 @@ export async function authenticateWithPassword(app: FastifyInstance) {
                 },
             )
 
-            return reply.status(201).send({ token })
+            return reply.status(201).send(
+                { 
+                  token,
+                  mustCChangePassword: userFromEmail.mustChangePassword,
+                  passwordChangedAt: userFromEmail.passwordChangedAt
+                }
+            )
         },
     )
 }

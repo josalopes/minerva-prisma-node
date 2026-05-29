@@ -2,6 +2,7 @@ import { auth } from './../../middlewares/auth';
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
+import crypto from "node:crypto"
 
 import { prisma } from "@/lib/prisma";
 import { getUserPermissions } from "@/utils/get-user-permissions";
@@ -30,7 +31,8 @@ export async function createInvite(app: FastifyInstance) {
                         message: z.string(),
                     }),
                 201: z.object({
-                        inviteId: z.uuid(),
+                        inviteId: z.string(),
+                        token: z.string(),
                     }),
             }
         },
@@ -39,6 +41,10 @@ export async function createInvite(app: FastifyInstance) {
         const { slug } = request.params
         const userId = await request.getCurrentUserid()
         const { organization, membership } = await request.getUserMembership(slug)
+
+        const token = crypto.randomBytes(32).toString("hex")
+        const expiresAt = new Date()
+        expiresAt.setDate(expiresAt.getDate() + 7)
 
         if (!organization) {
             return reply.status(400).send({ message: 'Organização inexistente' })
@@ -85,11 +91,16 @@ export async function createInvite(app: FastifyInstance) {
             data: {
                 email,
                 role,
+                token,
+                expiresAt,
                 organizationId: organization.id,
-                authorId: userId,
+                invitedById: userId,
             },
         })  
 
-        return reply.status(201).send({ inviteId: invite.id})
+        return reply.status(201).send({
+           inviteId: invite.id,
+           token: invite.token
+        })
       })
 }

@@ -66,6 +66,7 @@ export async function createAccount(app: FastifyInstance) {
                     name,
                     email,
                     passwordHash,
+                    passwordChangedAt: null,
                     login: (await gerarNextVal('seed_login') + BigInt(nextValUserLogin)).toString(),
                     member_on: autoJoinOrganization ? {
                         create: {

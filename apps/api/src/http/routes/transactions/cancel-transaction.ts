@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 import { auth } from "@/http/middlewares/auth";
 import { deleteProductService } from "@/services/products/delete-product";
-import { cancelTransactionService } from "@/services/transactions/create-transaction-service";
+import { cancelTransactionService } from "@/services/transactions/create-transaction";
 
 export async function cancelTransaction(app: FastifyInstance) {
     app
