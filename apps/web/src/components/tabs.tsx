@@ -22,9 +22,47 @@ export async function Tabs() {
                         size="sm" 
                         className="border border-transparent text-muted-foreground data-[current=true]:border-border data-[current=true]:text-foreground"
                     >
-                        <NavLink href={`/org/${currentOrg}`}>
-                        {/* <NavLink href={`/org/${currentOrg}/products`}> */}
-                            Produtos
+                        <NavLink href={`/org/${currentOrg}/org-settings/general`}>
+                            Dados básicos
+                        </NavLink>
+                    </Button>
+                )}
+                
+                {canGetMembers && (
+                    <Button 
+                        asChild 
+                        variant="ghost" 
+                        size="sm" 
+                        className="border border-transparent text-muted-foreground data-[current=true]:border-border data-[current=true]:text-foreground"
+                    >
+                        <NavLink href={`/org/${currentOrg}/org-settings/address`}>
+                            Endereços
+                        </NavLink>
+                    </Button>
+                )}
+                
+                {canGetMembers && (
+                    <Button 
+                        asChild 
+                        variant="ghost" 
+                        size="sm" 
+                        className="border border-transparent text-muted-foreground data-[current=true]:border-border data-[current=true]:text-foreground"
+                    >
+                        <NavLink href={`/org/${currentOrg}/org-settings/logo`}>
+                          Logo
+                        </NavLink>
+                    </Button>
+                )}
+                
+                {canGetMembers && (
+                    <Button 
+                        asChild 
+                        variant="ghost" 
+                        size="sm" 
+                        className="border border-transparent text-muted-foreground data-[current=true]:border-border data-[current=true]:text-foreground"
+                    >
+                        <NavLink href={`/org/${currentOrg}/org-settings/avatar`}>
+                            Avatar
                         </NavLink>
                     </Button>
                 )}
@@ -49,8 +87,8 @@ export async function Tabs() {
                         size="sm" 
                         className="border border-transparent text-muted-foreground data-[current=true]:border-border data-[current=true]:text-foreground"
                     >
-                        <NavLink href={`/org/${currentOrg}/settings`}>
-                            Configuração & Financeiro
+                        <NavLink href={`/org/${currentOrg}/invites`}>
+                            Convites
                         </NavLink>
                     </Button>
                 )}

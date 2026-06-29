@@ -12,8 +12,13 @@ export async function getAddressesService(
 
 return prisma.address.findMany({
     where,
-    orderBy: {
-      id: "desc",
-    },
+    orderBy: [
+      {
+        isPrimary: "desc",
+      },
+      {
+        createdAt: "desc",
+      },
+    ],
   });
 }

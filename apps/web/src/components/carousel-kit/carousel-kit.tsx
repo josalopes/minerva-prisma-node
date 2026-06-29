@@ -13,6 +13,7 @@ import type { CarouselApi } from "@/components/ui/carousel"
 import clsx from "clsx"
 import { CarouselKitDots } from "./carousel-kit-dots"
 import { CarouselKitProvider } from "./carousel-kit.context"
+import { cn } from "@/lib/utils"
 
 interface CarouselKitProps<T> {
   items: T[]
@@ -31,6 +32,7 @@ interface CarouselKitProps<T> {
   showArrows?: boolean
 
   className?: string
+  viewportPadding?: string
 }
 
 export function CarouselKit<T>({
@@ -46,6 +48,7 @@ export function CarouselKit<T>({
   showDots = true,
   showArrows = true,
   className,
+  viewportPadding = "px-4 py-2"
 }: CarouselKitProps<T>) {
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
@@ -125,7 +128,12 @@ export function CarouselKit<T>({
             loop: false,
           }}
         >
-          <CarouselContent className="-ml-4">
+          <CarouselContent
+            className={cn(
+                "-ml-4",
+                viewportPadding
+            )}
+        >
             {items.map((item, index) => (
               <CarouselItem
                 key={index}

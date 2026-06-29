@@ -27,7 +27,7 @@ type Props = {
   transactionType: "COMPRA" | "VENDA"
 }
 
-export function TransactionScreen({ slug, products, transactionType, organizationName, cpfCnpj }: Props) {
+export function TransactionScreen({ slug, products, transactionType, organizationName, organizationId, cpfCnpj }: Props) {
   const {
     selectedProduct,
     items,
@@ -42,7 +42,7 @@ export function TransactionScreen({ slug, products, transactionType, organizatio
   const productSearchRef = useRef<HTMLInputElement>(null)
 
   const weightRef = useRef<HTMLInputElement>(null)
-  const cachedProducts = useProductsCache(products)
+  const cachedProducts = useProductsCache(organizationId, products)
   const mutation = useCreateTransaction()
 
   const [receiptOpen, setReceiptOpen] = useState(false)
@@ -92,7 +92,8 @@ export function TransactionScreen({ slug, products, transactionType, organizatio
           <div className="col-span-4">
             <ProductSearch
               ref={productSearchRef}
-              products={cachedProducts}
+              products={products}
+              // products={cachedProducts}
               onSelect={(product) => {
                 setProduct(product.id)
 

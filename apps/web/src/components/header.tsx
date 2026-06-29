@@ -12,7 +12,7 @@ import { HeaderContainer } from "./header-container"
 export default async function Header() {
     const { user } = await auth()    
     const permissions = await ability()
-
+    
     return (
         <HeaderContainer>
             <div className="h-16 mx-auto flex max-w-[1200px] items-center justify-between">
@@ -27,9 +27,6 @@ export default async function Header() {
                     <ProfileButton />
                 </div>
             </div>
-            {/* <div className="py-2">
-                <Separator />
-            </div> */}
         </HeaderContainer>
     )
 }

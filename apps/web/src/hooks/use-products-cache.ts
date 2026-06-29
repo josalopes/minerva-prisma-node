@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from "react"
 
 export type Product = {
@@ -9,48 +7,76 @@ export type Product = {
   price: number
 }
 
-export function useProductsCache(initialProducts: Product[]) {
+export function useProductsCache(
+  organizationId: string,
+  initialProducts: Product[]
+) {
+
   const [products, setProducts] =
-    useState<Product[]>([])
-
-  const [weight, setWeight]   = useState("")
-
-//   useEffect(() => {
-//   async function syncProducts() {
-
-//     const res = await fetch("/api/products")
-//     const fresh = await res.json()
-
-//     setProducts(fresh)
-
-//     localStorage.setItem(
-//       "products",
-//       JSON.stringify(fresh)
-//     )
-//   }
-
-//   syncProducts()
-
-// }, [])
+    useState<Product[]>(initialProducts)
 
   useEffect(() => {
-    const cached =
-      localStorage.getItem("products")
 
-    // 🔥 cache existente
+    const cacheKey =
+      `products:${organizationId}`
+
+    const cached =
+      localStorage.getItem(cacheKey)
+
     if (cached) {
       setProducts(JSON.parse(cached))
-      return
+    } else {
+      localStorage.setItem(
+        cacheKey,
+        JSON.stringify(initialProducts)
+      )
     }
 
-    // 🔥 primeira carga
-    setProducts(initialProducts)
-
-    localStorage.setItem(
-      "products",
-      JSON.stringify(initialProducts)
-    )
-  }, [initialProducts])
+  }, [
+    organizationId,
+    initialProducts
+  ])
 
   return products
 }
+
+// export function useProductsCache(
+//   organizationId: string,
+//   initialProducts: Product[]
+// ) {
+
+//   const [products, setProducts] =
+//     useState<Product[]>([])
+
+//   useEffect(() => {
+
+//     const cacheKey =
+//       `products:${organizationId}`
+
+//     const cached =
+//       localStorage.getItem(cacheKey)
+
+//     if (cached) {
+
+//       setProducts(
+//         JSON.parse(cached)
+//       )
+
+//       return
+//     }
+
+//     setProducts(initialProducts)
+
+//     localStorage.setItem(
+//       cacheKey,
+//       JSON.stringify(initialProducts)
+//     )
+
+//   }, [
+//     organizationId,
+//     initialProducts
+//   ])
+
+//   return products
+// }
+

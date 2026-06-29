@@ -28,6 +28,9 @@ export async function getOrganizationBySlug(app: FastifyInstance) {
                             organization: z.object({
                                 id: z.uuid(),
                                 name: z.string(),
+                                domain: z.string().nullable(),
+                                shouldAttachUserByDomain: z.boolean(),
+                                personType: z.string(),
                                 slug: z.string(),
                                 cpfCnpj: z.string(),
                                 avatarUrl: z.url().nullable(),
@@ -52,6 +55,9 @@ export async function getOrganizationBySlug(app: FastifyInstance) {
                 const organization = {
                     id: org.id,
                     name: org?.name,
+                    domain: org?.domain,
+                    personType: org?.personType,
+                    shouldAttachUserByDomain: org?.shouldAttachUserByDomain,
                     slug: org.slug,
                     cpfCnpj: org.cpfCnpj,
                     avatarUrl: org.avatarUrl,

@@ -38,6 +38,7 @@ import { createAddress } from './routes/addresses/create-address'
 import { updateAddress } from './routes/addresses/update-address'
 import { getAddresses } from './routes/addresses/get-address'
 import { deleteAddress } from './routes/addresses/delete-address'
+import { setPrimary } from './routes/addresses/set-primary'
 
 import { createCustomer } from './routes/customers/create-customer'
 
@@ -143,6 +144,7 @@ app.register(createAddress)
 app.register(updateAddress)
 app.register(getAddresses)
 app.register(deleteAddress)
+app.register(setPrimary)
 
 app.register(createCustomer)
 

@@ -1,53 +1,54 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useState } from "react"
+
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreVertical, Pencil, Trash } from "lucide-react"
 
-export interface Address {
-  id: number
-  street: string
-  number: string
-  complement?: string
-  district: string
-  city: string
-  state: string
-  zipCode: string
-  isPrimary?: boolean
-  type?: "GENERAL" | "BILLING" | "SHIPPING"
-}
+import {
+  MoreVertical,
+  Star,
+  Trash,
+} from "lucide-react"
+
+import clsx from "clsx"
+
+import { Address } from "@/types/address"
 
 interface AddressCardProps {
   address: Address
   compact?: boolean
-  onClick?: (id: number) => void
-  onEdit?: (address: Address) => void
+  selected?: boolean
+  highlight?: boolean
+  
+  onClick?: (address: Address) => void
   onDelete?: (id: number) => void
+  onMakePrimary?: (address: Address) => void
 }
 
 export function AddressCard({
   address,
+  selected = false,
   compact = false,
   onClick,
-  onEdit,
   onDelete,
+  onMakePrimary,
 }: AddressCardProps) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [localStreet, setLocalStreet] = useState(address.street)
 
   const typeLabel = {
     GENERAL: "Geral",
@@ -57,87 +58,146 @@ export function AddressCard({
 
   return (
     <motion.div
+      layout
       whileHover={{ y: -4 }}
-      transition={{ type: "spring", stiffness: 300 }}
-      className="h-full"
+      animate={{
+        scale: selected ? 1.01 : 1,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 320,
+        damping: 24,
+      }}
+      className="h-full py-2"
     >
       <Card
-        onClick={() => onClick?.(address.id)}
-        className="h-full cursor-pointer transition-shadow hover:shadow-xl"
+        onClick={() => onClick?.(address)}
+        className={clsx(
+          "relative h-full cursor-pointer border transition-all duration-300",
+
+          selected
+            ? `
+              border-primary
+              bg-primary/5
+            `
+            : `
+              hover:border-primary/30
+              hover:bg-muted/30
+            `
+        )}
       >
-        <CardHeader className="flex flex-row justify-between items-start">
+        {selected && (
+          <div
+            className="
+              absolute
+              left-0
+              top-3
+              bottom-3
+              w-[3px]
+              rounded-full
+              bg-primary
+            "
+          />
+        )}
+
+        <CardHeader className="flex flex-row items-start justify-between">
           <div>
-            {isEditing ? (
-              <input
-                value={localStreet}
-                onChange={(e) => setLocalStreet(e.target.value)}
-                className="border rounded px-2 py-1 text-sm"
-              />
-            ) : (
-              <CardTitle className="text-base">
-                {localStreet}, {address.number}
-              </CardTitle>
-            )}
+            <CardTitle
+              className={clsx(
+                "text-base transition-colors",
+                selected && "text-primary"
+              )}
+            >
+              {address.street}, {address.number}
+            </CardTitle>
 
             {address.isPrimary && (
-              <Badge className="mt-1" variant="secondary">
+              <Badge
+                className="mt-2"
+                variant={
+                  selected
+                    ? "default"
+                    : "secondary"
+                }
+              >
                 Principal
               </Badge>
             )}
           </div>
 
-          {(onEdit || onDelete) && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={(e) => e.stopPropagation()}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreVertical size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end">
+
+              {!address.isPrimary && (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onMakePrimary?.(address)
+                  }}
                 >
-                  <MoreVertical size={16} />
-                </Button>
-              </DropdownMenuTrigger>
+                  <Star
+                    size={14}
+                    className="mr-2"
+                  />
+                  Tornar principal
+                </DropdownMenuItem>
+              )}
 
-              <DropdownMenuContent align="end">
-                {onEdit && (
-                  <DropdownMenuItem
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setIsEditing(true)
-                      onEdit(address)
-                    }}
-                  >
-                    <Pencil size={14} className="mr-2" />
-                    Editar
-                  </DropdownMenuItem>
-                )}
+              {onDelete && (
+                <>
+                  <DropdownMenuSeparator />
 
-                {onDelete && (
                   <DropdownMenuItem
+                    className="text-destructive"
                     onClick={(e) => {
                       e.stopPropagation()
                       onDelete(address.id)
                     }}
                   >
-                    <Trash size={14} className="mr-2" />
-                    Excluir
+                    <Trash
+                      size={14}
+                      className="mr-2"
+                    />
+                    Excluir endereço...
                   </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+                </>
+              )}
+
+            </DropdownMenuContent>
+          </DropdownMenu>
         </CardHeader>
 
         {!compact && (
-          <CardContent className="text-sm space-y-1">
+          <CardContent className="space-y-1 text-sm">
             <p>{address.district}</p>
+
             <p>
               {address.city} - {address.state}
             </p>
-            <p>CEP: {address.zipCode}</p>
+
+            <p>
+              CEP: {address.zipCode}
+            </p>
 
             {address.type && (
-              <Badge variant="outline" className="mt-2">
+              <Badge
+                variant={
+                  selected
+                    ? "default"
+                    : "outline"
+                }
+                className="mt-2"
+              >
                 {typeLabel[address.type]}
               </Badge>
             )}

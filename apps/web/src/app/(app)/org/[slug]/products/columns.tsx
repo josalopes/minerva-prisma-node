@@ -91,7 +91,8 @@ export function useProductColumns() {
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("price"))
  
-      return <div className="font-medium text-right">{formatCurrency(amount / 100)}</div>
+      return <div className="font-medium text-right">{formatCurrency(amount)}</div>
+      // return <div className="font-medium text-right">{formatCurrency(amount / 100)}</div>
     },
   },
   {

@@ -1,3 +1,4 @@
+import { Address } from "@/types/address";
 import { api } from "../../http/api-client";
 interface CreateAddressRequest {
     ownerType: string,
@@ -22,20 +23,8 @@ interface CreateAddressResponse {
     city: string,
     state: string,
     zipCode: string,
-    isPrimary: boolean
-}
-
-interface Address {
-    id: number
-    street: string
-    number: string
-    complement: string
-    district: string
-    city: string
-    state: string
-    zipCode: string
-    country: string
-    isPrimary: boolean
+    isPrimary: boolean,
+    type: string
 }
 
 export async function createAddress({
@@ -43,28 +32,35 @@ export async function createAddress({
 }: CreateAddressRequest): Promise<CreateAddressResponse> {
     const response = await api.post('addresses', {
         json: { 
-            ownerType,
-            ownerId,
-            street,
-            number,
-            complement,
-            district,
-            city,
-            state,
-            country,
-            zipCode,
-            isPrimary,
+          street,
+          number,
+          complement,
+          district,
+          city,
+          state,
+          zipCode,
+          country,
+          ownerType,
+          ownerId,
+          isPrimary,
         },
     }).json<CreateAddressResponse>()
 
     return response
 }
 
+interface getAddressesProps {
+  ownerId: string
+  ownerType: string
+}
 
 export async function getAddresses(
-  ownerType: string,
-  ownerId: string
+  {
+    ownerType,
+    ownerId
+  }: getAddressesProps
 ): Promise<Address[]> {
+
   const addresses = await api
     .get('addresses', { searchParams: { ownerType, ownerId } })
     .json<Address[]>()
@@ -72,6 +68,25 @@ export async function getAddresses(
   return addresses
 }
 
-export async function deleteAddress(id: string) {
-  await api.delete(`/addresses/${id}`)
+export async function deleteAddress(id: number) {
+  await api.delete(`address/${id}`)
+}
+
+type SetPrimaryAddressInput = {
+  id: number
+  ownerId: string
+  ownerType: string
+}
+
+export async function setPrimaryAddress({
+  id,
+  ownerId,
+  ownerType,
+}: SetPrimaryAddressInput) {
+  await api.patch(`address/${id}/primary`, {
+    json: {
+      ownerId,
+      ownerType,
+    },
+  })
 }

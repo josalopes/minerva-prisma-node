@@ -17,13 +17,11 @@ export default async function OrganizationAddresses({ params }: AddressProps) {
 
   return (
     <div className="space-y-4">
-        <Header />
-        {/* <div className="flex flex-row"> */}
-            <AddressList 
-                ownerType="organization"
-                ownerId={organization.organization.id}
-            />
-        {/* </div> */}
+      <Header />
+      <AddressList 
+        ownerType="organization"
+        ownerId={organization.organization.id}
+      />
     </div>
   )
 }

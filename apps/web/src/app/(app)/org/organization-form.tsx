@@ -17,27 +17,41 @@ import { useFormState } from '@/hooks/use-form-state'
 
 import { AlertTriangle, Loader2 } from "lucide-react";
 
-import { OrganizationSchema } from "./actions";
 import { createOrganizationAction } from "./actions";
 import { updateOrganizationAction } from "./actions";
 import { useOrganizationForm } from "./use-organization-form";
 import { formatCpfCnpj } from "@/utils/formata-cpf-cnpj";
 import { Checkbox } from "@/components/ui/checkbox";
 
+import { createOrganizationSchema, updateOrganizationSchema     
+} from "@saas/contracts/organization"
+
 interface OrganizationFormProps {
     isUpdating?: boolean,
-    initialData?: OrganizationSchema
+    initialData: Organization
 }
+
+type Organization = {
+    id: string;
+    name: string;
+    domain: string;
+    slug: string;
+    cpfCnpj: string;
+    personType: string;
+    shouldAttachUsersByDomain: boolean;
+  }
 
 export function OrganizationForm({ isUpdating, initialData }: OrganizationFormProps) {
     const form = useOrganizationForm({
         initialValues: initialData
     });
 
+    const formatedCpfCnpj = formatCpfCnpj(initialData.cpfCnpj)
+
     const formAction = isUpdating ? updateOrganizationAction : createOrganizationAction
    
     const [{ success, message, errors }, handleSubmit, isPending] = useFormState(
-        formAction,
+        formAction
     )
 
     const { watch } = form
@@ -114,7 +128,6 @@ export function OrganizationForm({ isUpdating, initialData }: OrganizationFormPr
                                         <RadioGroupItem id="fisica" value="FISICA" />
                                         <Label htmlFor="fisica">Pessoa Física</Label>
                                     </div>
-                                    
                                 </RadioGroup>
                             </FormControl>
                             <FormMessage />
@@ -141,7 +154,7 @@ export function OrganizationForm({ isUpdating, initialData }: OrganizationFormPr
                                         }} 
                                         placeholder="Digite um CPF ou CNPJ"
                                         maxLength={inputSize}
-                                        defaultValue={initialData?.cpfCnpj ?? undefined}
+                                        defaultValue={formatedCpfCnpj ?? undefined}
                                         {...props} 
                                     />
                                 </FormControl>
@@ -184,7 +197,7 @@ export function OrganizationForm({ isUpdating, initialData }: OrganizationFormPr
                             name="shouldAttachUsersByDomain"
                             id="shouldAttachUsersByDomain"
                             className=" translate-y-0.5"
-                            defaultChecked={initialData?.shouldAttachUserByDomain}
+                            defaultChecked={initialData?.shouldAttachUsersByDomain}
                         />
                         <label 
                             htmlFor="shouldAttachUsersByDomain" 

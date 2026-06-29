@@ -9,7 +9,7 @@ import { FormFieldBase } from "@/components/form-field-base"
 import { useFieldStatus } from "@/hooks/use-field-status"
 import { FieldStatusIcon } from "./field-status-icon"
 
-type AsyncField = {
+export type AsyncField = {
   error: string | null
   isLoading: boolean
   onChangeAsyncClear: (value: string) => void

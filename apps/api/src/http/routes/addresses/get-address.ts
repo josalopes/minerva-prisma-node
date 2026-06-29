@@ -25,6 +25,7 @@ export async function getAddresses(app: FastifyInstance) {
                     ownerType: z.string(),
                     ownerId: z.string(),
                     type: z.string(),
+                    isPrimary: z.boolean(),
                     street: z.string().nullable(),
                     number: z.string().nullable(),
                     complement: z.string().nullable(),
@@ -41,7 +42,7 @@ export async function getAddresses(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const querySchema = z.object({
-          ownerType: z.enum(["organization", "member"]),
+          ownerType: z.enum(["organization", "customer", "member"]),
           ownerId: z.string(),
         });
 

@@ -89,7 +89,8 @@ export default function ProductList({ productList, canCreate=true}: ListProps) {
                             initialValues={editingProduct ? {
                                 name: editingProduct.name,
                                 code: editingProduct.code,
-                                price: (editingProduct.price / 100).toFixed(2).replace('.', ','),
+                                price: (editingProduct.price).toFixed(2).replace('.', ','),
+                                // price: (editingProduct.price / 100).toFixed(2).replace('.', ','),
                                 measureUnit: editingProduct.measureUnit,
                                 } : undefined}
                         />

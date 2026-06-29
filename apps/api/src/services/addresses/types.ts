@@ -1,10 +1,10 @@
-export type AddressOwnerType = "organization" | "member";
+export type AddressOwnerType = "organization" | "member" | "customer";
 
 export interface CreateAddressInput {
   ownerType: AddressOwnerType;
   ownerId: string;
   type: string;
-  
+  isPrimary: boolean;
   street?: string;
   number?: string;
   complement?: string;

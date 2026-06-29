@@ -16,7 +16,8 @@ import {
     UserPen,
     Users, Store,
     Warehouse,
-    Feather
+    Feather,
+    ChevronDown
  } from "lucide-react";
 
 import {
@@ -29,7 +30,8 @@ import {
 
 import {
     Collapsible,
-    CollapsibleContent
+    CollapsibleContent,
+    CollapsibleTrigger
 } from "@/components/ui/collapsible"
 
 import { Button } from "@/components/ui/button";
@@ -47,6 +49,10 @@ export function SidebarDashboardClient({ children }: { children: React.ReactNode
     
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
+
+    const [openOperation, setOpenOperation] = useState(false)
+    const [openPerson, setOpenPerson] = useState(false)
+    const [openAdministration, setOpenAdministration] = useState(false)
     
     function handleOrganizationAvatar() {
         if (!currentOrg) {
@@ -68,14 +74,14 @@ export function SidebarDashboardClient({ children }: { children: React.ReactNode
         })
     }
 
-    function handleMembers() {
+    function handleMember() {
         if (!currentOrg) {
             return
         }
 
-        startTransition(() => {
-            router.push(`/org/${currentOrg.slug}/members`)
-        })
+        // startTransition(() => {
+        //     router.push(`/org/${currentOrg.slug}/members`)
+        // })
     }
 
     function handleProduct() {
@@ -88,14 +94,14 @@ export function SidebarDashboardClient({ children }: { children: React.ReactNode
         })
     }    
     
-    function handleConfiguration() {
+    function handleStorage() {
         if (!currentOrg) {
             return
         }
 
-        startTransition(() => {
-            router.push(`/org/${currentOrg.slug}/settings`)
-        })
+        // startTransition(() => {
+        //     router.push(`/org/${currentOrg.slug}/settings`)
+        // })
     }
     
     function handleAddress() {
@@ -117,9 +123,49 @@ export function SidebarDashboardClient({ children }: { children: React.ReactNode
             router.push(`/org/${currentOrg.slug}/transactions`)
         })
     }
+    
+    function handleCustomer() {
+        if (!currentOrg) {
+            return
+        }
+
+        // startTransition(() => {
+        //     router.push(`/org/${currentOrg.slug}/transactions`)
+        // })
+    }
+    
+    function handleSchedule() {
+        if (!currentOrg) {
+            return
+        }
+
+        // startTransition(() => {
+        //     router.push(`/org/${currentOrg.slug}/transactions`)
+        // })
+    }
+    
+    function handleOrganization() {
+        if (!currentOrg) {
+            return
+        }
+
+        // startTransition(() => {
+        //     router.push(`/org/${currentOrg.slug}/transactions`)
+        // })
+    }
+    
+    function handleSupplier() {
+        if (!currentOrg) {
+            return
+        }
+
+        // startTransition(() => {
+        //     router.push(`/org/${currentOrg.slug}/transactions`)
+        // })
+    }
 
     return (
-        <div className="flex min-h-screen w-full">
+        <div className="flex h-screen w-full">
             <aside
               className={clsx("flex flex-col border-r bg-background transition-all duration-300 p-4 h-full", {
                 "w-20": isCollapsed,
@@ -149,210 +195,156 @@ export function SidebarDashboardClient({ children }: { children: React.ReactNode
                     {!isCollapsed ? <ChevronLeft className="w-12 h-12"/> : <ChevronRight className="w-12 h-12"/>}
                 </Button>
 
-                {isCollapsed && (
-                    <nav className="flex flex-col gap-1 overflow-hidden mt-2">
-                       <SidebarActionButton
-                            icon={<UserPen className="w-6 h-6" />}
-                            label="Avatar"
-                            isCollapsed={isCollapsed}
-                            onClick={handleOrganizationAvatar}
-                        />
+                <Collapsible 
+                  open={openOperation} 
+                  onOpenChange={setOpenOperation}
+                >
+                  <CollapsibleTrigger
+                    className="
+                      flex
+                      items-center
+                      justify-between
+                      w-full
+                      px-2
+                      py-2
+                      rounded-md
+                      hover:bg-accent
+                    "
+                  >
+                    <span>Operação</span>
 
-                        <SidebarActionButton
-                            icon={<Feather className="w-6 h-6" />}
-                            label="Logo"
-                            isCollapsed={isCollapsed}
-                            onClick={handleOrganizationLogo}
-                        />
+                    {
+                      openOperation
+                        ? <ChevronDown className="w-4 h-4" />
+                        : <ChevronRight className="w-4 h-4" />
+                    }
+                  </CollapsibleTrigger>
 
-                        <SidebarActionButton
-                            icon={<Users className="w-6 h-6" />}
-                            label="Membros"
-                            isCollapsed={isCollapsed}
-                            onClick={handleMembers}
-                        />
-
-                        <SidebarActionButton
-                            icon={<Warehouse className="w-6 h-6" />}
-                            label="Produtos"
-                            isCollapsed={isCollapsed}
-                            onClick={handleProduct}
-                        />
-
-                        <SidebarActionButton
-                            icon={<CalendarCheck2 className="w-6 h-6" />}
-                            label="Organização"
-                            isCollapsed={isCollapsed}
-                            onClick={handleConfiguration}
-                        />
-                            
-                        <SidebarNavLink 
-                            href="/dashboard/profile"
-                            label="Meu perfil"
-                            pathname={pathname}
-                            isCollapsed={isCollapsed}
-                            icon={<Settings className="w-6 h-6" />}
-                        />
-
-                        <SidebarNavLink 
-                            href="/dashboard/plans"
-                            label="Planos"
-                            pathname={pathname}
-                            isCollapsed={isCollapsed}
-                            icon={<Banknote className="w-6 h-6" />}
-                        /> 
-                    </nav>
-                )}
-
-                <Collapsible open={!isCollapsed}>
                   <CollapsibleContent>
-                    <nav className="flex flex-col gap-1 overflow-hidden">
-                        <span className="text-sm text-gray-400 font-medium mt-1 uppercase">
-                            Organização
-                        </span>
-                        
-                        <SidebarActionButton
-                            icon={<UserPen className="w-6 h-6" />}
-                            label="Avatar"
-                            isCollapsed={isCollapsed}
-                            onClick={handleOrganizationAvatar}
-                        />
+                    <SidebarActionButton
+                        icon={<Warehouse className="w-6 h-6" />}
+                        label="Transações"
+                        isCollapsed={isCollapsed}
+                        onClick={handleTransaction}
+                    />
+                    
+                    <SidebarActionButton
+                        icon={<Warehouse className="w-6 h-6" />}
+                        label="Produtos"
+                        isCollapsed={isCollapsed}
+                        onClick={handleProduct}
+                    />
 
-                        <SidebarActionButton
-                            icon={<Feather className="w-6 h-6" />}
-                            label="Logo"
-                            isCollapsed={isCollapsed}
-                            onClick={handleOrganizationLogo}
-                        />
+                    <SidebarActionButton
+                        icon={<CalendarCheck2 className="w-6 h-6" />}
+                        label="Estoque"
+                        isCollapsed={isCollapsed}
+                        onClick={handleStorage}
+                    />
+                  </CollapsibleContent>
+                </Collapsible>
 
-                        <SidebarActionButton
-                            icon={<Users className="w-6 h-6" />}
-                            label="Membros"
-                            isCollapsed={isCollapsed}
-                            onClick={handleMembers}
-                        />
+                <Collapsible 
+                  open={openPerson} 
+                  onOpenChange={setOpenPerson}
+                >
+                  <CollapsibleTrigger
+                    className="
+                      flex
+                      items-center
+                      justify-between
+                      w-full
+                      px-2
+                      py-2
+                      rounded-md
+                      hover:bg-accent
+                    "
+                  >
+                    <span>Pessoas</span>
 
-                        <SidebarActionButton
-                            icon={<Warehouse className="w-6 h-6" />}
-                            label="Produtos"
-                            isCollapsed={isCollapsed}
-                            onClick={handleProduct}
-                        />
+                    {
+                      openPerson
+                        ? <ChevronDown className="w-4 h-4" />
+                        : <ChevronRight className="w-4 h-4" />
+                    }
+                  </CollapsibleTrigger>
 
-                        <span className="text-sm text-gray-400 font-medium mt-1 uppercase">
-                            Configurações
-                        </span>
+                  <CollapsibleContent>
+                    <SidebarActionButton
+                        icon={<Warehouse className="w-6 h-6" />}
+                        label="Clientes"
+                        isCollapsed={isCollapsed}
+                        onClick={handleCustomer}
+                    />
+                    
+                    <SidebarActionButton
+                        icon={<Warehouse className="w-6 h-6" />}
+                        label="Fornecedores"
+                        isCollapsed={isCollapsed}
+                        onClick={handleSupplier}
+                    />
 
-                        <SidebarActionButton
-                            icon={<Store className="w-6 h-6" />}
-                            label="Organização"
-                            isCollapsed={isCollapsed}
-                            onClick={handleConfiguration}
-                        />
-                        
-                        <SidebarActionButton
-                            icon={<Store className="w-6 h-6" />}
-                            label="Endereços"
-                            isCollapsed={isCollapsed}
-                            onClick={handleAddress}
-                        />
-                        
-                        <SidebarActionButton
-                            icon={<Store className="w-6 h-6" />}
-                            label="Transação"
-                            isCollapsed={isCollapsed}
-                            onClick={handleTransaction}
-                        />
+                    <SidebarActionButton
+                        icon={<CalendarCheck2 className="w-6 h-6" />}
+                        label="Membros"
+                        isCollapsed={isCollapsed}
+                        onClick={handleMember}
+                    />
+                  </CollapsibleContent>
+                </Collapsible>
 
-                        <SidebarNavLink 
-                            href="/dashboard/profile"
-                            label="Meu perfil"
-                            pathname={pathname}
-                            isCollapsed={isCollapsed}
-                            icon={<Settings className="w-6 h-6" />}
-                        />
+                <Collapsible 
+                  open={openAdministration} 
+                  onOpenChange={setOpenAdministration}
+                >
+                  <CollapsibleTrigger
+                    className="
+                      flex
+                      items-center
+                      justify-between
+                      w-full
+                      px-2
+                      py-2
+                      rounded-md
+                      hover:bg-accent
+                    "
+                  >
+                    <span>Administração</span>
 
-                        <SidebarNavLink 
-                            href="/dashboard/plans"
-                            label="Planos"
-                            pathname={pathname}
-                            isCollapsed={isCollapsed}
-                            icon={<Banknote className="w-6 h-6" />}
-                        />
-                    </nav>
+                    {
+                      openAdministration
+                        ? <ChevronDown className="w-4 h-4" />
+                        : <ChevronRight className="w-4 h-4" />
+                    }
+                  </CollapsibleTrigger>
+
+                  <CollapsibleContent>
+                    <SidebarActionButton
+                        icon={<Warehouse className="w-6 h-6" />}
+                        label="Organização"
+                        isCollapsed={isCollapsed}
+                        onClick={handleOrganization}
+                    />
+                    
+                    <SidebarActionButton
+                        icon={<Warehouse className="w-6 h-6" />}
+                        label="Planos"
+                        isCollapsed={isCollapsed}
+                        onClick={handleSchedule}
+                    />
                   </CollapsibleContent>
                 </Collapsible>
             </aside>
 
-            <div className={clsx("flex flex-1 flex-col transition-all duration-300", {
+            <div className={clsx("flex flex-1 flex-col min-h-0 transition-all duration-300", {
                 "md:ml-20": isCollapsed,
                 "md:ml-64": !isCollapsed
             })}>
 
-                <header className="md:hidden flex items-center justify-between border-b px-2 md:px-6 h-14 z-10 sticky top-0 bg-white">
-                  <Sheet>
-                    <div className="flex items-center gap-4">
-                        <SheetTrigger asChild>
-                            <Button 
-                                variant="outline" 
-                                size="icon" 
-                                className="md:hidden"
-                                onClick={() => setIsCollapsed(false)}
-                            >
-                                <List className="w-5 h-5"/>
-                            </Button>
-                        </SheetTrigger>
-
-                        <h1 className="text-base md:text-lg font-semibold">
-                            Menu OdontoPRO
-                        </h1>
-                    </div>
-
-                    <SheetContent side="right" className="sm:max-w-xs" text-black>
-                        <SheetTitle>OdontoPRO</SheetTitle>  
-                        <SheetDescription>Menu Administrativo</SheetDescription>
-
-                        <nav className="grid gap-2 text-base pt-5">
-                            <SidebarNavLink 
-                              href="/dashboard"
-                              label="Agendamentos"
-                              pathname={pathname}
-                              isCollapsed={isCollapsed}
-                              icon={<CalendarCheck2 className="w-6 h-6" />}
-                            />
-
-                            <SidebarNavLink 
-                              href="/dashboard/services"
-                              label="Serviços"
-                              pathname={pathname}
-                              isCollapsed={isCollapsed}
-                              icon={<Folder className="w-6 h-6" />}
-                            />
-                            
-                            <SidebarNavLink 
-                              href="/dashboard/profile"
-                              label="Meu perfil"
-                              pathname={pathname}
-                              isCollapsed={isCollapsed}
-                              icon={<Settings className="w-6 h-6" />}
-                            />
-
-                            <SidebarNavLink 
-                              href="/dashboard/plans"
-                              label="Planos"
-                              pathname={pathname}
-                              isCollapsed={isCollapsed}
-                              icon={<Banknote className="w-6 h-6" />}
-                            />
-                        </nav>
-                    </SheetContent> 
-                  </Sheet> 
-                </header>
-
-                <main className="flex-1 py-4 px-2 md:p-6">
-                    {children}
-                </main>
-            </div>
+            <main className="flex-1 min-h-0 overflow-y-auto py-4 px-2 md:p-6">
+                {children}
+            </main>
         </div>
+      </div>
     )
 }

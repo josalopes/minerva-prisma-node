@@ -155,7 +155,7 @@ model Organization {
 
 model Address {
   id         Int         @id @default(autoincrement())
-  ownerType  String // 'organization' | 'user' | 'customer' | 'supplier'
+  ownerType  String
   ownerId    String
   street     String?     @map("street")
   number     String?     @map("number")
@@ -176,9 +176,9 @@ model Address {
   memberId       String?
   customerId     String?
 
-  organization Organization? @relation(fields: [organizationId], references: [id])
-  member       Member?       @relation(fields: [memberId], references: [id])
-  customer     Customer?     @relation(fields: [customerId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  member       Member?       @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  customer     Customer?     @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@index([ownerType, ownerId])
   @@map("address")

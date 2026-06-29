@@ -17,7 +17,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
 import { CreateOrganizationFormData } from "@/schemas/create-organization-form"
-import { CreateAddressFormData } from "@/schemas/create-address-form"
+import { addressFormData } from "@/schemas/address-form"
+// import { CreateAddressFormData } from "@/schemas/address-form"
 import { useFormFlow } from "@/lib/use-form-flow"
 import { useAutoSaveStatus } from "@/lib/autosave-status"
 import { useScrollOnStep } from "@/lib/scroll"
@@ -57,7 +58,7 @@ export function CreateOrganizationForm() {
     }
   })
 
-  const addressForm = useForm<CreateAddressFormData>({
+  const addressForm = useForm<addressFormData>({
     defaultValues: {
       type: "GENERAL",
       street: "",
@@ -68,7 +69,7 @@ export function CreateOrganizationForm() {
       state: "",
       zipCode: "",
       isPrimary: true,
-      isNew: "new",
+      // isNew: "new",
     }
   })
 

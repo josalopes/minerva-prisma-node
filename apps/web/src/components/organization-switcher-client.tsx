@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronsUpDown, PlusCircle } from 'lucide-react'
+import { ChevronsUpDown, PlusCircle, Settings } from 'lucide-react'
 
 import {
   DropdownMenu,
@@ -19,18 +19,23 @@ import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
 import { useOrganization } from '@/hooks/use-organization'
 import type { Organization } from '@/contexts/organization-context'
 import { setOrganizationCookie } from '@/app/api/auth/change-tenant/route'
+import { permissions } from '@saas/auth/src/permissions'
+import { ability, getCurrentOrg } from "@/auth/auth"
 
 interface Props {
   organizations: Organization[]
   currentOrganization: Organization | null
+  canUpdateOrganization: boolean | undefined
 }
 
 export function OrganizationSwitcherClient({
   organizations,
-  currentOrganization
+  currentOrganization,
+  canUpdateOrganization
 }: Props) {
   const router = useRouter()
   const currentOrg = currentOrganization
+  const hasOrganization = !!currentOrg
 
   async function handleChangeOrganization(org: Organization) {
     setOrganizationCookie(org.slug)
@@ -45,8 +50,6 @@ export function OrganizationSwitcherClient({
 
     return initials    
 }
-
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex w-[220px] items-center gap-2 rounded p-1 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-primary">
@@ -105,13 +108,23 @@ export function OrganizationSwitcherClient({
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem asChild>
-          <Link href="/onboarding">
-          {/* <Link href="/create-organization"> */}
-            <PlusCircle className="mr-2 size-4" />
-            Nova Organização
-          </Link>
-        </DropdownMenuItem>
+        {!hasOrganization && (
+          <DropdownMenuItem asChild>
+            <Link href="/onboarding">
+              <PlusCircle className="mr-2 size-4" />
+              Nova Organização
+            </Link>
+          </DropdownMenuItem>
+        )}
+
+        {hasOrganization && canUpdateOrganization && (
+          <DropdownMenuItem asChild>
+            <Link href={`/org/${currentOrg.slug}/org-settings`}>
+              <Settings className="mr-2 size-4" />
+              Configurações da Organização
+            </Link>
+          </DropdownMenuItem>
+        )}  
       </DropdownMenuContent>
     </DropdownMenu>
   )

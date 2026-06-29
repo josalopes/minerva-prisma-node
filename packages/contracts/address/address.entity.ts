@@ -14,9 +14,6 @@ export const addressEntitySchema = z.object({
   type: z.string(),
   ownerType: z.string(),
   ownerId: z.string(),
-//   organizationId: z.string().nullable(),
-//   memberId: z.string().nullable(),
-//   customerId: z.string().nullable()
 })
 
 export type Address =

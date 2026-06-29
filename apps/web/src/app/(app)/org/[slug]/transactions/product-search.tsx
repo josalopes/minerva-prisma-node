@@ -26,11 +26,11 @@ export const ProductSearch = forwardRef<
 
   const [search, setSearch] = useState("")
   const [focusedIndex, setFocusedIndex] = useState(0)
+  const [isOpen, setIsOpen] = useState(false)
 
   const filtered = useMemo(() => {
-
     if (!search.trim()) {
-      return []
+      return products
     }
 
     return products.filter(product =>
@@ -48,15 +48,22 @@ export const ProductSearch = forwardRef<
 
     setSearch("")
     setFocusedIndex(0)
+    setIsOpen(false)
   }
 
   return (
     <div className="relative">
-
       <input
         ref={ref}
         value={search}
-        placeholder="Código do produto..."
+        autoComplete="off"
+        onClick={() => setIsOpen(true)}
+        onBlur={() => {
+          setTimeout(() => {
+            setIsOpen(false)
+          }, 150)
+        }}
+        placeholder="Nome ou código do produto..."
         className="
           w-full
           border
@@ -65,16 +72,17 @@ export const ProductSearch = forwardRef<
           px-4
           text-lg
         "
-        autoComplete="off"
+
         onChange={(e) => {
           setSearch(e.target.value)
           setFocusedIndex(0)
+          setIsOpen(true)
         }}
+
         onKeyDown={(e) => {
 
           // ENTER
           if (e.key === "Enter") {
-
             e.preventDefault()
 
             const product =
@@ -87,7 +95,6 @@ export const ProductSearch = forwardRef<
 
           // ↓
           if (e.key === "ArrowDown") {
-
             e.preventDefault()
 
             setFocusedIndex(prev =>
@@ -100,7 +107,6 @@ export const ProductSearch = forwardRef<
 
           // ↑
           if (e.key === "ArrowUp") {
-
             e.preventDefault()
 
             setFocusedIndex(prev =>
@@ -112,11 +118,12 @@ export const ProductSearch = forwardRef<
           if (e.key === "Escape") {
             setSearch("")
             setFocusedIndex(0)
+            setIsOpen(false)
           }
         }}
       />
 
-      {filtered.length > 0 && (
+      {isOpen && filtered.length > 0 && (
         <div
           className="
             absolute
@@ -136,7 +143,11 @@ export const ProductSearch = forwardRef<
             <button
               key={product.id}
               type="button"
-              onClick={() => handleSelect(product)}
+              onMouseDown={(e) => {
+                e.preventDefault()
+                handleSelect(product)
+              }}
+              // onClick={() => handleSelect(product)}
               className={`
                 w-full
                 text-left

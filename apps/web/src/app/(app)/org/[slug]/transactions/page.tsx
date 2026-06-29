@@ -10,9 +10,6 @@ interface ProjectsProps {
 }
 
 export default async function Page({ params }: ProjectsProps) {
-//   const { user } = await auth()
-//   const permissions = await ability()
-//   const slug = await getCurrentOrg()
   const { slug: currentOrg } = await params
   const organization = await getOrganizationBySlug(currentOrg)
 

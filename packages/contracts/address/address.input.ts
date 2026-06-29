@@ -6,6 +6,8 @@ export const typeAddressSchema = z.union([
     z.literal('SHIPPING'),
 ])
 
+
+
 export type typeAddress = z.infer<typeof typeAddressSchema>
 
 
@@ -37,11 +39,24 @@ export const updateAddressSchema =
       id: z.int()
     })
 
+export const ownerTypeSchema = z.enum([
+  "organization",
+  "member",
+  "customer",
+])   
+
+export const setPrimaryAddressSchema = z.object({
+  id: z.number(),
+  ownerId: z.string(),
+  ownerType: ownerTypeSchema,
+})
+
+export type SetPrimaryAddressInput =
+  z.infer<typeof setPrimaryAddressSchema>    
+
 
 export type CreateAddressInput =
   z.infer<typeof createAddressSchema>
 
 export type UpdateAddressInput =
   z.infer<typeof updateAddressSchema>
-
-// export type Organization = z.infer<typeof organizationSchema>

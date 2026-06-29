@@ -120,3 +120,9 @@ export const requiredNumber = (label: string) =>
 // ==============================
 export const optionalBoolean = () =>
   z.boolean().optional()
+
+// ==============================
+// 🔘 BOOLEAN REQUERIDO
+// ==============================
+export const requiredBoolean = () =>
+  z.boolean()

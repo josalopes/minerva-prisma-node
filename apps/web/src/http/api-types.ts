@@ -6,6 +6,11 @@ export const apiSuccessSchema = <T extends z.ZodTypeAny>(data: T) =>
     data
   })
 
+  export const apiEmptySuccessSchema =
+    z.object({
+      success: z.literal(true),
+  })
+
 export const apiErrorSchema = z.object({
   success: z.literal(false),
   error: z.object({
@@ -18,5 +23,8 @@ export type ApiSuccess<T> = {
   success: true
   data: T
 }
+
+export const apiVoidSuccessSchema =
+  apiSuccessSchema(z.null())
 
 export type ApiError = z.infer<typeof apiErrorSchema>

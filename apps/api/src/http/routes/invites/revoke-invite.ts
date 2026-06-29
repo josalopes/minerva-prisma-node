@@ -42,7 +42,7 @@ export async function revokeInvite(app: FastifyInstance) {
         const { cannot } = getUserPermissions(userId, membership.role)
         
         if (cannot('delete', 'Invite')) {
-            return reply.status(401).send({ message: 'Você não tem permissão para criar projetos' })
+            return reply.status(401).send({ message: 'Você não tem permissão para revogar convites' })
         }  
       
         const invite = await prisma.invite.findFirst({

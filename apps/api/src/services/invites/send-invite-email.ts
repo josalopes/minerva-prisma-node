@@ -15,15 +15,12 @@ export async function sendInviteEmail({
 
   await resend.emails.send({
     from: "convites@seudominio.com",
-
     to: email,
-
     subject:
       `Convite para ${organizationName}`,
-
     html: `
       <h2>Convite</h2>
-
+      
       <p>
         Você foi convidado para
         ${organizationName}

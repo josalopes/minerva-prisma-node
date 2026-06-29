@@ -1,9 +1,9 @@
-import { auth } from './../../middlewares/auth';
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 import crypto from "node:crypto"
 
+import { auth } from './../../middlewares/auth';
 import { prisma } from "@/lib/prisma";
 import { getUserPermissions } from "@/utils/get-user-permissions";
 import { roleSchema } from "@saas/auth";
@@ -53,7 +53,7 @@ export async function createInvite(app: FastifyInstance) {
         const { cannot } = getUserPermissions(userId, membership.role)
         
         if (cannot('create', 'Invite')) {
-            return reply.status(401).send({ message: 'Você não tem permissão para criar projetos' })
+            return reply.status(401).send({ message: 'Você não tem permissão para criar convites' })
         }  
       
         const { email, role } = request.body

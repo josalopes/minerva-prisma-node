@@ -1,6 +1,6 @@
 import { api } from "@/http/api-client"
 import { apiRequest } from "@/http/api-request"
-import { apiSuccessSchema } from "@/http/api-types"
+import { apiEmptySuccessSchema, apiSuccessSchema, apiVoidSuccessSchema } from "@/http/api-types"
 
 import { CreateAddressInput, UpdateAddressInput
  } from './../../../../../../packages/contracts/address';
@@ -22,7 +22,7 @@ export const addressesClient = {
       schema
     )
 
-    return data.addresses
+    return data
   },
 
   async create(data: CreateAddressInput) {
@@ -35,7 +35,7 @@ export const addressesClient = {
       schema
     )
 
-    return result
+    return result.data
   },
 
   async update(data: UpdateAddressInput) {
@@ -50,6 +50,26 @@ export const addressesClient = {
       schema
     )
         
-    return result
+    return result.data
+  },
+
+  async delete(id: number) {
+    await apiRequest(
+      api.delete(`address/${id}`),
+      apiEmptySuccessSchema
+    )
+  },
+
+  async setPrimary(id: number) {
+    const schema = apiSuccessSchema(
+      addressEntitySchema
+    )
+  
+    const result = await apiRequest(
+      api.patch(`address/${id}/primary`),
+      schema
+    )
+  
+    return result.data
   }
 }
