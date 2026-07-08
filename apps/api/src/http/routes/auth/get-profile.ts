@@ -7,13 +7,14 @@ import z from 'zod';
 import { prisma } from '@/lib/prisma';
 import { BadRequestError } from '../-errors/bad-request-error';
 import { auth } from '@/http/middlewares/auth';
+import { verifyJwt } from '@/http/hooks/verify-jwt';
 
 export async function getProfile(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>()
-        .register(auth)
         .get(
         '/profile', 
         {
+        preHandler: [verifyJwt],
            schema: {
                 tags: ['Auth'],
                 summary: 'Obtém perfil do usuário autenticado',
@@ -35,7 +36,7 @@ export async function getProfile(app: FastifyInstance) {
             }, 
         }, 
         async (request, reply) => {
-            const userId = await request.getCurrentUserid()
+            const userId = await request.getCurrentUserId()
 
             const user = await prisma.user.findUnique({
                 where: {

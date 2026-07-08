@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function organizationMiddleware(app: FastifyInstance) {
   app.addHook("preHandler", async (request) => {
-    const userId = await request.getCurrentUserid();
+    const userId = await request.getCurrentUserId();
 
     const slug = (request.params as any)?.slug;
 

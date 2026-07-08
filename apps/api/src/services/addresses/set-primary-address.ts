@@ -1,19 +1,20 @@
-import { prisma } from "@/lib/prisma"
-import { Prisma } from "@prisma/client"
+import { prisma } from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
-import {OwnerType} from "../../../../web/src/types/address"
+import { AddressOwnerType } from '@prisma/client'
+import { audit, AuditAction, AuditEntity } from '../audit'
+import { logger } from '@/lib/logger'
 
 type SetPrimaryParams = {
-  ownerType: OwnerType
+  ownerType: AddressOwnerType
   ownerId: string
   addressId: number
+  userId: string
+  organizationId: string | undefined
 }
 
-export async function setPrimaryAddressService({
-  ownerType,
-  ownerId,
-  addressId
-}: SetPrimaryParams,
+export async function setPrimaryAddressService(
+  { ownerType, ownerId, addressId, userId, organizationId }: SetPrimaryParams,
   tx?: Prisma.TransactionClient,
 ) {
   const db = tx ?? prisma
@@ -27,7 +28,7 @@ export async function setPrimaryAddressService({
   })
 
   if (!address) {
-    throw new Error("Endereço não encontrado.")
+    throw new Error('Endereço não encontrado.')
   }
 
   await db.address.updateMany({
@@ -48,4 +49,24 @@ export async function setPrimaryAddressService({
       isPrimary: true,
     },
   })
+
+  logger.info(
+    {
+      addressId: address.id,
+      ownerId: address.ownerId,
+    },
+    'Address updated',
+  )
+
+  await audit.create(
+    {
+      organizationId,
+      userId,
+      entity: AuditEntity.ADDRESS,
+      entityId: addressId.toString(),
+      action: AuditAction.UPDATE,
+      description: 'Endereço atualizado.',
+    },
+    tx,
+  )
 }

@@ -34,7 +34,6 @@ export async function getUserOrganizationsService(userId: string) {
     select: {
       organizationId: true,
       userId: true,
-      email: true,
       role: true,
     },
   });
@@ -46,7 +45,6 @@ export async function getUserOrganizationsService(userId: string) {
 
     acc[member.organizationId].push({
       userId: member.userId,
-      email: member.email,
       role: member.role,
     });
 

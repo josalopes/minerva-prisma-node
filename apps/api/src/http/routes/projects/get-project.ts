@@ -3,14 +3,14 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/http/middlewares/auth";
 import { getUserPermissions } from "@/utils/get-user-permissions";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function getProject(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .get('/organization/:orgSlug/project/:projectSlug', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Projects'],
             summary: 'Obtém os detalhes de um projeto dentro de uma organização',
@@ -46,8 +46,8 @@ export async function getProject(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const { orgSlug, projectSlug} = request.params
-        const userId = await request.getCurrentUserid()
-        const { organization, membership } = await request.getUserMembership(orgSlug)
+        const userId = await request.getCurrentUserId()
+        const { organization, membership } = await request.getMembership(orgSlug)
 
         const { cannot } = getUserPermissions(userId, membership.role)
         

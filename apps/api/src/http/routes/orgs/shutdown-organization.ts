@@ -4,15 +4,15 @@ import { z } from 'zod'
 
 import { organizationSchema } from '@saas/auth';
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/http/middlewares/auth";
 import { getUserPermissions } from "@/utils/get-user-permissions";
 import { BadRequestError } from "../-errors/bad-request-error";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function shutdownOrganization(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .delete('/organization/:slug', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Organizations'],
             summary: 'Desativa uma organização',
@@ -29,8 +29,8 @@ export async function shutdownOrganization(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const { slug } = request.params
-        const userId = await request.getCurrentUserid()
-        const { membership, organization } = await request.getUserMembership(slug)
+        const userId = await request.getCurrentUserId()
+        const { membership, organization } = await request.getMembership(slug)
 
         const authOrganization = organizationSchema.parse({
             id: organization.id,

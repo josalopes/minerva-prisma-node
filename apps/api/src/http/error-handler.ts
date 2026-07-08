@@ -1,33 +1,81 @@
-import type { FastifyInstance } from 'fastify'
-import { ZodError } from 'zod'
-import { BadRequestError } from './routes/-errors/bad-request-error'
-import { UnauthorizedError } from './routes/-errors/unauthorized-error'
+import type { FastifyInstance } from "fastify"
+import { ZodError } from "zod"
 
-type FastifyErrorHandler = FastifyInstance['errorHandler']
+import { logger } from "@/lib/logger"
 
-export const errorHandler: FastifyErrorHandler = (error, request, reply) => {
-    if (error instanceof ZodError) {
-        return reply.status(400).send({
-            message: 'Erro de validação',
-            errors: error.flatten().fieldErrors
-        })
-    }
-    
-    if (error instanceof BadRequestError) {
-        return reply.status(400).send({
-            message: error.message,
-        })
-    }
-    
-    if (error instanceof UnauthorizedError) {
-        return reply.status(401).send({
-            message: error.message,
-        })
-    }
+import { BadRequestError } from "./routes/-errors/bad-request-error"
+import { UnauthorizedError } from "./routes/-errors/unauthorized-error"
 
-    console.log(error)
+type FastifyErrorHandler = FastifyInstance["errorHandler"]
 
-    // sendo to some observability platform
+export const errorHandler: FastifyErrorHandler = (
+  error,
+  request,
+  reply,
+) => {
 
-    return reply.status(500).send({ message: 'Internal server error'})
+  if (error instanceof ZodError) {
+
+    logger.warn(
+      {
+        method: request.method,
+        url: request.url,
+        errors: error.flatten().fieldErrors,
+      },
+      "Validation failed",
+    )
+
+    return reply.status(400).send({
+      message: "Erro de validação",
+      errors: error.flatten().fieldErrors,
+    })
+  }
+
+  if (error instanceof BadRequestError) {
+
+    logger.warn(
+      {
+        method: request.method,
+        url: request.url,
+        message: error.message,
+      },
+      "Bad request",
+    )
+
+    return reply.status(400).send({
+      message: error.message,
+    })
+  }
+
+  if (error instanceof UnauthorizedError) {
+
+    logger.warn(
+      {
+        method: request.method,
+        url: request.url,
+        message: error.message,
+      },
+      "Unauthorized request",
+    )
+
+    return reply.status(401).send({
+      message: error.message,
+    })
+  }
+
+  logger.error(
+    {
+      err: error,
+      method: request.method,
+      url: request.url,
+      params: request.params,
+      query: request.query,
+      body: request.body,
+    },
+    "Unhandled error",
+  )
+
+  return reply.status(500).send({
+    message: "Internal server error",
+  })
 }

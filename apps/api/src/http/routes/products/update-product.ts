@@ -2,16 +2,15 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
-// import { productSchema } from '@saas/auth';
-import { auth } from "@/http/middlewares/auth";
 import { productUnitSchema } from "@/http/schemas";
 import { updateProductService } from "@/services/products/update-product";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function updateProduct(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .patch('/organization/:slug/product/:id', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Products'],
             summary: 'Atualiza dados de um produto da organização',
@@ -38,8 +37,8 @@ export async function updateProduct(app: FastifyInstance) {
       async (request, reply) => {
         const { slug, id } = request.params
 
-        const userId = await request.getCurrentUserid()
-        const { membership } = await request.getUserMembership(slug)
+        const userId = await request.getCurrentUserId()
+        const { membership } = await request.getMembership(slug)
         
         const { name, price, measureUnit } = request.body
 

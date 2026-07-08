@@ -38,14 +38,14 @@ export const newAddressSchema = z.object({
 })
 
 export const updateAddressSchema = z.object({
-    type: z.string(),
-    street: z.string().optional(),
-    number: z.string().optional(),
-    complement: z.string().optional(),
-    district: z.string().optional(),
-    city: z.string().optional(),
-    state: z.string().optional(),
-    zipCode: z.string().optional(),
+    type: typeAddressSchema,
+    street: z.string().nullish(),
+    number: z.string().nullish(),
+    complement: z.string().nullish(),
+    district: z.string().nullish(),
+    city: z.string().nullish(),
+    state: z.string().nullish(),
+    zipCode: z.string().nullish(),
     isPrimary: z.coerce.boolean().default(false),
 })
 

@@ -1,40 +1,40 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import { Providers } from "./providers";
-import { getOrganizationBySlug } from "@/http/organizations/get-organization-by-slug";
-import { cookies } from "next/headers";
-import { OrganizationProvider } from "@/contexts/organization-context";
-import { getCurrentOrg } from "@/auth/auth";
-import { Toaster } from "sonner";
+import type { Metadata } from 'next'
+import './globals.css'
+import { Providers } from './providers'
+import { getOrganizationBySlug } from '@/http/organizations/get-organization-by-slug'
+import { cookies } from 'next/headers'
+import { OrganizationProvider } from '@/contexts/organization-context'
+import { getCurrentOrg } from '@/auth/auth'
+import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
-  title: "Minerva App",
-};
+  title: 'Minerva App',
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   const slug = await getCurrentOrg()
 
   let organization = null
 
   if (slug) {
-    organization = (await getOrganizationBySlug(slug)).organization;
+    organization = await getOrganizationBySlug(slug)
   }
 
   return (
     <html lang="pt" suppressHydrationWarning>
-      <body className="h-screen overflow-hidden bg-background antialiased">
+      <body className="bg-background h-screen overflow-hidden antialiased">
         <Providers>
           {organization ? (
-          <OrganizationProvider organization={organization}>
-            {children}
-          </OrganizationProvider>
-        ) : (
-          children
-        )}
+            <OrganizationProvider organization={organization}>
+              {children}
+            </OrganizationProvider>
+          ) : (
+            children
+          )}
         </Providers>
 
         <Toaster
@@ -45,5 +45,5 @@ export default async function RootLayout({
         />
       </body>
     </html>
-  );
+  )
 }

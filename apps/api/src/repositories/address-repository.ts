@@ -1,4 +1,6 @@
+import { AddressOwnerType } from '@prisma/client'
 import { prisma } from '../lib/prisma'
+import { audit, AuditAction, AuditEntity } from '@/services/audit'
 
 export const addressRepository = {
   create: (data: any) =>
@@ -15,7 +17,7 @@ export const addressRepository = {
       where: { id },
     }),
 
-  findByOwner: (ownerType: string, ownerId: string) =>
+  findByOwner: (ownerType: AddressOwnerType, ownerId: string) =>
     prisma.address.findMany({
       where: {
         ownerType,
@@ -25,4 +27,5 @@ export const addressRepository = {
         createdAt: 'desc',
       },
     }),
+
 }

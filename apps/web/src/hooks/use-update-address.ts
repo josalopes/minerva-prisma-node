@@ -1,43 +1,25 @@
-"use client"
+'use client'
 
-import { useMutation } from "@tanstack/react-query"
+import { useMutation } from '@tanstack/react-query'
 
-import {
-  updateAddressAction
-} from "@/http/address/actions"
+import { updateAddressAction } from '@/http/address/actions'
+import { UpdateAddressInput } from '@saas/contracts'
+import { useOrganizationSlug } from '@/contexts/organization-context'
 
-export function useUpdateAddress() {
-  return useMutation({
-    mutationFn: updateAddressAction
-  })
+interface UpdateAddressMutationInput {
+  id: number
+  data: UpdateAddressInput
 }
 
-// "use client"
+export function useUpdateAddress() {
+  const slug = useOrganizationSlug()
 
-// import { useMutation } from "@tanstack/react-query"
-
-// import {
-//   updateAddress
-// } from "@/http/address/update-address"
-
-// import {
-//   CreateAddressRequest
-// } from "@/http/address/create-address"
-
-// interface Props {
-//   id: number
-//   data: CreateAddressRequest
-// }
-
-// export function useUpdateAddress() {
-
-//   return useMutation({
-
-//     mutationFn: ({
-//       id,
-//       data
-//     }: Props) => updateAddress(id, data)
-
-//   })
-
-// }
+  return useMutation({
+    mutationFn: ({ id, data }: UpdateAddressMutationInput) =>
+      updateAddressAction({
+        slug,
+        id,
+        data,
+      }),
+  })
+}

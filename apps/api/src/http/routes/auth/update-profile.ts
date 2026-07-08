@@ -4,12 +4,13 @@ import { z } from 'zod'
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/http/middlewares/auth";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function updateProfile(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .put('/profile/avatar', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Auth'],
             summary: 'Atualiza a imagem de avatar do usuário',
@@ -30,7 +31,7 @@ export async function updateProfile(app: FastifyInstance) {
       async (request, reply) => {
         const { avatarUrl } = request.body
 
-        const userId = await request.getCurrentUserid()
+        const userId = await request.getCurrentUserId()
         // const { membership, organization } = await request.getUserMembership(slug)
         
         const user = await prisma.user.findUnique({

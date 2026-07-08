@@ -1,48 +1,30 @@
 import { prisma } from '@/lib/prisma'
-import { AddressType } from '@prisma/client'
-import { setPrimaryAddress } from './set-primary-address'
+import z from 'zod'
+import { createLogger } from '@/lib/logger'
 
-interface CreateAddressRequest {
-  ownerType: string
-  ownerId: string
-  street?: string
-  number?: string
-  complement?: string
-  district?: string
-  city?: string
-  state?: string
-  zipCode?: string
-  country?: string
-  isPrimary?: boolean
-  type?: AddressType
-}
-interface CreateAddressResponse {
-  id: number;
-  ownerType: string;
-  ownerId: string;
-  street: string | null;
-  number: string | null;
-  complement: string | null;
-  district: string | null;
-  city: string | null;
-  state: string | null;
-  zipCode: string | null;
-  country: string | null;
-  type: AddressType;
-  isPrimary: boolean;
-}
+import { setPrimaryAddressService } from './set-primary-address'
+import { audit, AuditAction, AuditEntity } from '../audit'
+import { addressEntitySchema, createAddressSchema } from '@saas/contracts'
+
+type CreateAddressRequest =
+  z.infer<typeof createAddressSchema>
+
+type CreateAddressResponse =
+  z.infer<typeof addressEntitySchema>
+
+const logger = createLogger("address")
 
 export async function createAddressService(
-  data: CreateAddressRequest
+  data: CreateAddressRequest,
+  userId: string,
+  organizationId: string
 ): Promise<CreateAddressResponse> {
-
   const ownerField =
-    data.ownerType === "organization"
+    data.ownerType === "ORGANIZATION"
       ? { organizationId: data.ownerId }
       : { memberId: data.ownerId }
 
-  const address = await prisma.$transaction(async (tx) => {
-
+  return await prisma.$transaction(async (tx) => {
     const address = await tx.address.create({
       data: {
         street: data.street,
@@ -56,20 +38,39 @@ export async function createAddressService(
         ownerId: data.ownerId,
         ownerType: data.ownerType,
         type: data.type,
-        country: data.country ?? "BR",
         ...ownerField,
       },
     })
 
-    await setPrimaryAddress(
-      address.ownerType,
-      address.ownerId,
-      address.id,
+    await setPrimaryAddressService(
+      {
+        ownerType: address.ownerType,
+        ownerId: address.ownerId,
+        addressId: address.id
+      },
       tx
+    )
+
+    logger.info(
+      {
+        addressId: address.id,
+        ownerId: address.ownerId,
+      },
+      "Address created"
+    )
+
+    await audit.create(
+      {
+        organizationId,
+        userId,
+        entity: AuditEntity.ADDRESS,
+        entityId: address.id.toString(),
+        action: AuditAction.CREATE,
+        description: "Endereço cadastrado.",
+      },
+      tx,
     )
 
     return address
   })
-
-  return address
 }

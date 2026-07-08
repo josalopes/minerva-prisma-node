@@ -6,12 +6,13 @@ import { auth } from "@/http/middlewares/auth";
 import { createCustomerSchema, customerEntitySchema } from '@saas/contracts/customer';
 import { errorResponseSchema, successResponseSchema } from '@/lib/api-response';
 import { createCustomerService } from "@/services/customers/create-customer";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function createCustomer(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .post('/organization/:slug/customer', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Customers'],
             summary: 'Cria um novo cliente dentro da organização',
@@ -29,9 +30,9 @@ export async function createCustomer(app: FastifyInstance) {
       async (request, reply) => {
         const { slug } = request.params
         const { name, code, cpfCnpj } = request.body
-        const userId = await request.getCurrentUserid()
+        const userId = await request.getCurrentUserId()
         
-        const { organization, membership } = await request.getUserMembership(slug)
+        const { organization, membership } = await request.getMembership(slug)
 
         const customer = await createCustomerService(
             {

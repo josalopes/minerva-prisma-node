@@ -3,17 +3,17 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/http/middlewares/auth";
 import { BadRequestError } from "../-errors/bad-request-error";
 import { errorResponseSchema, successResponseSchema } from "@/lib/api-response";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function getOrganization(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .get(
             '/organization/:slug', 
             {
+        preHandler: [verifyJwt],
                 schema: {
                     tags: ['Organizations'],
                     summary: 'Obtém os detalhes de uma organização',

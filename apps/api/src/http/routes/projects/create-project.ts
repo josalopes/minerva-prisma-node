@@ -3,15 +3,15 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/http/middlewares/auth";
 import { createSlug } from "@/utils/create-slug";
 import { getUserPermissions } from "@/utils/get-user-permissions";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function createProject(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .post('/organization/:slug/project', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Projects'],
             summary: 'Cria um novo projeto dentro de uma organização',
@@ -37,9 +37,9 @@ export async function createProject(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const { slug } = request.params
-        const userId = await request.getCurrentUserid()
+        const userId = await request.getCurrentUserId()
         
-        const { organization, membership } = await request.getUserMembership(slug)
+        const { organization, membership } = await request.getMembership(slug)
 
         if (!organization) {
             return reply.status(400).send({ message: 'Organização inexistente' })

@@ -7,12 +7,13 @@ import { auth } from './../../middlewares/auth';
 import { prisma } from "@/lib/prisma";
 import { roleSchema } from "@saas/auth";
 import { gerarNextVal } from "@/utils/generate-next-sequence";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function acceptInvite(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .post('/invite/:token', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Invites'],
             summary: 'Aceitar convite de uma organização',
@@ -29,9 +30,6 @@ export async function acceptInvite(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const { token } = request.params
-        // const userId = await request.getCurrentUserid()
-
-        // const passwordHash = await hash('123456', 1)
 
         const geradorLoginUsuario = await prisma.seedUserLogin.findFirst({
           where: {

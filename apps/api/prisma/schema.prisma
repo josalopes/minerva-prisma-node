@@ -36,13 +36,15 @@ model User {
   passwordChangedAt  DateTime? @map("password_changed_at")
   mustChangePassword Boolean   @default(false)
 
-  tokens             Token[]
-  accounts           Account[]
-  invites            Invite[]
-  member_on          Member[]
-  owns_organizations Organization[]
-  owns_projects      Project[]
-  transactions       Transaction[]
+  tokens                  Token[]
+  accounts                Account[]
+  organizationMemberships Member[]
+  ownedOrganizations      Organization[]
+  ownedProjects           Project[]
+  transactions            Transaction[]
+
+  invitesSent     Invite[] @relation("InvitedBy")
+  acceptedInvites Invite[] @relation("AcceptedInvites")
 
   @@map("user")
 }
@@ -72,11 +74,14 @@ model Account {
 }
 
 model Invite {
-  id    String @id @default(uuid())
-  email String
-  role  Role
+  id      String  @id @default(uuid())
+  email   String
+  name    String?
+  message String?
+  role    Role
 
-  invitedById String? @map("author_id")
+  invitedById  String? @map("author_id")
+  acceptedById String? @map("accepted_user_id")
 
   organizationId String @map("organization_id")
 
@@ -84,13 +89,17 @@ model Invite {
 
   acceptedAt DateTime?
   expiresAt  DateTime
+  status     InviteStatus
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  invitedBy    User?        @relation(fields: [invitedById], references: [id], onDelete: SetNull)
+  acceptedBy   User?        @relation("AcceptedInvites", fields: [acceptedById], references: [id], onDelete: SetNull)
+  invitedBy    User?        @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
+  @@index([organizationId])
+  @@index([email])
   @@map("invite")
 }
 
@@ -106,15 +115,12 @@ model Member {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  email     String?
-  cpf       String?
   addresses Address[]
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([organizationId])
-  @@index([userId])
+  @@index([organizationId, userId])
   @@map("member")
 }
 
@@ -154,19 +160,19 @@ model Organization {
 }
 
 model Address {
-  id         Int         @id @default(autoincrement())
-  ownerType  String
+  id         Int              @id @default(autoincrement())
+  ownerType  AddressOwnerType
   ownerId    String
-  street     String?     @map("street")
-  number     String?     @map("number")
-  complement String?     @map("complement")
-  district   String?     @map("district")
-  city       String?     @map("city")
-  state      String?     @map("state")
-  zipCode    String?     @map("postalCode")
-  country    String      @default("BR")
-  isPrimary  Boolean     @default(false) @map("is_primary")
-  type       AddressType @default(GENERAL)
+  street     String?          @map("street")
+  number     String?          @map("number")
+  complement String?          @map("complement")
+  district   String?          @map("district")
+  city       String?          @map("city")
+  state      String?          @map("state")
+  zipCode    String?          @map("postalCode")
+  country    String           @default("BR")
+  isPrimary  Boolean          @default(false) @map("is_primary")
+  type       AddressType      @default(GENERAL)
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -306,6 +312,22 @@ model TransactionItems {
   @@map("transaction_items")
 }
 
+model AuditLog {
+  id String @id @default(uuid())
+  organizationId String?
+  userId String?
+  entity String
+  entityId String?
+  action String
+  description String
+  metadata Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@map("audit-log")
+}
+
 model CnpjCache {
   cnpj      String   @id
   data      Json
@@ -317,6 +339,9 @@ model CnpjCache {
 
 enum TokenType {
   PASSWORD_RECOVER
+  EMAIL_CONFIRMATION
+  INVITE
+  FIRST_LOGIN
 }
 
 enum TransactionType {
@@ -338,7 +363,13 @@ enum Role {
   ADMIN
   MEMBER
   BILLING
-  CHECKIN
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELED
 }
 
 enum PersonType {

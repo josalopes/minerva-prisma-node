@@ -1,12 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import { AddressOwnerType } from "./types";
+import { AddressOwnerType } from "@prisma/client"
 
 export async function getAddressesService(
   ownerType: AddressOwnerType,
   ownerId: string
 ) {
   const where =
-    ownerType === "organization"
+    ownerType === "ORGANIZATION"
       ? { organizationId: ownerId }
       : { memberId: ownerId };
 

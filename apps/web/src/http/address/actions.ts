@@ -1,25 +1,29 @@
-"use server"
-
+'use server'
 
 import { revalidateTag } from 'next/cache'
 
 import { ActionResult } from '@/types/action-result'
-
-import { createAddressSchema, updateAddressSchema     
-  } from "../../../../../packages/contracts/address"
-
-import { Address     
-  } from "../../../../../packages/contracts/address"
-
+import {
+  createAddressSchema,
+  SetPrimaryAddressInput,
+  updateAddressSchema,
+} from '@saas/contracts'
+import { Address } from '@saas/contracts'
 import { addressesClient } from '@/http/modules/addresses/addresses.client'
 
-export async function createAddressAction(data: unknown): Promise<ActionResult<Address>> {
+export async function createAddressAction({
+  slug,
+  data,
+}: {
+  slug: string
+  data: unknown
+}): Promise<ActionResult<Address>> {
   const result = createAddressSchema.safeParse(data)
 
   if (!result.success) {
     return {
       success: false,
-      errors: result.error.flatten().fieldErrors
+      errors: result.error.flatten().fieldErrors,
     }
   }
 
@@ -28,99 +32,110 @@ export async function createAddressAction(data: unknown): Promise<ActionResult<A
   }
 
   try {
-    const addresses = await addressesClient.create(result.data) 
+    const addresses = await addressesClient.create({
+      slug,
+      payload,
+    })
 
     revalidateTag('addresses')
 
-    return { 
+    return {
       success: true,
-      data: addresses
+      data: addresses,
     }
   } catch (error) {
     return {
       success: false,
-      message:
-      error instanceof Error
-        ? error.message
-        : "Erro inesperado"
+      message: error instanceof Error ? error.message : 'Erro inesperado',
     }
-  }  
+  }
 }
 
-
-export async function updateAddressAction(data: unknown): Promise<ActionResult<Address>> {
+export async function updateAddressAction({
+  slug,
+  id,
+  data,
+}: {
+  slug: string
+  id: number
+  data: unknown
+}): Promise<ActionResult<Address>> {
   const result = updateAddressSchema.safeParse(data)
-  
+
   if (!result.success) {
     return {
-    success: false,
-    errors: result.error.flatten().fieldErrors
+      success: false,
+      errors: result.error.flatten().fieldErrors,
     }
   }
 
+  const payload = {
+    ...result.data,
+  }
+
   try {
-    const address = await addressesClient.update(result.data) 
-    
+    const address = await addressesClient.update({
+      slug,
+      id,
+      payload,
+    })
+
     revalidateTag('addresses')
 
-    return { 
-      success: true,
-      data: address
-    }
-  } catch (error) {
-      return {
-        success: false,
-        message:
-        error instanceof Error
-          ? error.message
-          : "Erro inesperado"
-      }
-    }
-}
-
-export async function deleteAddressAction(
-  id: number
-): Promise<ActionResult<void>> {
-
-  try {
-    await addressesClient.delete(id)
-
-    revalidateTag("addresses")
-
     return {
       success: true,
+      data: address,
     }
-
   } catch (error) {
     return {
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Erro inesperado",
+      message: error instanceof Error ? error.message : 'Erro inesperado',
     }
   }
 }
 
-export async function setPrimaryAddressAction(
+export async function deleteAddressAction({
+  slug,
+  id,
+}: {
+  slug: string
   id: number
-): Promise<ActionResult<void>> {
+}): Promise<ActionResult<void>> {
   try {
-    await addressesClient.setPrimary(id)
+    await addressesClient.delete(slug, id)
 
-    revalidateTag("addresses")
+    revalidateTag('addresses')
 
     return {
       success: true,
     }
-
   } catch (error) {
     return {
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Erro inesperado",
+      message: error instanceof Error ? error.message : 'Erro inesperado',
+    }
+  }
+}
+
+export async function setPrimaryAddressAction({
+  slug,
+  payload,
+}: {
+  slug: string
+  payload: SetPrimaryAddressInput
+}): Promise<ActionResult<void>> {
+  try {
+    await addressesClient.setPrimary({ slug, payload })
+
+    revalidateTag('addresses')
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Erro inesperado',
     }
   }
 }

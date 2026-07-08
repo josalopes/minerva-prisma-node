@@ -1,7 +1,8 @@
+import { AddressOwnerType } from "@prisma/client"
 import { addressRepository } from '../../repositories/address-repository'
 
 export async function getAddressesByOwner(
-  ownerType: string,
+  ownerType: AddressOwnerType,
   ownerId: string
 ) {
   const addresses = await addressRepository.findByOwner(

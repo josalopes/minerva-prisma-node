@@ -2,18 +2,17 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
-// import { productSchema } from '@saas/auth';
 import { productSchema } from '@saas/auth/src/models/product';
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/http/middlewares/auth";
 import { getUserPermissions } from "@/utils/get-user-permissions";
 import { productUnitSchema } from "@/http/schemas";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function updateProduct(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .put('/organization/:slug/product/:id/image', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Products'],
             summary: 'Atualiza a imagem de um produto da organização',
@@ -38,8 +37,8 @@ export async function updateProduct(app: FastifyInstance) {
       async (request, reply) => {
         const { slug, id } = request.params
 
-        const userId = await request.getCurrentUserid()
-        const { membership, organization } = await request.getUserMembership(slug)
+        const userId = await request.getCurrentUserId()
+        const { membership, organization } = await request.getMembership(slug)
         
         const { imageUrl } = request.body
         

@@ -1,74 +1,61 @@
-import type { FastifyInstance } from "fastify";
-import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import type { FastifyInstance } from 'fastify'
+import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
-import { prisma } from "@/lib/prisma";
-import { auth } from "@/http/middlewares/auth";
-import { BadRequestError } from "../-errors/bad-request-error";
+import { prisma } from '@/lib/prisma'
+import { BadRequestError } from '../-errors/bad-request-error'
+import { verifyJwt } from '@/http/hooks/verify-jwt'
+import { getOrganizationBySlugResponseSchema } from '@saas/contracts/organization'
 
 export async function getOrganizationBySlug(app: FastifyInstance) {
-    app
-      .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
-      .get(
-            '/organization/slug/:slug', 
-            {
-                schema: {
-                    tags: ['Organizations'],
-                    summary: 'Obtém os detalhes de uma organização',
-                    security: [{ bearerAuth: [] }],
-                    params: z.object({
-                        slug: z.string(),
-                    }),
-                    response: {
-                        400: z.object({
-                            message: z.string(),
-                            }),
-                        200: z.object({
-                            organization: z.object({
-                                id: z.uuid(),
-                                name: z.string(),
-                                domain: z.string().nullable(),
-                                shouldAttachUserByDomain: z.boolean(),
-                                personType: z.string(),
-                                slug: z.string(),
-                                cpfCnpj: z.string(),
-                                avatarUrl: z.url().nullable(),
-                                avatarPublicId: z.string().nullable(),
-                                logoUrl: z.url().nullable(),
-                                logoPublicId: z.string().nullable(),
-                            }),
-                        })
-                    },                
-                },
-            }, 
-            async (request, reply) => {
-                const { slug } = request.params
-                const org = await prisma.organization.findUnique({
-                  where: { slug },
-                })
+  app.withTypeProvider<ZodTypeProvider>().get(
+    '/organization/slug/:slug',
+    {
+      preHandler: [verifyJwt],
+      schema: {
+        tags: ['Organizations'],
+        summary: 'Obtém os detalhes de uma organização',
+        security: [{ bearerAuth: [] }],
+        params: z.object({
+          slug: z.string(),
+        }),
+        response: {
+          400: z.object({
+            message: z.string(),
+          }),
+          200: getOrganizationBySlugResponseSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      const { slug } = request.params
 
-                if (!org) {
-                    throw new BadRequestError('Organização não encontrada')
-                }
+      const organization = await prisma.organization.findUnique({
+        where: {
+          slug,
+        },
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          cpfCnpj: true,
+          domain: true,
+          personType: true,
+          shouldAttachUserByDomain: true,
+          avatarUrl: true,
+          avatarPublicId: true,
+          logoUrl: true,
+          logoPublicId: true,
+        },
+      })
 
-                const organization = {
-                    id: org.id,
-                    name: org?.name,
-                    domain: org?.domain,
-                    personType: org?.personType,
-                    shouldAttachUserByDomain: org?.shouldAttachUserByDomain,
-                    slug: org.slug,
-                    cpfCnpj: org.cpfCnpj,
-                    avatarUrl: org.avatarUrl,
-                    avatarPublicId: org.avatarPublicId,
-                    logoUrl: org.logoUrl,
-                    logoPublicId: org.logoPublicId,
-                }
+      if (!organization) {
+        throw new BadRequestError('Organização não encontrada')
+      }
 
-                return reply.status(200).send(
-                    {organization}
-                )
-            }
-        )
-    }
+      return reply.send({
+        organization,
+      })
+    },
+  )
+}

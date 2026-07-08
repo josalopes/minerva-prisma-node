@@ -2,7 +2,6 @@ import type { FastifyInstance } from "fastify"
 import z from "zod"
 import { ZodTypeProvider } from "fastify-type-provider-zod"
 
-import { auth } from "@/http/middlewares/auth"
 import {
   createTransactionSchema 
 } from "@saas/contracts/transaction/create-transaction-schema"
@@ -13,14 +12,15 @@ import {
 import { createTransactionService } from "@/services/transactions/create-transaction"
 import { successResponseSchema } from "@/lib/api-response"
 import { fromCents } from "@/utils/money"
+import { verifyJwt } from "@/http/hooks/verify-jwt"
 
 export async function createTransaction(app: FastifyInstance) {
   app
     .withTypeProvider<ZodTypeProvider>()
-    .register(auth)
     .post(
       "/organization/:slug/transaction",
       {
+        preHandler: [verifyJwt],
         schema: {
           tags: ["Transactions"],
           summary: "Cria uma transação com itens",
@@ -40,10 +40,10 @@ export async function createTransaction(app: FastifyInstance) {
       async (request, reply) => {
 
         const { slug } = request.params
-        const userId = await request.getCurrentUserid()
+        const userId = await request.getCurrentUserId()
 
         const { organization } =
-          await request.getUserMembership(slug)
+          await request.getMembership(slug)
 
         const transaction = await createTransactionService(
           request.body,

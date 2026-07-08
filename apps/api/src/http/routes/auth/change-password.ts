@@ -6,16 +6,17 @@ import { compare, hash } from "bcryptjs"
 
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/http/middlewares/auth"
+import { verifyJwt } from "@/http/hooks/verify-jwt"
 
 export async function changePassword(
   app: FastifyInstance
 ) {
   app
     .withTypeProvider<ZodTypeProvider>()
-    .register(auth)
     .patch(
       "/account/password",
       {
+        preHandler: [verifyJwt],
         schema: {
           tags: ["Account"],
           summary: "Alterar senha",
@@ -42,7 +43,7 @@ export async function changePassword(
       },
 
       async (request, reply) => {
-        const userId = await request.getCurrentUserid()
+        const userId = await request.getCurrentUserId()
 
         const {
           currentPassword,

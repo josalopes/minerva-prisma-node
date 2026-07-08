@@ -2,17 +2,17 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
-import { auth } from "@/http/middlewares/auth";
 import { BadRequestError } from "../-errors/bad-request-error";
 import { roleSchema } from "@saas/auth"
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function getMembership(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .get(
             '/organization/:slug/membership', 
             {
+        preHandler: [verifyJwt],
                 schema: {
                     tags: ['Organizations'],
                     summary: 'Obtém os detalhes da associação do usuário na organização',
@@ -37,7 +37,7 @@ export async function getMembership(app: FastifyInstance) {
             }, 
             async (request, reply) => {
                 const { slug } = request.params
-                const { membership } = await request.getUserMembership(slug)
+                const { membership } = await request.getMembership(slug)
 
                 if (!membership) {
                     throw new BadRequestError('Você não é membro dessa organização')

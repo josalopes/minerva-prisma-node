@@ -1,16 +1,16 @@
-import { auth } from './../../middlewares/auth';
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
 import { prisma } from "@/lib/prisma";
 import { roleSchema } from "@saas/auth";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function rejectInvite(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .post('/invite/:inviteId/reject', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Invites'],
             summary: 'Rejeitar convite de uma organização',
@@ -27,7 +27,7 @@ export async function rejectInvite(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const { inviteId } = request.params
-        const userId = await request.getCurrentUserid()
+        const userId = await request.getCurrentUserId()
 
         const invite = await prisma.invite.findUnique({
             where: {

@@ -1,4 +1,4 @@
-export type AddressOwnerType = "organization" | "member" | "customer";
+import { AddressOwnerType } from "@prisma/client"
 
 export interface CreateAddressInput {
   ownerType: AddressOwnerType;

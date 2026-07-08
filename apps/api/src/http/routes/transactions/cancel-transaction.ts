@@ -2,15 +2,15 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
-import { auth } from "@/http/middlewares/auth";
 import { deleteProductService } from "@/services/products/delete-product";
 import { cancelTransactionService } from "@/services/transactions/create-transaction";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function cancelTransaction(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .patch('/organization/:slug/transaction/:transactionId', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Transactions'],
             summary: 'Cancela uma transação',
@@ -31,8 +31,8 @@ export async function cancelTransaction(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const { slug, transactionId } = request.params
-        const userId = await request.getCurrentUserid()
-        const { membership, organization } = await request.getUserMembership(slug)
+        const userId = await request.getCurrentUserId()
+        const { membership, organization } = await request.getMembership(slug)
 
         const product = await cancelTransactionService(
             transactionId, 

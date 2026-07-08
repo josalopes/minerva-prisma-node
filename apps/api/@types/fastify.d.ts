@@ -1,11 +1,19 @@
 import 'fastify'
 
-import { Member, Organization } from '@prisma/client'
+export interface MembershipContext {
+  organization: Organization
+  membership: Member
+}
+
+import { Member, Organization, Role } from '@prisma/client'
 declare module 'fastify' {
-    export interface FastifyRequest {
-        organizationId: string;
-        organizationRole: string;
-        getCurrentUserid(): Promise<string>
-        getUserMembership(slug: string): Promise<{ organization: Organization; membership: Member}>
-    }
+  export interface FastifyRequest {
+    organizationId: string;
+    organizationRole: Role;
+    currentUserId: string | null;
+    getCurrentUserId(): Promise<string>
+    getMembership(
+      slug: string)
+      : Promise<MembershipContext>
+  }
 }

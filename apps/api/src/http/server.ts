@@ -1,17 +1,17 @@
-import {fastify} from 'fastify'
+import { fastify } from 'fastify'
 import fastifyCors from '@fastify/cors'
 import fastifyJwt from '@fastify/jwt'
 import fastifySwagger from '@fastify/swagger'
 import { fastifySwaggerUi } from '@fastify/swagger-ui'
 import {
-    jsonSchemaTransform,
-    serializerCompiler,
-    validatorCompiler,
-    ZodTypeProvider
+  jsonSchemaTransform,
+  serializerCompiler,
+  validatorCompiler,
+  ZodTypeProvider,
 } from 'fastify-type-provider-zod'
 
-import { env } from '@saas/env';
-import { organizationMiddleware } from '@/http/middlewares/organization';
+import { env } from '@saas/env'
+import { organizationMiddleware } from '@/http/middlewares/organization'
 
 import { createAccount } from './routes/auth/create-account'
 import { authenticateWithPassword } from './routes/auth/authenticate-with-password'
@@ -77,6 +77,9 @@ import { errorHandler } from './error-handler'
 import { createTransaction } from './routes/transactions/create-transaction'
 import { cancelTransaction } from './routes/transactions/cancel-transaction'
 
+import { testMail } from './routes/mails/test-mail'
+import { logger } from '@/lib/logger'
+import { auth } from './middlewares/auth'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -85,39 +88,41 @@ app.setValidatorCompiler(validatorCompiler)
 app.setErrorHandler(errorHandler)
 
 app.register(fastifySwagger, {
-    openapi: {
-        info: {
-            title: 'Next.js Saas',
-            description: 'Full-stack Saas with multi-tenant & RBAC',
-            version: '1.0.0',
-        },
-        components: {
-            securitySchemes: {
-                bearerAuth: {
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT',
-                },
-            },
-        },
+  openapi: {
+    info: {
+      title: 'Next.js Saas',
+      description: 'Full-stack Saas with multi-tenant & RBAC',
+      version: '1.0.0',
     },
-    transform: jsonSchemaTransform
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+  },
+  transform: jsonSchemaTransform,
 })
 
 app.register(fastifySwaggerUi, {
-    routePrefix: '/docs',
+  routePrefix: '/docs',
 })
 
 app.register(fastifyJwt, {
-    secret: env.JWT_SECRET
+  secret: env.JWT_SECRET,
 })
 
+app.register(auth)
+
 app.register(fastifyCors, {
-  origin: env.NEXT_PUBLIC_URL,
+  origin: env.NEXT_PUBLIC_APP_URL,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 })
 
-app.register(organizationMiddleware);
+app.register(organizationMiddleware)
 
 app.register(createAccount)
 app.register(authenticateWithPassword)
@@ -182,9 +187,18 @@ app.register(getOrganizationBilling)
 app.register(createTransaction)
 app.register(cancelTransaction)
 
-app.listen({ port: env.PORT, host:'0.0.0.0'}).then(() => {
-    console.log('HTTP server running!')
+app.register(testMail)
+
+// if (process.env.NODE_ENV === "development") {
+//     app.register(testMail)
+//   }
+
+app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
+  logger.info(
+    {
+      port: env.PORT,
+      env: process.env.NODE_ENV,
+    },
+    'HTTP server running',
+  )
 })
-
-
-

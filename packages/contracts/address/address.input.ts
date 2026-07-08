@@ -1,62 +1,39 @@
 import z from "zod";
-
-export const typeAddressSchema = z.union([
-    z.literal('GENERAL'),
-    z.literal('BILLING'),
-    z.literal('SHIPPING'),
-])
-
-
-
-export type typeAddress = z.infer<typeof typeAddressSchema>
-
+import { addressOwnerTypeSchema, addressTypeSchema } from "./address.entity";
 
 export const baseAddressSchema = z.object({
-    street: z.string(),
-    number: z.string(),
-    complement: z.string().optional(),
-    district: z.string().optional(),        
-    city: z.string().optional(),
-    state: z.string().optional(),
-    zipCode: z.string().optional(),
-    type: typeAddressSchema,
-    isPrimary: z.coerce.boolean().default(false),
-    ownerType: z.enum(["organization", "member"]),
-    ownerId: z.string(),
-})
- 
-export const createAddressSchema = 
-    baseAddressSchema
+  street: z.string().nullish(),
+  number: z.string().nullish(),
+  complement: z.string().nullish(),
+  district: z.string().nullish(),
+  city: z.string().nullish(),
+  state: z.string().nullish(),
+  zipCode: z.string().nullish(),
+  type: addressTypeSchema,
+  isPrimary: z.coerce.boolean(),
+  ownerType: addressOwnerTypeSchema,
+  ownerId: z.string(),
+});
 
-export const updateAddressSchema =
-  baseAddressSchema
-    .partial()
-    .omit({
-      ownerType: true,
-      ownerId: true
-    })
-    .extend({
-      id: z.int()
-    })
+export const createAddressSchema = baseAddressSchema.strict();
 
-export const ownerTypeSchema = z.enum([
-  "organization",
-  "member",
-  "customer",
-])   
+export const updateAddressSchema = baseAddressSchema
+  .omit({
+    ownerType: true,
+    ownerId: true,
+  })
+  .partial();
 
 export const setPrimaryAddressSchema = z.object({
   id: z.number(),
   ownerId: z.string(),
-  ownerType: ownerTypeSchema,
-})
+  ownerType: addressOwnerTypeSchema,
+});
 
-export type SetPrimaryAddressInput =
-  z.infer<typeof setPrimaryAddressSchema>    
+export type SetPrimaryAddressInput = z.infer<typeof setPrimaryAddressSchema>;
 
+export type AddressTypeInput = z.infer<typeof addressTypeSchema>;
 
-export type CreateAddressInput =
-  z.infer<typeof createAddressSchema>
+export type CreateAddressInput = z.infer<typeof createAddressSchema>;
 
-export type UpdateAddressInput =
-  z.infer<typeof updateAddressSchema>
+export type UpdateAddressInput = z.infer<typeof updateAddressSchema>;

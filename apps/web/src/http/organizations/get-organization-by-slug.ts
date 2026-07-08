@@ -1,25 +1,10 @@
-import { api } from "../api-client";
-
-interface GetOrganizationBySlugResponse {
-    organization: {
-        id: string;
-        name: string;
-        domain: string;
-        slug: string;
-        cpfCnpj: string;
-        personType: string;
-        shouldAttachUserByDomain: boolean;
-        avatarUrl: string | null;
-        avatarPublicId: string;
-        logoUrl: string | null;
-        logoPublicId: string | null;
-    }
-}
+import { api } from '../api-client'
+import { GetOrganizationBySlugResponse } from '@saas/contracts/organization'
 
 export async function getOrganizationBySlug(slug: string) {
-    const response = await api
-        .get(`organization/slug/${slug}`)
-        .json<GetOrganizationBySlugResponse>()
+  const response = await api
+    .get(`organization/slug/${slug}`)
+    .json<GetOrganizationBySlugResponse>()
 
-    return response
+  return response.organization
 }

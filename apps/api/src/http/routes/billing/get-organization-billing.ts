@@ -3,16 +3,16 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/http/middlewares/auth";
 import { getUserPermissions } from "@/utils/get-user-permissions";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function getOrganizationBilling(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .get(
             '/organization/:slug/billing', 
             {
+                preHandler: [verifyJwt],
                 schema: {
                     tags: ['Billing'],
                     summary: 'Obtém os detalhes de faturamento da organização',
@@ -45,8 +45,8 @@ export async function getOrganizationBilling(app: FastifyInstance) {
             async (request, reply) => {
                 const { slug } = request.params
 
-                const userId = await request.getCurrentUserid()
-                const { organization, membership } = await request.getUserMembership(slug)
+                const userId = await request.getCurrentUserId()
+                const { organization, membership } = await request.getMembership(slug)
 
                  const { cannot } = getUserPermissions(userId, membership.role)
 

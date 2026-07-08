@@ -7,13 +7,14 @@ import z from 'zod';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/http/middlewares/auth';
 import { UnauthorizedError } from '../-errors/unauthorized-error';
+import { verifyJwt } from '@/http/hooks/verify-jwt';
 
 export async function resetPassword(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>()
-        .register(auth)
         .post(
         '/password/reset', 
         {
+            preHandler: [verifyJwt],
            schema: {
                 tags: ['Auth'],
                 summary: 'Troca a senha',

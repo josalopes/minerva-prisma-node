@@ -1,16 +1,16 @@
-import { auth } from './../../middlewares/auth';
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
 import { prisma } from "@/lib/prisma";
 import { roleSchema } from "@saas/auth";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function getPendingInvites(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .get('/pending-invites', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Invites'],
             summary: 'Obtém todos os convites pendentes para um usuário',
@@ -40,7 +40,7 @@ export async function getPendingInvites(app: FastifyInstance) {
         },
       }, 
       async (request, reply) => {
-        const userId = await request.getCurrentUserid()
+        const userId = await request.getCurrentUserId()
 
 
         const user = await prisma.user.findUnique({

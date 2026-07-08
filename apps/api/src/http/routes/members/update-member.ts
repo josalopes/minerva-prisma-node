@@ -3,15 +3,15 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/http/middlewares/auth";
 import { getUserPermissions } from "@/utils/get-user-permissions";
 import { roleSchema } from "@saas/auth";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function updateMember(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .put('/organization/:slug/member/:memberId', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Members'],
             summary: 'Atualiza o papel de membro da organização',
@@ -35,8 +35,8 @@ export async function updateMember(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const { slug, memberId } = request.params
-        const userId = await request.getCurrentUserid()
-        const { organization, membership } = await request.getUserMembership(slug)
+        const userId = await request.getCurrentUserId()
+        const { organization, membership } = await request.getMembership(slug)
 
         const { cannot } = getUserPermissions(userId, membership.role)
         

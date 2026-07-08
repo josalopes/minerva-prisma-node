@@ -3,7 +3,7 @@
 import { AddressCard } from '@/components/address/address-card'
 import { CarouselKit } from '@/components/carousel-kit/carousel-kit'
 import { CarouselKitDots } from '@/components/carousel-kit/carousel-kit-dots'
-import { Address } from '@/types/address'
+import { Address } from '@saas/contracts'
 
 interface Props {
   addresses: Address[]
@@ -52,5 +52,4 @@ export function AddressCarousel({
       <CarouselKitDots />
     </>
   )
-        
 }

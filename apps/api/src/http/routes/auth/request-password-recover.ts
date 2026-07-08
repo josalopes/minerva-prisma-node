@@ -6,13 +6,14 @@ import z from 'zod';
 
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/http/middlewares/auth';
+import { verifyJwt } from '@/http/hooks/verify-jwt';
 
 export async function requestPasswordRecovery(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>()
-        .register(auth)
         .post(
         '/password/recover', 
         {
+        preHandler: [verifyJwt],
            schema: {
                 tags: ['Auth'],
                 summary: 'Recupera senha',

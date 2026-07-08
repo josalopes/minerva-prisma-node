@@ -3,15 +3,14 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/http/middlewares/auth";
-import { getUserPermissions } from "@/utils/get-user-permissions";
 import { roleSchema } from "@saas/auth";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function getMember(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .get('/member', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Member'],
             summary: 'Obtém os dados de membro do usuário autenticado',
@@ -35,7 +34,7 @@ export async function getMember(app: FastifyInstance) {
         },
       }, 
       async (request, reply) => {
-        const userId = await request.getCurrentUserid()
+        const userId = await request.getCurrentUserId()
 
         const member = await prisma.member.findFirst({
             select: {

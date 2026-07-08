@@ -1,75 +1,61 @@
-import { api } from "@/http/api-client"
-import { apiRequest } from "@/http/api-request"
-import { apiEmptySuccessSchema, apiSuccessSchema, apiVoidSuccessSchema } from "@/http/api-types"
-
-import { CreateAddressInput, UpdateAddressInput
- } from './../../../../../../packages/contracts/address';
+import { api } from '@/http/api-client'
+import { apiRequest } from '@/http/api-request'
+import { apiSuccessSchema } from '@/http/api-types'
+import {
+  createAddress,
+  deleteAddress,
+  setPrimaryAddress,
+  updateAddress,
+} from '@/services/addresses'
 
 import {
-  addressEntitySchema,
-  addressListSchema
-} from "../../../../../../packages/contracts/address"
+  CreateAddressInput,
+  SetPrimaryAddressInput,
+  UpdateAddressInput,
+} from '@saas/contracts'
+import { addressEntitySchema, addressListSchema } from '@saas/contracts'
+
+interface CreateProps {
+  slug: string
+  payload: CreateAddressInput
+}
+
+interface UpdateProps {
+  slug: string
+  id: number
+  payload: UpdateAddressInput
+}
+
+interface SetPrimaryProps {
+  slug: string
+  payload: SetPrimaryAddressInput
+}
 
 export const addressesClient = {
-
   async get() {
-    const schema = apiSuccessSchema(
-      addressListSchema
-    )
-
-    const data = await apiRequest(
-      api.get("addresses"),
-      schema
-    )
+    const schema = apiSuccessSchema(addressListSchema)
+    const data = await apiRequest(api.get('addresses'), schema)
 
     return data
   },
 
-  async create(data: CreateAddressInput) {
-    const schema = apiSuccessSchema(
-      addressEntitySchema
-    )
+  async create({ slug, payload }: CreateProps) {
+    const result = await createAddress(slug, payload)
 
-    const result = await apiRequest(
-      api.post("addresses", { json: data }),
-      schema
-    )
-
-    return result.data
+    return result
   },
 
-  async update(data: UpdateAddressInput) {
-    const schema = apiSuccessSchema(
-      addressEntitySchema
-    )
+  async update({ slug, id, payload }: UpdateProps) {
+    const result = await updateAddress(slug, id, payload)
 
-    const id = data.id
-
-    const result = await  apiRequest(
-      api.patch(`address/entity/${id}`, { json: data }),
-      schema
-    )
-        
-    return result.data
+    return result
   },
 
-  async delete(id: number) {
-    await apiRequest(
-      api.delete(`address/${id}`),
-      apiEmptySuccessSchema
-    )
+  async delete(slug: string, id: number) {
+    await deleteAddress(slug, id)
   },
 
-  async setPrimary(id: number) {
-    const schema = apiSuccessSchema(
-      addressEntitySchema
-    )
-  
-    const result = await apiRequest(
-      api.patch(`address/${id}/primary`),
-      schema
-    )
-  
-    return result.data
-  }
+  async setPrimary({ slug, payload }: SetPrimaryProps) {
+    await setPrimaryAddress(slug, payload)
+  },
 }

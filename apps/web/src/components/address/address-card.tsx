@@ -1,41 +1,27 @@
-"use client"
+'use client'
 
-import { motion } from "framer-motion"
-
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-
+import { motion } from 'framer-motion'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu'
 
-import {
-  MoreVertical,
-  Star,
-  Trash,
-} from "lucide-react"
-
-import clsx from "clsx"
-
-import { Address } from "@/types/address"
+import { MoreVertical, Star, Trash } from 'lucide-react'
+import clsx from 'clsx'
+import { Address } from '@saas/contracts'
 
 interface AddressCardProps {
   address: Address
   compact?: boolean
   selected?: boolean
   highlight?: boolean
-  
+
   onClick?: (address: Address) => void
   onDelete?: (id: number) => void
   onMakePrimary?: (address: Address) => void
@@ -49,11 +35,10 @@ export function AddressCard({
   onDelete,
   onMakePrimary,
 }: AddressCardProps) {
-
   const typeLabel = {
-    GENERAL: "Geral",
-    BILLING: "Cobrança",
-    SHIPPING: "Entrega",
+    GENERAL: 'Geral',
+    BILLING: 'Cobrança',
+    SHIPPING: 'Entrega',
   }
 
   return (
@@ -64,7 +49,7 @@ export function AddressCard({
         scale: selected ? 1.01 : 1,
       }}
       transition={{
-        type: "spring",
+        type: 'spring',
         stiffness: 320,
         damping: 24,
       }}
@@ -73,39 +58,23 @@ export function AddressCard({
       <Card
         onClick={() => onClick?.(address)}
         className={clsx(
-          "relative h-full cursor-pointer border transition-all duration-300",
+          'relative h-full cursor-pointer border transition-all duration-300',
 
           selected
-            ? `
-              border-primary
-              bg-primary/5
-            `
-            : `
-              hover:border-primary/30
-              hover:bg-muted/30
-            `
+            ? `border-primary bg-primary/5`
+            : `hover:border-primary/30 hover:bg-muted/30`,
         )}
       >
         {selected && (
-          <div
-            className="
-              absolute
-              left-0
-              top-3
-              bottom-3
-              w-[3px]
-              rounded-full
-              bg-primary
-            "
-          />
+          <div className="bg-primary absolute top-3 bottom-3 left-0 w-[3px] rounded-full" />
         )}
 
         <CardHeader className="flex flex-row items-start justify-between">
           <div>
             <CardTitle
               className={clsx(
-                "text-base transition-colors",
-                selected && "text-primary"
+                'text-base transition-colors',
+                selected && 'text-primary',
               )}
             >
               {address.street}, {address.number}
@@ -114,11 +83,7 @@ export function AddressCard({
             {address.isPrimary && (
               <Badge
                 className="mt-2"
-                variant={
-                  selected
-                    ? "default"
-                    : "secondary"
-                }
+                variant={selected ? 'default' : 'secondary'}
               >
                 Principal
               </Badge>
@@ -137,7 +102,6 @@ export function AddressCard({
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-
               {!address.isPrimary && (
                 <DropdownMenuItem
                   onClick={(e) => {
@@ -145,10 +109,7 @@ export function AddressCard({
                     onMakePrimary?.(address)
                   }}
                 >
-                  <Star
-                    size={14}
-                    className="mr-2"
-                  />
+                  <Star size={14} className="mr-2" />
                   Tornar principal
                 </DropdownMenuItem>
               )}
@@ -164,15 +125,11 @@ export function AddressCard({
                       onDelete(address.id)
                     }}
                   >
-                    <Trash
-                      size={14}
-                      className="mr-2"
-                    />
+                    <Trash size={14} className="mr-2" />
                     Excluir endereço...
                   </DropdownMenuItem>
                 </>
               )}
-
             </DropdownMenuContent>
           </DropdownMenu>
         </CardHeader>
@@ -185,17 +142,11 @@ export function AddressCard({
               {address.city} - {address.state}
             </p>
 
-            <p>
-              CEP: {address.zipCode}
-            </p>
+            <p>CEP: {address.zipCode}</p>
 
             {address.type && (
               <Badge
-                variant={
-                  selected
-                    ? "default"
-                    : "outline"
-                }
+                variant={selected ? 'default' : 'outline'}
                 className="mt-2"
               >
                 {typeLabel[address.type]}

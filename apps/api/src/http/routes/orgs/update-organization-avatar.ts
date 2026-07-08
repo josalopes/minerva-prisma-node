@@ -3,16 +3,16 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/http/middlewares/auth";
 import { BadRequestError } from "../-errors/bad-request-error";
 import { getUserPermissions } from "@/utils/get-user-permissions";
 import { organizationSchema } from "@saas/auth";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function updateOrganizationAvatar(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .patch('/organization/:slug/avatar', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Organizations'],
             summary: 'Atualiza a imagem de avatar da organização',
@@ -37,8 +37,8 @@ export async function updateOrganizationAvatar(app: FastifyInstance) {
       async (request, reply) => {
         const { avatarUrl, avatarPublicId } = request.body
         const { slug } = request.params
-        const userId = await request.getCurrentUserid()
-        const { membership, organization } = await request.getUserMembership(slug)
+        const userId = await request.getCurrentUserId()
+        const { membership, organization } = await request.getMembership(slug)
 
         const authOrganization = organizationSchema.parse({
             id: organization.id,

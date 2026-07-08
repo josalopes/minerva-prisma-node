@@ -1,6 +1,6 @@
-import { ability, auth, getCurrentOrg } from "@/auth/auth"
-import { getOrganizationBySlug } from "@/http/organizations/get-organization-by-slug";
-import OrganizationLogoForm from "./organization-logo-form";
+import { ability, auth, getCurrentOrg } from '@/auth/auth'
+import { getOrganizationBySlug } from '@/http/organizations/get-organization-by-slug'
+import OrganizationLogoForm from './organization-logo-form'
 
 export default async function OrganizationAvatar() {
   const { user } = await auth()
@@ -11,7 +11,7 @@ export default async function OrganizationAvatar() {
   let organization = null
 
   if (slug) {
-    organizationData = (await getOrganizationBySlug(slug)).organization;
+    organizationData = await getOrganizationBySlug(slug)
     organization = {
       id: organizationData.id,
       slug: organizationData.slug,
@@ -22,9 +22,9 @@ export default async function OrganizationAvatar() {
 
   return (
     <div className="space-y-4">
-        {/* {permissions?.can('create', 'Project') && ( */}
-            {organization && <OrganizationLogoForm organization={organization}  />}
-        {/* )} */}
+      {/* {permissions?.can('create', 'Project') && ( */}
+      {organization && <OrganizationLogoForm organization={organization} />}
+      {/* )} */}
     </div>
   )
 }

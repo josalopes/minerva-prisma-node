@@ -1,92 +1,64 @@
-import { Address } from "@/types/address";
-import { api } from "../../http/api-client";
-interface CreateAddressRequest {
-    ownerType: string,
-    ownerId: string,
-    street: string,
-    number: string,
-    complement: string,
-    district: string,
-    city: string,
-    state: string,
-    country: string,
-    zipCode: string,
-    isPrimary: boolean
-}
-interface CreateAddressResponse {
-    ownerType: string,
-    ownerId: string,
-    street: string,
-    number: string,
-    complement: string,
-    district: string,
-    city: string,
-    state: string,
-    zipCode: string,
-    isPrimary: boolean,
-    type: string
+import z from 'zod'
+import { api } from '../../http/api-client'
+
+import {
+  Address,
+  SetPrimaryAddressInput,
+  UpdateAddressInput,
+} from '@saas/contracts'
+import { createAddressSchema } from '@saas/contracts'
+import { addressRoutes } from '@/lib/api/routes'
+
+type CreateAddressInput = z.infer<typeof createAddressSchema>
+
+export async function createAddress(slug: string, data: CreateAddressInput) {
+  return api
+    .post(addressRoutes.create(slug), {
+      json: data,
+    })
+    .json<Address>()
 }
 
-export async function createAddress({
-    ownerType, ownerId, street, number, complement, district, city, state, country, zipCode, isPrimary
-}: CreateAddressRequest): Promise<CreateAddressResponse> {
-    const response = await api.post('addresses', {
-        json: { 
-          street,
-          number,
-          complement,
-          district,
-          city,
-          state,
-          zipCode,
-          country,
-          ownerType,
-          ownerId,
-          isPrimary,
-        },
-    }).json<CreateAddressResponse>()
-
-    return response
-}
-
-interface getAddressesProps {
-  ownerId: string
-  ownerType: string
+export async function updateAddress(
+  slug: string,
+  id: number,
+  data: UpdateAddressInput,
+) {
+  return api
+    .patch(addressRoutes.update(slug, id), {
+      json: data,
+    })
+    .json<Address>()
 }
 
 export async function getAddresses(
-  {
-    ownerType,
-    ownerId
-  }: getAddressesProps
-): Promise<Address[]> {
-
-  const addresses = await api
-    .get('addresses', { searchParams: { ownerType, ownerId } })
+  slug: string,
+  ownerId: string,
+  ownerType: string,
+) {
+  return api
+    .get(addressRoutes.list(slug), {
+      searchParams: {
+        ownerId,
+        ownerType,
+      },
+    })
     .json<Address[]>()
-
-  return addresses
 }
 
-export async function deleteAddress(id: number) {
-  await api.delete(`address/${id}`)
+export async function deleteAddress(slug: string, id: number) {
+  await api.delete(addressRoutes.remove(slug, id))
 }
 
-type SetPrimaryAddressInput = {
-  id: number
-  ownerId: string
-  ownerType: string
-}
-
-export async function setPrimaryAddress({
-  id,
-  ownerId,
-  ownerType,
-}: SetPrimaryAddressInput) {
-  await api.patch(`address/${id}/primary`, {
-    json: {
-      ownerId,
-      ownerType,
-    },
+export async function setPrimaryAddress(
+  slug: string,
+  payload: SetPrimaryAddressInput,
+) {
+  const data = {
+    ownerId: payload.ownerId,
+    ownerType: payload.ownerType,
+  }
+  await api.patch(addressRoutes.setPrimary(slug, payload.id), {
+    json: data,
   })
 }

@@ -2,15 +2,14 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
-// import { productSchema } from '@saas/auth';
-import { auth } from "@/http/middlewares/auth";
 import { updateStockService } from "@/services/products/update-stock";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function updateProductStock(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .patch('/organization/:slug/productId/:id/stock', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Products'],
             summary: 'Atualiza o estoque de um produto da organização',
@@ -35,8 +34,8 @@ export async function updateProductStock(app: FastifyInstance) {
       async (request, reply) => {
         const { slug, id } = request.params
 
-        const userId = await request.getCurrentUserid()
-        const { membership } = await request.getUserMembership(slug)
+        const userId = await request.getCurrentUserId()
+        const { membership } = await request.getMembership(slug)
         
         const { stock } = request.body
 

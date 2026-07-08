@@ -4,18 +4,16 @@ import { z } from 'zod'
 import { hash } from "bcryptjs";
 
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/http/middlewares/auth";
-import { createSlug } from "@/utils/create-slug";
-import { getUserPermissions } from "@/utils/get-user-permissions";
 import { roleSchema } from "@saas/auth";
 import { BadRequestError } from "../-errors/bad-request-error";
 import { gerarNextVal } from "@/utils/generate-next-sequence";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function createMember(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .post('/organization/:slug/member', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Projects'],
             summary: 'Cria um novo membro dentro de uma organização e vincula a um usuário',
@@ -48,8 +46,8 @@ export async function createMember(app: FastifyInstance) {
       async (request, reply) => {
         const { slug } = request.params
         const { name, email, role } = request.body
-        const currentUserId = await request.getCurrentUserid()
-        const { organization, membership } = await request.getUserMembership(slug)
+        const currentUserId = await request.getCurrentUserId()
+        const { organization, membership } = await request.getMembership(slug)
 
         // const { cannot } = getUserPermissions(currentUserId, membership.role)
         
@@ -104,7 +102,6 @@ export async function createMember(app: FastifyInstance) {
 
         const member = await prisma.member.create({
             data: {
-                email,
                 role,
                 organizationId: organization.id,
                 userId: newUser.id,

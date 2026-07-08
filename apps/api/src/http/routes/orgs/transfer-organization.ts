@@ -4,15 +4,15 @@ import { z } from 'zod'
 
 import { organizationSchema } from '@saas/auth'
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/http/middlewares/auth";
 import { getUserPermissions } from "@/utils/get-user-permissions";
 import { BadRequestError } from "../-errors/bad-request-error";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function transferOrganization(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .patch('/organization/:slug/owner', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Organizations'],
             summary: 'Transfere a propriedade de uma organização',
@@ -35,8 +35,8 @@ export async function transferOrganization(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const { slug } = request.params
-        const userId = await request.getCurrentUserid()
-        const { membership, organization } = await request.getUserMembership(slug)
+        const userId = await request.getCurrentUserId()
+        const { membership, organization } = await request.getMembership(slug)
 
         const { transferToUserId } = request.body
 

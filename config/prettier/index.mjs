@@ -2,19 +2,23 @@
 
 /** @type { PrettierConfig } */
 const config = {
-    plugins: ['prettier-plugin-tailwindcss'],
-    printWidth: 80,
-    tabWidth: 2,
-    useTabs: false,
-    semi: false,
-    singleQuote: true,
-    quoteProps: 'as-needed',
-    jsxSingleQuote: false,
-    trailingComma: 'es5',
-    bracketSpacing: true,
-    arrowParens: 'always',
-    endOfLine: 'auto',
-    bracketSameLine: false,
-}
+  plugins: ["prettier-plugin-tailwindcss"],
+  printWidth: 80,
 
-export default config
+  tabWidth: 2,
+  useTabs: false,
+
+  semi: false,
+  singleQuote: true,
+  quoteProps: "as-needed",
+
+  jsxSingleQuote: false,
+  trailingComma: "all",
+  bracketSpacing: true,
+
+  arrowParens: "always",
+  endOfLine: "lf",
+  bracketSameLine: false,
+};
+
+export default config;

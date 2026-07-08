@@ -1,48 +1,57 @@
-import type { FastifyInstance } from "fastify";
-import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import type { FastifyInstance } from 'fastify'
+import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
-import { auth } from "@/http/middlewares/auth";
-import { successResponseSchema } from "@/lib/api-response";
-import { setPrimaryAddressService } from "@/services/addresses/set-primary-address";
-import { ownerTypeSchema } from "@saas/contracts";
-
+import { auth } from '@/http/middlewares/auth'
+import { successResponseSchema } from '@/lib/api-response'
+import { setPrimaryAddressService } from '@/services/addresses/set-primary-address'
+import { verifyJwt } from '@/http/hooks/verify-jwt'
+import { addressOwnerTypeSchema } from '@saas/contracts'
+import { getOrganizationBySlugService } from '@/services/organizations/get-organization-by-slug'
 
 export async function setPrimary(app: FastifyInstance) {
-    app
-      .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
-      .patch('/address/:id/primary', {
-        schema: {
-          tags: ['Adrdresses'],
-          summary: 'Converte o endereço em principal',
-          body: z.object({
-            ownerId: z.string(),
-            ownerType: ownerTypeSchema
-          }),
-          params: z.object({
-            id: z.coerce.number()
-          }),
-          response: {
-            200: successResponseSchema(z.object({}))
-          }
+  app.withTypeProvider<ZodTypeProvider>().patch(
+    '/org/:slug/address/:id/primary',
+    {
+      preHandler: [verifyJwt],
+      schema: {
+        tags: ['Addresses'],
+        summary: 'Converte o endereço em principal',
+        body: z.object({
+          ownerId: z.string(),
+          ownerType: addressOwnerTypeSchema,
+        }),
+        params: z.object({
+          slug: z.string(),
+          id: z.coerce.number(),
+        }),
+        response: {
+          200: successResponseSchema(z.object({})),
         },
-      }, 
-      async (request, reply) => {
-        const { id } = request.params
-        const { ownerId, ownerType } = request.body;
+      },
+    },
+    async (request, reply) => {
+      const { id, slug } = request.params
 
-        const address = await setPrimaryAddressService(
-         { 
-          ownerType,
-          ownerId,
-          addressId: id
-        },
-        );
-    
-        return reply.status(200).send({
-            success: true,
-            data: {}
-        })
+      const userId = await request.getCurrentUserId()
+
+      const organization = await getOrganizationBySlugService(slug)
+      const organizationId = organization.id
+
+      const { ownerId, ownerType } = request.body
+
+      await setPrimaryAddressService({
+        ownerType,
+        ownerId,
+        addressId: id,
+        userId,
+        organizationId,
       })
+
+      return reply.status(200).send({
+        success: true,
+        data: {},
+      })
+    },
+  )
 }

@@ -1,18 +1,42 @@
 import { z } from "zod"
 
+export const addressTypes = [
+  "GENERAL",
+  "BILLING",
+  "SHIPPING",
+] as const
+
+export const addressTypeSchema =
+  z.enum(addressTypes)
+
+export type AddressType =
+  z.infer<typeof addressTypeSchema>
+
+export const addressOwnerTypes = [
+  "ORGANIZATION",
+  "CUSTOMER",
+  "MEMBER",
+] as const
+
+export const addressOwnerTypeSchema =
+  z.enum(addressOwnerTypes)
+
+export type AddressOwnerType =
+  z.infer<typeof addressOwnerTypeSchema>
+
 export const addressEntitySchema = z.object({
   id: z.int(),
-  street: z.string().optional(),
-  number: z.string().optional(),
-  complement: z.string().optional(),
-  district: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zipCode: z.string().optional(),
-  country: z.string().optional(),
+  street: z.string().nullish(),
+  number: z.string().nullish(),
+  complement: z.string().nullish(),
+  district: z.string().nullish(),
+  city: z.string().nullish(),
+  state: z.string().nullish(),
+  zipCode: z.string().nullish(),
+  country: z.string().nullish(),
   isPrimary: z.boolean(),
-  type: z.string(),
-  ownerType: z.string(),
+  type: addressTypeSchema,
+  ownerType: addressOwnerTypeSchema,
   ownerId: z.string(),
 })
 

@@ -1,32 +1,19 @@
-"use client"
+'use client'
 
-import { useMutation } from "@tanstack/react-query"
+import { useMutation } from '@tanstack/react-query'
 
-import {
-  createAddressAction
-} from "@/http/address/actions"
+import { createAddressAction } from '@/http/address/actions'
+import { CreateAddressInput } from '@saas/contracts'
+import { useOrganizationSlug } from '@/contexts/organization-context'
 
 export function useCreateAddress() {
+  const slug = useOrganizationSlug()
+
   return useMutation({
-    mutationFn: createAddressAction
+    mutationFn: (data: CreateAddressInput) =>
+      createAddressAction({
+        slug,
+        data,
+      }),
   })
 }
-
-// "use client"
-
-// import { useMutation } from "@tanstack/react-query"
-
-// import {
-//   createAddress,
-//   CreateAddressRequest
-// } from "@/http/address/create-address"
-
-// export function useCreateAddress() {
-//   return useMutation({
-//     mutationFn: (
-//       data: CreateAddressRequest
-//     ) => createAddress(data)
-
-//   })
-
-// }

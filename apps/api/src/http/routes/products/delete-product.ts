@@ -2,14 +2,14 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
-import { auth } from "@/http/middlewares/auth";
 import { deleteProductService } from "@/services/products/delete-product";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function deleteProduct(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .delete('/organization/:slug/product/:productCode', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Projects'],
             summary: 'Efetua soft-delete em um produto da organização',
@@ -30,8 +30,8 @@ export async function deleteProduct(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const { slug, productCode } = request.params
-        const userId = await request.getCurrentUserid()
-        const { membership, organization } = await request.getUserMembership(slug)
+        const userId = await request.getCurrentUserId()
+        const { membership, organization } = await request.getMembership(slug)
 
         const product = await deleteProductService(
             userId, 

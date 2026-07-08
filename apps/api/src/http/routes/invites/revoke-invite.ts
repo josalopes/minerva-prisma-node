@@ -1,4 +1,3 @@
-import { auth } from './../../middlewares/auth';
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
@@ -6,12 +5,13 @@ import { z } from 'zod'
 import { prisma } from "@/lib/prisma";
 import { getUserPermissions } from "@/utils/get-user-permissions";
 import { roleSchema } from "@saas/auth";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function revokeInvite(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .delete('/organization/:slug/invite/:inviteId', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Invites'],
             summary: 'Revoga um convite',
@@ -32,8 +32,8 @@ export async function revokeInvite(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const { slug, inviteId } = request.params
-        const userId = await request.getCurrentUserid()
-        const { organization, membership } = await request.getUserMembership(slug)
+        const userId = await request.getCurrentUserId()
+        const { organization, membership } = await request.getMembership(slug)
 
         if (!organization) {
             return reply.status(400).send({ message: 'Organização inexistente' })

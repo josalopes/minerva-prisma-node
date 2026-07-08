@@ -2,15 +2,15 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod'
 
-import { auth } from "@/http/middlewares/auth";
 import { productUnitSchema } from "@/http/schemas";
 import { getProductsService } from "@/services/products/get-products";
+import { verifyJwt } from "@/http/hooks/verify-jwt";
 
 export async function getProducts(app: FastifyInstance) {
     app
       .withTypeProvider<ZodTypeProvider>()
-      .register(auth)
       .get('/organization/:slug/products', {
+        preHandler: [verifyJwt],
         schema: {
             tags: ['Products'],
             summary: 'Obtém todos os produtos da organização',
@@ -41,8 +41,8 @@ export async function getProducts(app: FastifyInstance) {
       }, 
       async (request, reply) => {
         const { slug } = request.params
-        const userId = await request.getCurrentUserid()
-        const { organization, membership } = await request.getUserMembership(slug)
+        const userId = await request.getCurrentUserId()
+        const { organization, membership } = await request.getMembership(slug)
 
         const products = await getProductsService(
             userId, 
