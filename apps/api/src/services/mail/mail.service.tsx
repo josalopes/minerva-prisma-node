@@ -14,10 +14,16 @@ export interface SendInviteMailInput {
 }
 
 export class MailService {
-  async sendInvite({ to, organization, invitedBy, role, token }: SendInviteMailInput) {
+  async sendInvite({
+    to,
+    organization,
+    invitedBy,
+    role,
+    token,
+  }: SendInviteMailInput) {
     const logger = createLogger('mail')
 
-    const url = `${env.NEXT_PUBLIC_APP_URL}/invite/${token}`
+    const url = `${env.NEXT_PUBLIC_URL}/invite/${token}`
 
     const result = await resend.emails.send({
       from: process.env.MAIL_FROM!,

@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { PersonType } from '@prisma/client'
 import { audit, AuditAction, AuditEntity } from '../audit'
 import { RequestContext } from '@/http/request-context'
+import { createLogger } from '@/lib/logger'
 
 interface CreateOrganizationRequest {
   name: string
@@ -11,20 +12,22 @@ interface CreateOrganizationRequest {
   personType: PersonType
 }
 interface CreateOrganizationResponse {
-  id: string;
-  slug: string;
-  name: string;
-  cpfCnpj: string;
-  domain: string | null | undefined;
-  personType: PersonType;
-  shouldAttachUserByDomain: boolean;
+  id: string
+  slug: string
+  name: string
+  cpfCnpj: string
+  domain: string | null | undefined
+  personType: PersonType
+  shouldAttachUserByDomain: boolean
 }
 
+const logger = createLogger('organization')
+
 export async function createOrganizationService(
-  slug: string, 
-  userId: string, 
+  slug: string,
+  userId: string,
   data: CreateOrganizationRequest,
-  context?: RequestContext
+  context?: RequestContext,
 ): Promise<CreateOrganizationResponse> {
   return await prisma.$transaction(async (tx) => {
     const organization = await tx.organization.create({
@@ -42,8 +45,15 @@ export async function createOrganizationService(
             role: 'ADMIN',
           },
         },
-      },      
+      },
     })
+
+    logger.info(
+      {
+        organizationId: organization.id,
+      },
+      'Organization created',
+    )
 
     await audit.create(
       {
@@ -54,7 +64,7 @@ export async function createOrganizationService(
         action: AuditAction.CREATE,
         description: `Organização "${organization.name}" criada.`,
         ipAddress: context?.ipAddress,
-        userAgent: context?.userAgent
+        userAgent: context?.userAgent,
       },
       tx,
     )

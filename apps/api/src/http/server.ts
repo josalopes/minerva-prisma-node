@@ -118,7 +118,7 @@ app.register(fastifyJwt, {
 app.register(auth)
 
 app.register(fastifyCors, {
-  origin: env.NEXT_PUBLIC_APP_URL,
+  origin: env.NEXT_PUBLIC_URL,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 })
 

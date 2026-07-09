@@ -1,20 +1,19 @@
-"use client"
+'use client'
 
-import { useEffect, useRef } from "react"
-import { UseFormReturn } from "react-hook-form"
+import { useEffect } from 'react'
+import { UseFormReturn } from 'react-hook-form'
 
-import { useStepController } from "@/hooks/use-step-controller"
-import { useCnpjLookupFlow } from "@/hooks/use-cnpj-lookup-flow"
-import { useFocusFirstError } from "@/hooks/use-focus-first-error"
-import { useDocumentField } from "@/hooks/use-document-field"
-import { useCompanyPreview } from "@/hooks/use-company-preview"
+import { useStepController } from '@/hooks/use-step-controller'
+import { useCnpjLookupFlow } from '@/hooks/use-cnpj-lookup-flow'
+import { useFocusFirstError } from '@/hooks/use-focus-first-error'
+import { useDocumentField } from '@/hooks/use-document-field'
+import { useCompanyPreview } from '@/hooks/use-company-preview'
 
-
-import { CreateOrgContext } from "@/types/create-org-flow"
-import { FormFieldUniversal } from "@/lib/form-field-universal"
-import { autoFill } from "@/utils/auto-fill-form"
-import { FormRadioGroup } from "../../form-radio-group"
-import { FormCheckbox } from "../../form-checbox"
+import { CreateOrgContext } from '@/types/create-org-flow'
+import { FormFieldUniversal } from '@/lib/form-field-universal'
+import { autoFill } from '@/utils/auto-fill-form'
+import { FormRadioGroup } from '../../form-radio-group'
+import { FormCheckbox } from '../../form-checbox'
 
 type Props = {
   form: UseFormReturn<any>
@@ -23,12 +22,10 @@ type Props = {
 }
 
 export function Step0BasicInfo({ form, flow, preview }: Props) {
-  const step1 = useStepController<CreateOrgContext, "step1">(flow, "step1")
-
-  const personType = form.watch("personType")
+  const step1 = useStepController<CreateOrgContext, 'step1'>(flow, 'step1')
 
   const handled = step1.data?.companyHandled ?? false
-  const cnpjValue = form.watch("cpfCnpj") ?? ""
+  const cnpjValue = form.watch('cpfCnpj') ?? ''
   const documentField = useDocumentField({ form })
 
   useFocusFirstError(form, flow.step)
@@ -42,37 +39,35 @@ export function Step0BasicInfo({ form, flow, preview }: Props) {
     cnpj: cnpjValue,
     handled,
     preview,
-    onApply: applyCompany // 🔥 chave da arquitetura nova
+    onApply: applyCompany,
   })
 
   // =========================
   // 🔥 REIDRATAÇÃO
   // =========================
   useEffect(() => {
-    if (step1.data) {
-      form.reset(step1.data)
-    }
-  }, [])
+    if (!step1.data) return
+
+    form.reset(step1.data)
+  }, [step1.data, form])
 
   // =========================
   // 🔥 APPLY COMPANY (via modal global)
   // =========================
   function applyCompany(data: any) {
     const values = {
-        name: data.tradeName || data.name,
-        domain: data.email?.split("@")[1] || ""
+      cpfCnpj: data.document,
+      name: data.tradeName || data.name,
+      domain: data.email?.split('@')[1] || '',
     }
 
-    autoFill(form, {
-        name: values.name,
-        domain: values.domain
-    })
+    autoFill(form, values)
 
-    flow.context.set("addressFromCnpj", data.address)
-    flow.context.set("addressSource", "cnpj")
+    flow.context.set('addressFromCnpj', data.address)
+    flow.context.set('addressSource', 'cnpj')
 
-    step1.mutate(draft => {
-      Object.assign(draft, values)  
+    step1.mutate((draft) => {
+      Object.assign(draft, values)
       draft.companyHandled = true
     })
 
@@ -82,101 +77,81 @@ export function Step0BasicInfo({ form, flow, preview }: Props) {
   // =========================
   // 🔥 HANDLE NEXT
   // =========================
-  async function handleNext() {
-    step1.mutate(draft => {
-      Object.assign(draft, form.getValues())
-      draft.companyHandled = true // 🔥 ESSENCIAL
-    })
-
-    preview.reset() // 🔥 garante que não vaza estado
-    await flow.next()
-  }
-
-  const previousType = useRef(personType)
-
   function clearPersonFields() {
     form.reset({
-        personType: form.getValues("personType"),
-        name: "",
-        domain: "",
-        cpfCnpj: "",
-        shouldAttachUserByDomain: false,
+      personType: form.getValues('personType'),
+      name: '',
+      domain: '',
+      cpfCnpj: '',
+      shouldAttachUserByDomain: false,
     })
 
     preview.reset()
 
-    flow.context.set("step1", undefined)
+    flow.context.set('step1', undefined)
   }
-
-  useEffect(() => {
-    // 🔥 primeira render ignora
-    if (previousType.current === personType) {
-        return
-    }
-
-    previousType.current = personType
-
-    clearPersonFields()
-
-   }, [personType])
 
   // =========================
   // 🔥 RENDER
   // =========================
-      return (
-        <form className="space-y-8">
-            <FormRadioGroup
-                control={form.control}
-                name="personType"
-                label="Tipo de pessoa"
-                options={[
-                    { label: "Pessoa Jurídica", value: "JURIDICA" },
-                    { label: "Pessoa Física", value: "FISICA" }
-                ]}
-            />
+  return (
+    <form className="space-y-8">
+      <FormRadioGroup
+        control={form.control}
+        name="personType"
+        label="Tipo de pessoa"
+        options={[
+          { label: 'Pessoa Jurídica', value: 'JURIDICA' },
+          { label: 'Pessoa Física', value: 'FISICA' },
+        ]}
+        onSelectionChange={(previous, current) => {
+          if (previous !== current) {
+            clearPersonFields()
+          }
+        }}
+      />
 
-            <FormFieldUniversal
-                control={form.control}
-                form={form}
-                name="cpfCnpj"
-                label={documentField.label}
-                placeholder="Digite o documento"
-                transform={documentField.transform}
-            />
-            {documentField.error && (
-                <p className="text-sm text-muted-foreground">
-                    Não foi possível buscar os dados automaticamente.
-                    Você pode preencher manualmente.
-                </p>
-            )}
+      <FormFieldUniversal
+        control={form.control}
+        form={form}
+        name="cpfCnpj"
+        label={documentField.label}
+        placeholder="Digite o documento"
+        transform={documentField.transform}
+      />
+      {documentField.error && (
+        <p className="text-muted-foreground text-sm">
+          Não foi possível buscar os dados automaticamente. Você pode preencher
+          manualmente.
+        </p>
+      )}
 
-            <FormFieldUniversal
-                control={form.control}
-                form={form}
-                name="name"
-                label="Nome"
-                placeholder="Digite o nome da organização"
-            />
+      <FormFieldUniversal
+        control={form.control}
+        form={form}
+        name="name"
+        label="Nome"
+        placeholder="Digite o nome da organização"
+      />
 
-            <div className="space-y-8">
-                <FormFieldUniversal
-                    control={form.control}
-                    form={form}
-                    name="domain"
-                    label="Domínio"
-                    placeholder="empresa.com.br"
-                    // asyncField={domainField}
-                />
-            </div>
-            
-            <div className="space-y-8">
-                <FormCheckbox
-                    control={form.control}
-                    name="shouldAttachUserByDomain"
-                    label="Automaticamente vincular membros"
-                    description="Usuários com o mesmo domínio serão adicionados automaticamente"
-                />
-            </div>
-        </form>
-    )
+      <div className="space-y-8">
+        <FormFieldUniversal
+          control={form.control}
+          form={form}
+          name="domain"
+          label="Domínio"
+          placeholder="empresa.com.br"
+        />
+      </div>
+
+      <div className="space-y-8">
+        <FormCheckbox
+          control={form.control}
+          name="shouldAttachUserByDomain"
+          label="Automaticamente vincular membros"
+          description="Usuários com o mesmo domínio serão adicionados automaticamente"
+        />
+      </div>
+    </form>
+  )
 }

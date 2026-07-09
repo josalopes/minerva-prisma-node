@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import { Control, FieldValues, Path, UseFormReturn } from "react-hook-form"
-import { ReactNode } from "react"
-import clsx from "clsx"
+import { Control, FieldValues, Path, UseFormReturn } from 'react-hook-form'
+import { ReactNode } from 'react'
+import clsx from 'clsx'
 
-import { Input } from "@/components/ui/input"
-import { FormFieldBase } from "@/components/form-field-base"
-import { useFieldStatus } from "@/hooks/use-field-status"
-import { FieldStatusIcon } from "./field-status-icon"
+import { Input } from '@/components/ui/input'
+import { FormFieldBase } from '@/components/form-field-base'
+import { useFieldStatus } from '@/hooks/use-field-status'
+import { FieldStatusIcon } from './field-status-icon'
 
 export type AsyncField = {
   error: string | null
@@ -49,10 +49,15 @@ export function FormFieldUniversal<T extends FieldValues>({
   transform,
   asyncField,
   action,
-  render
+  render,
 }: Props<T>) {
   return (
-    <FormFieldBase control={control} name={name} label={label} className={className}>
+    <FormFieldBase
+      control={control}
+      name={name}
+      label={label}
+      className={className}
+    >
       {({ field, fieldState }) => {
         const asyncError = asyncField?.error
         const isLoading = asyncField?.isLoading
@@ -60,26 +65,20 @@ export function FormFieldUniversal<T extends FieldValues>({
         const status = useFieldStatus({
           value: field.value,
           error: fieldState.error,
-          isLoading
+          isLoading,
         })
 
         const hasSyncError = !!fieldState.error
 
         const hasAsyncError =
-            typeof asyncError === "string" &&
-            asyncError.length > 0 &&
-            !hasSyncError &&
-            !status.isValid
+          typeof asyncError === 'string' &&
+          asyncError.length > 0 &&
+          !hasSyncError &&
+          !status.isValid
 
-        const showAsyncError =
-            asyncError &&
-            !hasSyncError &&
-            !status.isValid
+        const showAsyncError = asyncError && !hasSyncError && !status.isValid
 
-        const isValid =
-            !hasSyncError &&
-            !hasAsyncError &&
-            !!field.value
+        const isValid = !hasSyncError && !hasAsyncError && !!field.value
 
         // 🔥 custom render (select, radio, etc)
         if (render) {
@@ -87,12 +86,13 @@ export function FormFieldUniversal<T extends FieldValues>({
         }
 
         return (
-          <div className="flex gap-2 items-center">
-
+          <div className="flex items-center gap-2">
             <div className="relative flex-1">
-
               <Input
                 {...field}
+                value={
+                  transform ? transform(field.value ?? '') : (field.value ?? '')
+                }
                 placeholder={placeholder}
                 maxLength={maxLength}
                 onChange={(e) => {
@@ -112,30 +112,23 @@ export function FormFieldUniversal<T extends FieldValues>({
                   asyncField?.onBlurAsync?.(e.target.value)
                 }}
                 className={clsx(
-                  "pr-10",
-                  status.hasError && "field-error",
-                  isValid && "border-success focus-visible:ring-success"
+                  'pr-10',
+                  status.hasError && 'field-error',
+                  isValid && 'border-success focus-visible:ring-success',
                 )}
               />
-
               {/* STATUS ICON */}
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <div className="absolute top-1/2 right-3 -translate-y-1/2">
                 <FieldStatusIcon
                   isLoading={isLoading}
                   hasError={hasSyncError || hasAsyncError}
                   isValid={isValid}
                 />
               </div>
-
             </div>
 
             {/* ACTION */}
-            {action && (
-              <div>
-                {action}
-              </div>
-            )}
-
+            {action && <div>{action}</div>}
           </div>
         )
       }}
