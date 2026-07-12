@@ -1,11 +1,4 @@
 'use client'
-
-import { useEffect, useState } from 'react'
-import {
-  getAddresses,
-  // deleteAddress,
-} from '@/services/addresses'
-
 interface Address {
   id: number
   street: string
@@ -23,29 +16,10 @@ interface Props {
 }
 
 export function AddressList({ addresses }: Props) {
-  // const [addresses, setAddresses] = useState<Address[]>([])
-
-  // async function load() {
-  //   const data = await getAddresses(ownerType, ownerId)
-  //   setAddresses(data)
-  // }
-
-  // async function handleDelete(id: string) {
-  //   await deleteAddress(id)
-  //   load()
-  // }
-
-  // useEffect(() => {
-  //   load()
-  // }, [])
-
   return (
     <div className="space-y-2">
       {addresses.map((address) => (
-        <div
-          key={address.id}
-          className="border p-3 rounded"
-        >
+        <div key={address.id} className="rounded border p-3">
           <div>
             {address.street}, {address.number}
           </div>
@@ -53,13 +27,7 @@ export function AddressList({ addresses }: Props) {
             {address.city} - {address.state}
           </div>
 
-          {address.isPrimary && (
-            <span>Principal</span>
-          )}
-
-          {/* <button onClick={() => handleDelete(address.id)}>
-            Excluir
-          </button> */}
+          {address.isPrimary && <span>Principal</span>}
         </div>
       ))}
     </div>

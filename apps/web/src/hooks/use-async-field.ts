@@ -1,7 +1,9 @@
-"use client"
+'use client'
 
-import { UseFormReturn, FieldValues, Path } from "react-hook-form"
-import { useSmartAsyncValidator } from "./use-smart-async-validator"
+import { useCallback } from 'react'
+import { FieldValues, Path, UseFormReturn } from 'react-hook-form'
+
+import { useSmartAsyncValidator } from './use-smart-async-validator'
 
 type Params<T extends FieldValues> = {
   form: UseFormReturn<T>
@@ -12,28 +14,30 @@ type Params<T extends FieldValues> = {
 export function useAsyncField<T extends FieldValues>({
   form,
   name,
-  validate
+  validate,
 }: Params<T>) {
   const validator = useSmartAsyncValidator(validate)
 
-  function handleChange(value: string) {
-    // 🔥 limpa erro async ao digitar
+  const handleChange = useCallback(() => {
     validator.setError(null)
-  }
+  }, [validator])
 
-  function handleBlur(value: string) {
-    const fieldState = form.getFieldState(name)
+  const handleBlur = useCallback(
+    (value: string) => {
+      const fieldState = form.getFieldState(name)
 
-    // 🔥 só valida async se já estiver válido no Zod
-    if (!fieldState.error && value) {
-      validator.validate(value)
-    }
-  }
+      // Só valida async se o Zod já aprovou
+      if (!fieldState.error && value) {
+        validator.validate(value)
+      }
+    },
+    [form, name, validator],
+  )
 
   return {
     error: validator.error,
     isLoading: validator.isLoading,
     onChangeAsyncClear: handleChange,
-    onBlurAsync: handleBlur
+    onBlurAsync: handleBlur,
   }
 }

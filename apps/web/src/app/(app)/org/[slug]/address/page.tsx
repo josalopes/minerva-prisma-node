@@ -1,4 +1,4 @@
-import { ability, auth } from '@/auth/auth'
+// import { ability, auth } from '@/auth/auth'
 import { AddressList } from '@/services/addresses/address-list'
 import Header from '@/components/header'
 import { getOrganizationBySlug } from '@/http/organizations/get-organization-by-slug'
@@ -11,8 +11,8 @@ interface AddressProps {
 }
 
 export default async function OrganizationAddresses({ params }: AddressProps) {
-  const { user } = await auth()
-  const permissions = await ability()
+  // const { user } = await auth()
+  // const permissions = await ability()
 
   const { slug } = await params
   const organization = await getOrganizationBySlug(slug)

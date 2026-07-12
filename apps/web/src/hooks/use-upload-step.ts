@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { mergeContextStep } from "@/lib/flow-helpers"
-import { FlowController } from "@/types/form-flow-types"
+import { useState } from 'react'
+import { mergeContextStep } from '@/lib/flow-helpers'
+import { FlowController } from '@/types/form-flow-types'
 
 type Options<TContext, K extends keyof TContext> = {
   flow: FlowController<TContext>
@@ -20,42 +20,44 @@ type UploadStepData = {
   url?: string | null
 }
 
-export function useUploadStep<
-  TContext,
-  K extends keyof TContext
->({
+export function useUploadStep<TContext, K extends keyof TContext>({
   flow,
   stepKey,
   maxSizeMB = 2,
-  acceptedTypes = ["image/"],
-  onUpload
+  acceptedTypes = ['image/'],
+  onUpload,
 }: Options<TContext, K>) {
-  const [file, setFile] = useState<File | null>(null)
-  const [preview, setPreview] = useState<string | null>(null)
+  // const [file, setFile] = useState<File | null>(null)
+  // const [preview, setPreview] = useState<string | null>(null)
+  const saved = flow.context.get(stepKey) as UploadStepData | undefined
+
+  const [file, setFile] = useState<File | null>(() => saved?.file ?? null)
+  const [preview, setPreview] = useState<string | null>(
+    () => saved?.preview ?? null,
+  )
+
   const [isUploading, setIsUploading] = useState(false)
 
   // =========================
   // 🔥 REHIDRATAR
   // =========================
-  useEffect(() => {
-    const saved = flow.context.get(stepKey) as UploadStepData | undefined
+  // useEffect(() => {
+  //   const saved = flow.context.get(stepKey) as UploadStepData | undefined
 
-    if (saved) {
-      setFile(saved.file ?? null)
-      setPreview(saved.preview ?? null)
-    }
-  }, [])
+  //   if (saved) {
+  //     setFile(saved.file ?? null)
+  //     setPreview(saved.preview ?? null)
+  //   }
+  // }, [])
 
   // =========================
   // 🔥 VALIDATION
   // =========================
   function isValidFile(file: File) {
-    const isValidType = acceptedTypes.some(type =>
-      file.type.startsWith(type)
-    )
+    const isValidType = acceptedTypes.some((type) => file.type.startsWith(type))
 
     if (!isValidType) {
-      alert("Tipo de arquivo inválido")
+      alert('Tipo de arquivo inválido')
       return false
     }
 
@@ -84,7 +86,7 @@ export function useUploadStep<
 
     mergeContextStep(flow.context, stepKey, {
       file,
-      preview: previewUrl
+      preview: previewUrl,
     } as any)
   }
 
@@ -102,7 +104,7 @@ export function useUploadStep<
     mergeContextStep(flow.context, stepKey, {
       file: null,
       preview: null,
-      url: null
+      url: null,
     } as any)
   }
 
@@ -118,7 +120,7 @@ export function useUploadStep<
       const url = await onUpload(file)
 
       mergeContextStep(flow.context, stepKey, {
-        url
+        url,
       } as any)
 
       return url
@@ -134,6 +136,6 @@ export function useUploadStep<
 
     selectFile,
     removeFile,
-    upload
+    upload,
   }
 }

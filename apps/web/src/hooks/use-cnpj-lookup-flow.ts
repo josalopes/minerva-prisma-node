@@ -1,13 +1,16 @@
-"use client"
+'use client'
 
-import { useEffect, useRef, useState } from "react"
-import { CnpjData } from "@/types/cnpj"
-import { api } from "@/http/api-client"
-import { useCompanyPreview } from "@/hooks/use-company-preview"
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { CnpjData } from '@/types/cnpj'
+import { api } from '@/http/api-client'
+import { useCompanyPreview } from '@/hooks/use-company-preview'
+import { useFormFlow } from '@/lib/use-form-flow'
+import { CreateOrgContext } from '@/types/create-org-flow'
 
+export type CreateOrgFlow = ReturnType<typeof useFormFlow<CreateOrgContext>>
 
 type Props = {
-  flow: any
+  flow: CreateOrgFlow
   stepIndex: number
   cnpj: string
   handled: boolean
@@ -21,13 +24,13 @@ export function useCnpjLookupFlow({
   cnpj,
   handled,
   preview,
-  onApply
+  onApply,
 }: Props) {
   const [data, setData] = useState<CnpjData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const lastCnpj = useRef("")
+  const lastCnpj = useRef('')
   const debounceRef = useRef<number | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const requestIdRef = useRef(0)
@@ -36,7 +39,7 @@ export function useCnpjLookupFlow({
   // =========================
   // 🔥 CLEANUP GLOBAL
   // =========================
-  function cleanup() {
+  const cleanup = useCallback(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current)
     }
@@ -46,7 +49,7 @@ export function useCnpjLookupFlow({
     }
 
     requestIdRef.current++
-  }
+  }, [])
 
   useEffect(() => {
     handledRef.current = handled
@@ -63,9 +66,9 @@ export function useCnpjLookupFlow({
       setError(null)
       setIsLoading(false)
 
-      lastCnpj.current = ""
+      lastCnpj.current = ''
     }
-  }, [flow.step])
+  }, [flow.step, stepIndex, cleanup])
 
   // =========================
   // 🔥 LOOKUP CONTROLADO
@@ -74,7 +77,7 @@ export function useCnpjLookupFlow({
     if (flow.step !== stepIndex) return
     if (handledRef.current) return
 
-    const clean = cnpj.replace(/\D/g, "")
+    const clean = cnpj.replace(/\D/g, '')
     if (clean.length !== 14) return
 
     // 🔥 evita repetir
@@ -87,7 +90,7 @@ export function useCnpjLookupFlow({
     debounceRef.current = window.setTimeout(async () => {
       const controller = new AbortController()
       abortRef.current = controller
-      
+
       const requestId = ++requestIdRef.current
 
       setIsLoading(true)
@@ -96,7 +99,7 @@ export function useCnpjLookupFlow({
       try {
         const result = await api
           .get(`cnpj/${clean}`, {
-            signal: controller.signal
+            signal: controller.signal,
           })
           .json<CnpjData>()
 
@@ -107,21 +110,18 @@ export function useCnpjLookupFlow({
 
         setData(result)
         preview.show(result, onApply)
-
       } catch (err: any) {
-        if (err.name === "AbortError") return
+        if (err.name === 'AbortError') return
         if (requestId !== requestIdRef.current) return
 
-        setError(err.message || "Erro ao consultar CNPJ")
+        setError(err.message || 'Erro ao consultar CNPJ')
       } finally {
         if (requestId !== requestIdRef.current) return
-        
+
         setIsLoading(false)
       }
     }, 400) // debounce real
-
-  }, [cnpj, handled, flow.step])
-
+  }, [cnpj, handled, flow.step, cleanup, preview, onApply, stepIndex])
 
   function reset() {
     cleanup()
@@ -130,7 +130,7 @@ export function useCnpjLookupFlow({
     setError(null)
     setIsLoading(false)
 
-    lastCnpj.current = ""
+    lastCnpj.current = ''
   }
 
   // =========================
@@ -140,12 +140,12 @@ export function useCnpjLookupFlow({
     return () => {
       cleanup()
     }
-  }, [])
+  }, [cleanup])
 
   return {
     data,
     isLoading,
     error,
-    reset
+    reset,
   }
 }

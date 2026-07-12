@@ -7,10 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { OrganizationForm } from '../../organization-form'
-import { Divide } from 'lucide-react'
 import { ShutdownOrganization } from './shutdown-organization-button'
-import { getOrganization } from '@/http/organizations/get-organization'
-import { Billing } from './billing'
 import { getOrganizationBySlug } from '@/http/organizations/get-organization-by-slug'
 
 export default async function Settings() {
@@ -18,7 +15,6 @@ export default async function Settings() {
   const permissions = await ability()
 
   const canUpdateOrganization = permissions?.can('update', 'Organization')
-  const canGetBilling = permissions?.can('get', 'Billing')
   const canShutdownOrganization = permissions?.can('delete', 'Organization')
 
   let organizationData = null

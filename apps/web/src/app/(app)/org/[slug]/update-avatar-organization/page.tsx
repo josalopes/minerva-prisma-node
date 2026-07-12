@@ -1,15 +1,12 @@
-import { ability, auth, getCurrentOrg } from '@/auth/auth'
+import { getCurrentOrg } from '@/auth/auth'
 import OrganizationAvatarForm from './organization-avatar-form'
 import { getOrganizationBySlug } from '@/http/organizations/get-organization-by-slug'
 
 export default async function OrganizationAvatar() {
-  const { user } = await auth()
-  const permissions = await ability()
   const slug = await getCurrentOrg()
 
   let organizationData = null
   let organization = null
-  let org = null
 
   if (slug) {
     organizationData = await getOrganizationBySlug(slug)

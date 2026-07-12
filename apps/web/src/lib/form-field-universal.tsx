@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+
 'use client'
 
 import { Control, FieldValues, Path, UseFormReturn } from 'react-hook-form'
@@ -75,8 +77,6 @@ export function FormFieldUniversal<T extends FieldValues>({
           asyncError.length > 0 &&
           !hasSyncError &&
           !status.isValid
-
-        const showAsyncError = asyncError && !hasSyncError && !status.isValid
 
         const isValid = !hasSyncError && !hasAsyncError && !!field.value
 

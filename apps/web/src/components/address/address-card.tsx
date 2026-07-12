@@ -20,7 +20,6 @@ interface AddressCardProps {
   address: Address
   compact?: boolean
   selected?: boolean
-  highlight?: boolean
 
   onClick?: (address: Address) => void
   onDelete?: (id: number) => void

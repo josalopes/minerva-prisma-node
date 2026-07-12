@@ -1,20 +1,17 @@
-import Header from "@/components/header";
-import { ReactNode } from "react"
+import Header from '@/components/header'
 
 export default async function OrganizationLogoLayout({
-    children,
-    }: {
-      children: React.ReactNode
-    }) {
-        return (
-          <>
-            <div className="shrink-0">
-                <Header />
-            </div>
-    
-            <main className="mx-auto w-[600px] max-w-[1200px] py-40">
-                {children}
-            </main>
-          </>
-        )
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <>
+      <div className="shrink-0">
+        <Header />
+      </div>
+
+      <main className="mx-auto w-[600px] max-w-[1200px] py-40">{children}</main>
+    </>
+  )
 }

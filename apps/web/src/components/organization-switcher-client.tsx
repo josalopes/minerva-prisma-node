@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { ChevronsUpDown, PlusCircle, Settings } from 'lucide-react'
 
 import {
@@ -16,11 +15,8 @@ import {
 
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
 
-import { useOrganization } from '@/hooks/use-organization'
 import type { Organization } from '@/contexts/organization-context'
 import { setOrganizationCookie } from '@/app/api/auth/change-tenant/route'
-import { permissions } from '@saas/auth/src/permissions'
-import { ability, getCurrentOrg } from "@/auth/auth"
 
 interface Props {
   organizations: Organization[]
@@ -31,9 +27,8 @@ interface Props {
 export function OrganizationSwitcherClient({
   organizations,
   currentOrganization,
-  canUpdateOrganization
+  canUpdateOrganization,
 }: Props) {
-  const router = useRouter()
   const currentOrg = currentOrganization
   const hasOrganization = !!currentOrg
 
@@ -43,39 +38,31 @@ export function OrganizationSwitcherClient({
 
   function getInitials(name: string) {
     const initials = name
-        .split(' ')
-        .map((word) => word.charAt(0).toLocaleUpperCase())
-        .slice(0,2)
-        .join('')
+      .split(' ')
+      .map((word) => word.charAt(0).toLocaleUpperCase())
+      .slice(0, 2)
+      .join('')
 
-    return initials    
-}
+    return initials
+  }
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex w-[220px] items-center gap-2 rounded p-1 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-primary">
+      <DropdownMenuTrigger className="focus-visible:ring-primary flex w-[220px] items-center gap-2 rounded p-1 text-sm font-medium outline-none focus-visible:ring-2">
         {currentOrg ? (
           <>
             <Avatar className="size-8">
               {currentOrg.avatarUrl && (
-                <AvatarImage 
-                  src={currentOrg.avatarUrl} 
-                />
+                <AvatarImage src={currentOrg.avatarUrl} />
               )}
-              <AvatarFallback>
-                  {getInitials(currentOrg.name)}
-              </AvatarFallback>
+              <AvatarFallback>{getInitials(currentOrg.name)}</AvatarFallback>
             </Avatar>
-            <span className="truncate text-left">
-              {currentOrg.name}
-            </span>
+            <span className="truncate text-left">{currentOrg.name}</span>
           </>
         ) : (
-          <span className="text-muted-foreground">
-            Selecione a organização
-          </span>
+          <span className="text-muted-foreground">Selecione a organização</span>
         )}
 
-        <ChevronsUpDown className="ml-auto size-4 text-muted-foreground" />
+        <ChevronsUpDown className="text-muted-foreground ml-auto size-4" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
@@ -93,12 +80,8 @@ export function OrganizationSwitcherClient({
               onClick={() => handleChangeOrganization(org)}
             >
               <Avatar className="mr-2 size-4">
-                {org.avatarUrl && (
-                  <AvatarImage src={org.avatarUrl} />
-                )}
-                <AvatarFallback>
-                  {getInitials(org.name)}
-                </AvatarFallback>
+                {org.avatarUrl && <AvatarImage src={org.avatarUrl} />}
+                <AvatarFallback>{getInitials(org.name)}</AvatarFallback>
               </Avatar>
 
               <span className="line-clamp-1">{org.name}</span>
@@ -124,7 +107,7 @@ export function OrganizationSwitcherClient({
               Configurações da Organização
             </Link>
           </DropdownMenuItem>
-        )}  
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

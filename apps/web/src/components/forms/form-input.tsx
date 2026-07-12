@@ -1,16 +1,18 @@
-"use client"
+/* eslint-disable react-hooks/rules-of-hooks */
 
-import { Control, FieldValues, Path, UseFormReturn } from "react-hook-form"
-import { Input } from "@/components/ui/input"
-import { Loader2, Check, X } from "lucide-react"
+'use client'
+
+import { Control, FieldValues, Path, UseFormReturn } from 'react-hook-form'
+import { Input } from '@/components/ui/input'
+import { Loader2, Check, X } from 'lucide-react'
 import {
   Tooltip,
   TooltipContent,
-  TooltipTrigger
-} from "@/components/ui/tooltip"
-import clsx from "clsx"
-import { FormFieldBase } from "@/components/form-field-base"
-import { useFieldStatus } from "@/hooks/use-field-status"
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import clsx from 'clsx'
+import { FormFieldBase } from '@/components/form-field-base'
+import { useFieldStatus } from '@/hooks/use-field-status'
 
 interface Props<T extends FieldValues> {
   control: Control<T>
@@ -35,13 +37,12 @@ export function FormInput<T extends FieldValues>({
   name,
   label,
   placeholder,
-  asyncError,
   asyncField,
-  transform
+  transform,
 }: Props<T>) {
   return (
     <FormFieldBase control={control} name={name} label={label}>
-      {({ field, fieldState, status }) => {
+      {({ field, fieldState }) => {
         const asyncError = asyncField?.error
         const isLoading = asyncField?.isLoading
         const onBlurAsync = asyncField?.onBlurAsync
@@ -51,20 +52,17 @@ export function FormInput<T extends FieldValues>({
           value: field.value,
           error: fieldState.error,
           isLoading,
-          isDirty: fieldState.isDirty
+          isDirty: fieldState.isDirty,
         })
 
         const hasSyncError = !!fieldState.error
         const hasAsyncError = !!asyncError && !hasSyncError
 
         const showAsyncError =
-          asyncError &&
-          !hasSyncError &&
-          !finalStatus.isValid
+          asyncError && !hasSyncError && !finalStatus.isValid
 
         return (
           <div className="relative">
-
             <Input
               {...field}
               placeholder={placeholder}
@@ -85,25 +83,26 @@ export function FormInput<T extends FieldValues>({
               }}
               onBlur={(e) => {
                 field.onBlur()
-                  onBlurAsync?.(e.target.value)
+                onBlurAsync?.(e.target.value)
               }}
               className={clsx(
-                "pr-10",
-                finalStatus.hasError && "field-error",
-                finalStatus.isValid && "border-success focus-visible:ring-success"
+                'pr-10',
+                finalStatus.hasError && 'field-error',
+                finalStatus.isValid &&
+                  'border-success focus-visible:ring-success',
               )}
             />
 
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <div className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2">
               {finalStatus.isLoading && (
-                <Loader2 className="w-4 h-4 animate-spin text-muted-foreground absolute" />
+                <Loader2 className="text-muted-foreground absolute h-4 w-4 animate-spin" />
               )}
 
               {!isLoading && (hasSyncError || showAsyncError) && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="pointer-events-auto">
-                      <X className="w-4 h-4 text-red-500" />
+                      <X className="h-4 w-4 text-red-500" />
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -113,7 +112,7 @@ export function FormInput<T extends FieldValues>({
               )}
 
               {!hasSyncError && !hasAsyncError && field.value && (
-                <Check className="w-4 h-4 text-success" />
+                <Check className="text-success h-4 w-4" />
               )}
             </div>
           </div>

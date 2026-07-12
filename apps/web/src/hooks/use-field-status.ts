@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { FieldError } from "react-hook-form"
+import { FieldError } from 'react-hook-form'
 
 interface Params {
   value: any
@@ -10,26 +10,18 @@ interface Params {
 }
 
 export function useFieldStatus({
-  value,
   error,
   isLoading,
-  isDirty
+  isDirty,
 }: Params & { isDirty?: boolean }) {
   const hasError = !!error
 
-  const hasValue =
-    value !== undefined &&
-    value !== null &&
-    value !== ""
-
-  const isValid =
-    !hasError &&
-    isDirty
+  const isValid = !hasError && isDirty
 
   return {
     hasError,
     // hasValue,
     isValid,
-    isLoading
+    isLoading,
   }
 }

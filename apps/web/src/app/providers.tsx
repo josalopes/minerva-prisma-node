@@ -3,7 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider } from 'next-themes'
 import { ReactNode } from 'react'
-import { toast, Toaster } from 'sonner'
+import { toast } from 'sonner'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,7 +27,6 @@ export function Providers({ children }: { children: ReactNode }) {
         disableTransitionOnChange
       >
         {children}
-        {/* <Toaster richColors /> */}
       </ThemeProvider>
     </QueryClientProvider>
   )

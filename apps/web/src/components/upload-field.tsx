@@ -1,8 +1,9 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Upload, X } from "lucide-react"
-import clsx from "clsx"
+import { useState } from 'react'
+import { Upload, X } from 'lucide-react'
+import clsx from 'clsx'
+import Image from 'next/image'
 
 type Props = {
   preview: string | null
@@ -30,7 +31,7 @@ export function UploadField({
   rounded = false,
   size = 160,
 
-  accept = "image/*"
+  accept = 'image/*',
 }: Props) {
   const [isDragging, setIsDragging] = useState(false)
 
@@ -43,16 +44,10 @@ export function UploadField({
       {/* ========================= */}
       {(title || description) && (
         <div>
-          {title && (
-            <h2 className="text-lg font-semibold">
-              {title}
-            </h2>
-          )}
+          {title && <h2 className="text-lg font-semibold">{title}</h2>}
 
           {description && (
-            <p className="text-sm text-muted-foreground">
-              {description}
-            </p>
+            <p className="text-muted-foreground text-sm">{description}</p>
           )}
         </div>
       )}
@@ -63,20 +58,17 @@ export function UploadField({
       {!preview && (
         <label
           className={clsx(
-            "flex flex-col items-center justify-center border-2 border-dashed rounded-lg h-48 cursor-pointer transition-all",
-            "hover:bg-muted/50",
-            isDragging && "border-primary bg-primary/5 scale-[1.01]"
+            'flex h-48 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-all',
+            'hover:bg-muted/50',
+            isDragging && 'border-primary bg-primary/5 scale-[1.01]',
           )}
-
           onDragOver={(e) => {
             e.preventDefault()
             setIsDragging(true)
           }}
-
           onDragLeave={() => {
             setIsDragging(false)
           }}
-
           onDrop={(e) => {
             e.preventDefault()
             setIsDragging(false)
@@ -88,16 +80,15 @@ export function UploadField({
             }
           }}
         >
-
-          <Upload className="w-6 h-6 mb-2" />
+          <Upload className="mb-2 h-6 w-6" />
 
           <span className="text-sm font-medium">
             {isDragging
-              ? "Solte a imagem aqui"
-              : "Clique ou arraste uma imagem"}
+              ? 'Solte a imagem aqui'
+              : 'Clique ou arraste uma imagem'}
           </span>
 
-          <span className="text-xs text-muted-foreground mt-1">
+          <span className="text-muted-foreground mt-1 text-xs">
             PNG, JPG ou WEBP
           </span>
 
@@ -125,17 +116,15 @@ export function UploadField({
             className="relative"
             style={{
               width: dimension,
-              height: dimension
+              height: dimension,
             }}
           >
-            <img
+            <Image
               src={preview}
               alt="preview"
               className={clsx(
-                "w-full h-full object-cover border shadow-sm",
-                rounded
-                  ? "rounded-full"
-                  : "rounded-lg"
+                'h-full w-full border object-cover shadow-sm',
+                rounded ? 'rounded-full' : 'rounded-lg',
               )}
             />
 
@@ -143,12 +132,12 @@ export function UploadField({
               type="button"
               onClick={onRemove}
               className={clsx(
-                "absolute -top-2 -right-2 rounded-full p-1.5",
-                "bg-destructive text-white shadow-md",
-                "hover:scale-105 transition cursor-pointer"
+                'absolute -top-2 -right-2 rounded-full p-1.5',
+                'bg-destructive text-white shadow-md',
+                'cursor-pointer transition hover:scale-105',
               )}
             >
-              <X className="w-4 h-4" />
+              <X className="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -158,7 +147,7 @@ export function UploadField({
       {/* 🔥 UX */}
       {/* ========================= */}
       {preview && (
-        <p className="text-xs text-muted-foreground text-center">
+        <p className="text-muted-foreground text-center text-xs">
           Você pode trocar a imagem antes de continuar
         </p>
       )}

@@ -1,4 +1,4 @@
-"use server"
+'use server'
 
 import { z } from 'zod'
 import { HTTPError } from 'ky'
@@ -9,130 +9,127 @@ import { acceptInvite } from '@/http/invites/accept-invite'
 import { signInWithLoginCodePassword } from '@/http/profile/sign-in-with-logincode-password'
 
 const signInSchema = z.object({
-    email: z.email({ message: 'Email inválido' }),
-    password: z.string().min(6, { message: 'A senha deve ter no mínimo 6 caracteres' }),
+  email: z.email({ message: 'Email inválido' }),
+  password: z
+    .string()
+    .min(6, { message: 'A senha deve ter no mínimo 6 caracteres' }),
 })
 
 const signInLoginCodeSchema = z.object({
-    login: z.string(),
-    password: z.string().min(6, { message: 'A senha deve ter no mínimo 6 caracteres' }),
+  login: z.string(),
+  password: z
+    .string()
+    .min(6, { message: 'A senha deve ter no mínimo 6 caracteres' }),
 })
 
 export async function signInWithEmailAndPassword(data: FormData) {
-    const entries = Object.fromEntries(data)
-    
-    const result = signInSchema.safeParse(entries)
+  const entries = Object.fromEntries(data)
 
-    console.log(result)
-    
-    if (!result.success) {
-        const errors = result.error.flatten().fieldErrors
-        
-        return { success: false, message: null, errors }
+  const result = signInSchema.safeParse(entries)
+
+  console.log(result)
+
+  if (!result.success) {
+    const errors = result.error.flatten().fieldErrors
+
+    return { success: false, message: null, errors }
+  }
+
+  const { email, password } = result.data
+
+  try {
+    const { token } = await signInWithPassword({
+      email,
+      password,
+    })
+
+    const cookieStore = await cookies()
+    cookieStore.set('token', token, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    })
+
+    const inviteId = (await cookies()).get('inviteId')?.value
+
+    if (inviteId) {
+      try {
+        await acceptInvite(inviteId)
+        ;(await cookies()).delete('inviteId')
+      } catch {}
+    }
+  } catch (err) {
+    if (err instanceof HTTPError) {
+      const { message } = await err.response.json()
+      return {
+        success: false,
+        message,
+        errors: null,
+      }
     }
 
-    const { email, password } = result.data
+    console.error(err)
 
-    try {
-        const { token} = await signInWithPassword({
-            email, password,
-        })  
-        
-        const cookieStore = await cookies();
-        cookieStore.set('token', token, 
-            { 
-                path: '/',
-                maxAge: 60 * 60 * 24 * 7,
-            })
-
-            const inviteId = (await cookies()).get('inviteId')?.value
-
-            if (inviteId) {
-                try {
-                    await acceptInvite(inviteId)
-                    ;(await cookies()).delete('inviteId')
-                } catch (err) {
-                    
-                }
-            }
-            
-    } catch (err) {
-        if (err instanceof HTTPError) {
-            const { message, status } = await err.response.json()
-            return { 
-                success: false, 
-                message, 
-                errors: null
-             }    
-        }
-
-        console.error(err)
-
-        return { 
-            success: false, 
-            message: 'Erro inesperado ao tentar fazer login', 
-            errors: null
-         }
+    return {
+      success: false,
+      message: 'Erro inesperado ao tentar fazer login',
+      errors: null,
     }
+  }
 
-    return { success: true, message: null, errors: null }
+  return { success: true, message: null, errors: null }
 }
 
 export async function signInWithLoginCodeAndPassword(data: FormData) {
-    const entries = Object.fromEntries(data)
-    
-    const result = signInLoginCodeSchema.safeParse(entries)
+  const entries = Object.fromEntries(data)
 
-    if (!result.success) {
-        const errors = result.error.flatten().fieldErrors
-        
-        return { success: false, message: null, errors }
+  const result = signInLoginCodeSchema.safeParse(entries)
+
+  if (!result.success) {
+    const errors = result.error.flatten().fieldErrors
+
+    return { success: false, message: null, errors }
+  }
+
+  const { login, password } = result.data
+
+  try {
+    const { token } = await signInWithLoginCodePassword({
+      login,
+      password,
+    })
+
+    const cookieStore = await cookies()
+    cookieStore.set('token', token, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    })
+
+    const inviteId = (await cookies()).get('inviteId')?.value
+
+    if (inviteId) {
+      try {
+        await acceptInvite(inviteId)
+        ;(await cookies()).delete('inviteId')
+      } catch {}
+    }
+  } catch (err) {
+    if (err instanceof HTTPError) {
+      const { message } = await err.response.json()
+      return {
+        success: false,
+        message,
+        errors: null,
+      }
     }
 
-    const { login, password } = result.data
+    console.error(err)
 
-    try {
-        const { token} = await signInWithLoginCodePassword({
-            login, password,
-        })  
-        
-        const cookieStore = await cookies();
-        cookieStore.set('token', token, 
-            { 
-                path: '/',
-                maxAge: 60 * 60 * 24 * 7,
-            })
-
-            const inviteId = (await cookies()).get('inviteId')?.value
-
-            if (inviteId) {
-                try {
-                    await acceptInvite(inviteId)
-                    ;(await cookies()).delete('inviteId')
-                } catch (err) {
-                    
-                }
-            }
-            
-    } catch (err) {
-        if (err instanceof HTTPError) {
-            const { message, status } = await err.response.json()
-            return { 
-                success: false, 
-                message, 
-                errors: null
-             }    
-        }
-
-        console.error(err)
-
-        return { 
-            success: false, 
-            message: 'Erro inesperado ao tentar fazer login', 
-            errors: null
-         }
+    return {
+      success: false,
+      message: 'Erro inesperado ao tentar fazer login',
+      errors: null,
     }
+  }
 
-    return { success: true, message: null, errors: null }
+  return { success: true, message: null, errors: null }
 }
-

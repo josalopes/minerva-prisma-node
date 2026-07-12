@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from 'react'
 
 type Options = {
   maxSizeMB?: number
@@ -9,11 +9,10 @@ type Options = {
   onUpload?: (file: File) => Promise<string> // retorna URL
 }
 
-export function useUploadFile({
-  maxSizeMB = 2,
-  acceptedTypes = ["image/"],
-  onUpload
-}: Options, previewUrl: string | null) {
+export function useUploadFile(
+  { maxSizeMB = 2, acceptedTypes = ['image/'], onUpload }: Options,
+  previewUrl: string | null,
+) {
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
@@ -25,18 +24,16 @@ export function useUploadFile({
     if (previewUrl) {
       setPreview(previewUrl)
     }
-  }, [])
+  }, [previewUrl])
 
   // =========================
   // 🔥 VALIDATION
   // =========================
   function isValidFile(file: File) {
-    const isValidType = acceptedTypes.some(type =>
-      file.type.startsWith(type)
-    )
+    const isValidType = acceptedTypes.some((type) => file.type.startsWith(type))
 
     if (!isValidType) {
-      alert("Tipo de arquivo inválido")
+      alert('Tipo de arquivo inválido')
       return false
     }
 
@@ -62,7 +59,6 @@ export function useUploadFile({
 
     setFile(file)
     setPreview(previewUrl)
-
   }
 
   // =========================
@@ -75,7 +71,6 @@ export function useUploadFile({
 
     setFile(null)
     setPreview(null)
-
   }
 
   // =========================
@@ -102,6 +97,6 @@ export function useUploadFile({
 
     selectFile,
     removeFile,
-    upload
+    upload,
   }
 }

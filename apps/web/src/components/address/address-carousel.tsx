@@ -8,7 +8,6 @@ import { Address } from '@saas/contracts'
 interface Props {
   addresses: Address[]
   selected?: Address
-  highlightId?: number
 
   onSelect(address: Address): void
   onDelete?(address: Address): void
@@ -18,7 +17,6 @@ interface Props {
 export function AddressCarousel({
   addresses,
   selected,
-  highlightId,
   onSelect,
   onMakePrimary,
   onDelete,
@@ -40,11 +38,10 @@ export function AddressCarousel({
         renderItem={(address) => (
           <AddressCard
             address={address}
-            highlight={highlightId === address.id}
             selected={selected?.id === address.id}
             onClick={onSelect}
             onMakePrimary={onMakePrimary}
-            onDelete={(id) => onDelete?.(address)}
+            onDelete={() => onDelete?.(address)}
           />
         )}
       />

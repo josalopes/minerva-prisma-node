@@ -1,5 +1,5 @@
 export function isValidCpfCnpj(value: string): boolean {
-  const clean = value.replace(/\D/g, "")
+  const clean = value.replace(/\D/g, '')
 
   if (clean.length === 11) return isValidCPF(clean)
   if (clean.length === 14) return isValidCNPJ(clean)
@@ -8,7 +8,7 @@ export function isValidCpfCnpj(value: string): boolean {
 }
 
 export function isValidCPF(cpf: string): boolean {
-  const clean = cpf.replace(/\D/g, "")
+  const clean = cpf.replace(/\D/g, '')
 
   if (clean.length !== 11) return false
   if (/^(\d)\1+$/.test(clean)) return false // iguais
@@ -37,13 +37,13 @@ export function isValidCPF(cpf: string): boolean {
 }
 
 export function isValidCNPJ(cnpj: string): boolean {
-  const clean = cnpj.replace(/\D/g, "")
+  const clean = cnpj.replace(/\D/g, '')
 
   if (clean.length !== 14) return false
   if (/^(\d)\1+$/.test(clean)) return false
 
-  const weights1 = [5,4,3,2,9,8,7,6,5,4,3,2]
-  const weights2 = [6,...weights1]
+  const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+  const weights2 = [6, ...weights1]
 
   let sum = 0
 
@@ -51,7 +51,7 @@ export function isValidCNPJ(cnpj: string): boolean {
     sum += Number(clean[i]) * weights1[i]
   }
 
-  let firstDigit = sum % 11 < 2 ? 0 : 11 - (sum % 11)
+  const firstDigit = sum % 11 < 2 ? 0 : 11 - (sum % 11)
 
   if (firstDigit !== Number(clean[12])) return false
 
@@ -61,7 +61,7 @@ export function isValidCNPJ(cnpj: string): boolean {
     sum += Number(clean[i]) * weights2[i]
   }
 
-  let secondDigit = sum % 11 < 2 ? 0 : 11 - (sum % 11)
+  const secondDigit = sum % 11 < 2 ? 0 : 11 - (sum % 11)
 
   return secondDigit === Number(clean[13])
 }

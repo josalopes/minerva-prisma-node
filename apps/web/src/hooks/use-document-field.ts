@@ -1,57 +1,46 @@
-"use client"
+'use client'
 
-import { useEffect, useRef, useState } from "react"
-import { UseFormReturn } from "react-hook-form"
-import { useAsyncField } from "./use-async-field"
-import { isValidCPF, isValidCNPJ } from "@/utils/cpf-cnpj-utils"
-import { CreateOrganizationFormData } from "@/schemas/create-organization-form"
-import { useCnpjLookup } from "./use-cnpj-lookup"
+import { useEffect } from 'react'
+import { UseFormReturn } from 'react-hook-form'
+import { CreateOrganizationFormData } from '@/schemas/create-organization-form'
+import { useCnpjLookup } from './use-cnpj-lookup'
 
-export function useDocumentField({ 
+export function useDocumentField({
   form,
 }: {
-  form: UseFormReturn<CreateOrganizationFormData> 
+  form: UseFormReturn<CreateOrganizationFormData>
 }) {
-  const [company, setCompany] = useState<any>(null)
-  const rawValue = form.watch("cpfCnpj")
-  const personType = form.watch("personType")
+  const rawValue = form.watch('cpfCnpj')
+  const personType = form.watch('personType')
 
-  const lastValidated = useRef("")
+  const value = typeof rawValue === 'string' ? rawValue : ''
 
-  const value =
-    typeof rawValue === "string"
-        ? rawValue
-    : ""
-
-  const docType = personType === "FISICA" ? "CPF" : "CNPJ"
+  const docType = personType === 'FISICA' ? 'CPF' : 'CNPJ'
 
   // =========================
   // 🧠 detectar tipo
   // =========================
-  const clean = value?.replace(/\D/g, "") || ""
-
-  
 
   // =========================
   // 🎨 máscara dinâmica
   // =========================
   function transform(value: string) {
-    let digits = value.replace(/\D/g, "")
+    let digits = value.replace(/\D/g, '')
 
-    const max = docType === "CPF" ? 11 : 14
+    const max = docType === 'CPF' ? 11 : 14
     digits = digits.slice(0, max)
 
-    if (docType === "CPF") {
-      digits = digits.replace(/^(\d{3})(\d)/, "$1.$2")
-      digits = digits.replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
-      digits = digits.replace(/\.(\d{3})(\d)/, ".$1-$2")
+    if (docType === 'CPF') {
+      digits = digits.replace(/^(\d{3})(\d)/, '$1.$2')
+      digits = digits.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+      digits = digits.replace(/\.(\d{3})(\d)/, '.$1-$2')
       return digits
     }
 
-    digits = digits.replace(/^(\d{2})(\d)/, "$1.$2")
-    digits = digits.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
-    digits = digits.replace(/\.(\d{3})(\d)/, ".$1/$2")
-    digits = digits.replace(/(\d{4})(\d)/, "$1-$2")
+    digits = digits.replace(/^(\d{2})(\d)/, '$1.$2')
+    digits = digits.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+    digits = digits.replace(/\.(\d{3})(\d)/, '.$1/$2')
+    digits = digits.replace(/(\d{4})(\d)/, '$1-$2')
 
     return digits
   }
@@ -62,17 +51,17 @@ export function useDocumentField({
   const cnpjLookup = useCnpjLookup()
 
   useEffect(() => {
-    const clean = value.replace(/\D/g, "")
+    const clean = value.replace(/\D/g, '')
 
-    if (docType === "CNPJ" && clean.length === 14) {
+    if (docType === 'CNPJ' && clean.length === 14) {
       cnpjLookup.lookup(value)
     }
-  }, [value, docType])
+  }, [value, docType, cnpjLookup])
 
   // =========================
   // 🧠 label dinâmica
   // =========================
-  const label = docType === "CPF" ? "CPF" : "CNPJ"
+  const label = docType === 'CPF' ? 'CPF' : 'CNPJ'
 
   return {
     label,
@@ -81,6 +70,6 @@ export function useDocumentField({
     value,
     company: cnpjLookup.data,
     isLoading: cnpjLookup.isLoading,
-    error: cnpjLookup.error
+    error: cnpjLookup.error,
   }
 }

@@ -32,15 +32,9 @@ export function Addresses({ ownerId, ownerType, addresses }: Props) {
   const router = useRouter()
 
   const deleteMutation = useDeleteAddress()
-
   const setPrimaryMutation = useSetPrimaryAddress()
-
   const [addressToDelete, setAddressToDelete] = useState<Address | null>(null)
-
-  const [highlightId, setHighlightId] = useState<number>()
-
   const [selectedAddress, setSelectedAddress] = useState<Address | undefined>()
-
   const [creating, setCreating] = useState(false)
 
   function handleNewAddress() {
@@ -107,7 +101,6 @@ export function Addresses({ ownerId, ownerType, addresses }: Props) {
         <AddressCarousel
           addresses={addresses}
           selected={selectedAddress}
-          highlightId={highlightId}
           onSelect={setSelectedAddress}
           onDelete={(address) => {
             setAddressToDelete(address)

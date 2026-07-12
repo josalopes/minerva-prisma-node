@@ -12,7 +12,7 @@ interface Props {
   ownerId: string
 }
 
-export function AddressList({ addresses, slug, ownerType, ownerId }: Props) {
+export function AddressList({ addresses }: Props) {
   return (
     <>
       <CarouselKit

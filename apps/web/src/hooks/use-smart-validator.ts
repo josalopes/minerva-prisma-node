@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { useRef, useState } from "react"
+import { useRef, useState } from 'react'
 
 export function useSmartValidator<T>(
   fn: (value: T) => Promise<string | null>,
-  delay = 400
+  delay = 400,
 ) {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -12,10 +12,9 @@ export function useSmartValidator<T>(
   const cache = useRef(new Map<string, string | null>())
   const timeout = useRef<NodeJS.Timeout | null>(null)
 
-  const lastValueRef = useRef(<string>(""))
+  const lastValueRef = useRef(<string>'')
 
-  let lastValue = ""
-  
+  const lastValue = ''
 
   function validate(value: T) {
     if (value !== lastValue) return

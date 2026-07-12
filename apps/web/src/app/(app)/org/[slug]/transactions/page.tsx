@@ -1,7 +1,6 @@
-import { ability, auth, getCurrentOrg } from "@/auth/auth"
-import { TransactionScreen } from "./create-transaction";
-import { getProducts } from "@/http/product/get-products";
-import { getOrganizationBySlug } from "@/http/organizations/get-organization-by-slug";
+import { TransactionScreen } from './create-transaction'
+import { getProducts } from '@/http/product/get-products'
+import { getOrganizationBySlug } from '@/http/organizations/get-organization-by-slug'
 
 interface ProjectsProps {
   params: Promise<{
@@ -18,9 +17,9 @@ export default async function Page({ params }: ProjectsProps) {
   return (
     <div className="space-y-4">
       <TransactionScreen
-        organizationId={organization.organization.id}
-        organizationName={organization.organization.name}
-        cpfCnpj={organization.organization.cpfCnpj}
+        organizationId={organization.id}
+        organizationName={organization.name}
+        cpfCnpj={organization.cpfCnpj}
         slug={currentOrg}
         products={productList}
         transactionType="COMPRA"

@@ -7,35 +7,30 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { OrganizationForm } from '../../../organization-form'
-import { Divide } from 'lucide-react'
 import { ShutdownOrganization } from '../shutdown-organization-button'
-import { getOrganization } from '@/http/organizations/get-organization'
 import { getOrganizationBySlug } from '@/http/organizations/get-organization-by-slug'
 
 export default async function GeneralSettings() {
-  const currentOrg = await getCurrentOrg()
   const slug = await getCurrentOrg()
   const permissions = await ability()
 
   const canUpdateOrganization = permissions?.can('update', 'Organization')
-  const canGetBilling = permissions?.can('get', 'Billing')
   const canShutdownOrganization = permissions?.can('delete', 'Organization')
 
-  let organizationData = null
-  let organization = null
+  if (!slug) return
 
-  if (slug) {
-    organizationData = await getOrganizationBySlug(slug)
-    organization = {
-      id: organizationData.id,
-      name: organizationData.name,
-      domain: organizationData.domain,
-      slug: organizationData.slug,
-      cpfCnpj: organizationData.cpfCnpj,
-      personType: organizationData.personType,
-      shouldAttachUserByDomain: organizationData.shouldAttachUserByDomain,
-    }
-  }
+  const organization = await getOrganizationBySlug(slug)
+  // const organizationData = await getOrganizationBySlug(slug)
+
+  // const organization = {
+  //   id: organizationData.id,
+  //   name: organizationData.name,
+  //   domain: organizationData.domain,
+  //   slug: organizationData.slug,
+  //   cpfCnpj: organizationData.cpfCnpj,
+  //   personType: organizationData.personType,
+  //   shouldAttachUserByDomain: organizationData.shouldAttachUserByDomain,
+  // }
 
   return (
     <div className="space-y-4">

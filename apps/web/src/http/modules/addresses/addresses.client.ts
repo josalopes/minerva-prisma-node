@@ -13,7 +13,7 @@ import {
   SetPrimaryAddressInput,
   UpdateAddressInput,
 } from '@saas/contracts'
-import { addressEntitySchema, addressListSchema } from '@saas/contracts'
+import { addressListSchema } from '@saas/contracts'
 
 interface CreateProps {
   slug: string

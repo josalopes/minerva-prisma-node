@@ -5,7 +5,7 @@
 // import { AddressList } from './address-list'
 // import { AddressForm } from '@/components/forms/address-form'
 // import { AddressList } from '@/components/address/address-list'
-import { getAddresses } from '@/http/address/get-addresses'
+// import { getAddresses } from '@/http/address/get-addresses'
 // import { getAddresses } from '@/services/addresses'
 
 // interface Address {
@@ -43,7 +43,7 @@ import { getAddresses } from '@/http/address/get-addresses'
 //       <AddressForm
 //         ownerType="organization"
 //         ownerId="8c3026ab-8cc6-484b-ba2d-aebcf5bb7970"
-        // ownerId={organization.id}
+// ownerId={organization.id}
 //         onSuccess={reload}
 //       />
 
@@ -55,7 +55,6 @@ import { getAddresses } from '@/http/address/get-addresses'
 //     </div>
 //   )
 // }
-
 
 // import { ability, auth } from "@/auth/auth"
 // import { cookies } from "next/headers";
@@ -69,7 +68,7 @@ import { getAddresses } from '@/http/address/get-addresses'
 //   return (
 //     <div className="space-y-4">
 //         {/* {permissions?.can('create', 'Project') && ( */}
-//             <AddressForm 
+//             <AddressForm
 //                 ownerType="organization"
 //                 ownerId="8c3026ab-8cc6-484b-ba2d-aebcf5bb7970"
 //                 // ownerId={organization.id}

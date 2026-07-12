@@ -78,11 +78,6 @@ export function CreateOrganizationForm() {
     },
   })
 
-  type cloudinaryProps = {
-    imageUrl: string
-    publicId: string
-  }
-
   async function handleLogoStep() {
     const step3 = flow.context.get('step3')
 
@@ -207,22 +202,9 @@ export function CreateOrganizationForm() {
       toast('Imagem alterada com sucesso!')
 
       return data
-    } catch (error) {
+    } catch {
       return undefined
     }
-  }
-
-  async function deleteFromCloudinary(publicId: string) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/image/upload`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-
-      body: JSON.stringify({
-        public_id: publicId,
-      }),
-    })
   }
 
   function nextWithSave<K extends keyof CreateOrgContext>(
@@ -403,7 +385,7 @@ export function CreateOrganizationForm() {
 
   useScrollOnStep(flow.step)
 
-  const saveStatus = useAutoSaveStatus({
+  useAutoSaveStatus({
     step: flow.step,
     context: flow.context.data,
   })

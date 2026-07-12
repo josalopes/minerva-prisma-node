@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
@@ -84,7 +84,7 @@ export function AddressForm({
       type: address.type,
       isPrimary: address.isPrimary,
     })
-  }, [address])
+  }, [address, form])
 
   const { cepField, cepPreview, handleUseCep } = useAddressLookup({
     form,

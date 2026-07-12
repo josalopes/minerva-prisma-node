@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useEffect, useRef, useState } from "react"
-import { CnpjData } from "@/types/cnpj"
-import { api } from "@/http/api-client"
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { CnpjData } from '@/types/cnpj'
+import { api } from '@/http/api-client'
 
 type CompanyData = CnpjData
 
@@ -14,21 +14,20 @@ export function useCnpjLookup() {
   const cache = useRef<Map<string, CompanyData>>(new Map())
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const lastCnpj = useRef<string>("")
-  const activeRequest = useRef<string>("") // 🔥 controle de concorrência
+  const lastCnpj = useRef<string>('')
+  const activeRequest = useRef<string>('') // 🔥 controle de concorrência
   const isActive = useRef(true)
 
   useEffect(() => {
     isActive.current = true
-    
+
     return () => {
       isActive.current = false
     }
   }, [])
 
-  function lookup(cnpj: string) {
-
-    const clean = cnpj.replace(/\D/g, "")
+  const lookup = useCallback((cnpj: string) => {
+    const clean = cnpj.replace(/\D/g, '')
 
     if (clean.length !== 14) return
 
@@ -44,7 +43,6 @@ export function useCnpjLookup() {
     }
 
     timeoutRef.current = setTimeout(async () => {
-
       // 🔥 cache primeiro
       if (cache.current.has(clean)) {
         setData(cache.current.get(clean)!)
@@ -55,51 +53,46 @@ export function useCnpjLookup() {
       setError(null)
 
       try {
-        const result = await api
-          .get(`cnpj/${clean}`)
-          .json<CompanyData>()
+        const result = await api.get(`cnpj/${clean}`).json<CompanyData>()
 
         // 🔥 ignora resposta antiga
         if (activeRequest.current !== clean) return
         if (!isActive.current) return
-        
+
         cache.current.set(clean, result)
         setData(result)
-        
       } catch (err: any) {
         if (activeRequest.current !== clean) return
         if (!isActive.current) return
 
-        setError(err.message || "Erro ao consultar CNPJ")
+        setError(err.message || 'Erro ao consultar CNPJ')
       } finally {
         if (activeRequest.current === clean && isActive.current) {
           setIsLoading(false)
         }
       }
-
     }, 600)
-  }
+  }, [])
 
   // 🔥 reset REAL (importante!)
-  function reset() {
+  const reset = useCallback(() => {
     setData(null)
     setError(null)
     setIsLoading(false)
 
-    lastCnpj.current = ""
-    activeRequest.current = ""
+    lastCnpj.current = ''
+    activeRequest.current = ''
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
     }
-  }
+  }, [])
 
   return {
     data,
     error,
     isLoading,
     lookup,
-    reset
+    reset,
   }
 }
-

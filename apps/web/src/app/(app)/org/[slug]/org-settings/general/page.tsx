@@ -1,5 +1,4 @@
-import { ability, auth, getCurrentOrg } from "@/auth/auth"
-import GeneralSettings from "./general";
+import GeneralSettings from './general'
 
 export default async function OrganizationAvatar() {
   return (

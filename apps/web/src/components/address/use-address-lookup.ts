@@ -1,18 +1,15 @@
-"use client"
+'use client'
 
-import { useEffect, useRef, useState } from "react"
-import { UseFormReturn } from "react-hook-form"
+import { useEffect, useRef, useState } from 'react'
+import { UseFormReturn } from 'react-hook-form'
 
-import { AddressFormData } from "@/schemas/address-form"
+import { AddressFormData } from '@/schemas/address-form'
 
-import { autoFill } from "@/utils/auto-fill-form"
-import { formatZipCode } from "@/utils/format-zip"
-import { useAsyncField } from "@/hooks/use-async-field"
+import { autoFill } from '@/utils/auto-fill-form'
+import { formatZipCode } from '@/utils/format-zip'
+import { useAsyncField } from '@/hooks/use-async-field'
 
-type AddressSource =
-  | "manual"
-  | "cep"
-  | "cnpj"
+type AddressSource = 'manual' | 'cep' | 'cnpj'
 
 interface AddressFromCnpj {
   street?: string
@@ -28,9 +25,7 @@ interface Props {
   source?: AddressSource | null
   addressFromCnpj?: AddressFromCnpj
   autoFillOnLookup?: boolean
-  onSourceChange?: (
-    source: AddressSource
-  ) => void
+  onSourceChange?: (source: AddressSource) => void
 
   onAddressFromCnpjConsumed?: () => void
 }
@@ -43,45 +38,37 @@ export function useAddressLookup({
   onSourceChange,
   onAddressFromCnpjConsumed,
 }: Props) {
+  const lastZipRef = useRef('')
 
-  const lastZipRef = useRef("")
-
-  const [cepPreview, setCepPreview] =
-    useState<{
-      street: string
-      district: string
-      complement: string
-      city: string
-      state: string
-      zipCode: string
-    } | null>(null)
+  const [cepPreview, setCepPreview] = useState<{
+    street: string
+    district: string
+    complement: string
+    city: string
+    state: string
+    zipCode: string
+  } | null>(null)
 
   const cepField = useAsyncField({
     form,
-    name: "zipCode",
+    name: 'zipCode',
 
     validate: async (value) => {
-
-      const clean =
-        value.replace(/\D/g, "")
+      const clean = value.replace(/\D/g, '')
 
       if (clean.length !== 8) {
-        return "CEP inválido"
+        return 'CEP inválido'
       }
 
-      const response =
-        await fetch(
-          `https://viacep.com.br/ws/${clean}/json`
-        )
+      const response = await fetch(`https://viacep.com.br/ws/${clean}/json`)
 
-      const data =
-        await response.json()
+      const data = await response.json()
 
       if (data.erro) {
-        return "CEP não encontrado"
+        return 'CEP não encontrado'
       }
 
-      onSourceChange?.("cep")
+      onSourceChange?.('cep')
 
       if (autoFillOnLookup) {
         autoFill(form, {
@@ -93,8 +80,7 @@ export function useAddressLookup({
           zipCode: data.cep,
         })
 
-        onSourceChange?.("manual")
-
+        onSourceChange?.('manual')
       } else {
         setCepPreview({
           street: data.logradouro,
@@ -111,12 +97,11 @@ export function useAddressLookup({
   })
 
   useEffect(() => {
-
     if (!addressFromCnpj) {
       return
     }
 
-    onSourceChange?.("cnpj")
+    onSourceChange?.('cnpj')
 
     autoFill(form, {
       street: addressFromCnpj.street,
@@ -124,27 +109,20 @@ export function useAddressLookup({
       district: addressFromCnpj.district,
       city: addressFromCnpj.city,
       state: addressFromCnpj.state,
-      zipCode: formatZipCode(
-        addressFromCnpj.zipCode ?? ""
-      ),
+      zipCode: formatZipCode(addressFromCnpj.zipCode ?? ''),
     })
 
-    lastZipRef.current =
-      addressFromCnpj.zipCode ?? ""
+    lastZipRef.current = addressFromCnpj.zipCode ?? ''
 
     onAddressFromCnpjConsumed?.()
+  }, [addressFromCnpj, form, onSourceChange, onAddressFromCnpjConsumed])
 
-  }, [addressFromCnpj])
-
-  const zipCode =
-    form.watch("zipCode")
+  const zipCode = form.watch('zipCode')
 
   useEffect(() => {
+    const clean = zipCode?.replace(/\D/g, '')
 
-    const clean =
-      zipCode?.replace(/\D/g, "")
-
-    if (source === "cnpj") {
+    if (source === 'cnpj') {
       return
     }
 
@@ -158,22 +136,14 @@ export function useAddressLookup({
 
     lastZipRef.current = clean
 
-    const timeout =
-      setTimeout(() => {
+    const timeout = setTimeout(() => {
+      cepField.onBlurAsync(zipCode ?? '')
+    }, 500)
 
-        cepField.onBlurAsync(
-          zipCode ?? ""
-        )
-
-      }, 500)
-
-    return () =>
-      clearTimeout(timeout)
-
-  }, [zipCode, source])
+    return () => clearTimeout(timeout)
+  }, [zipCode, source, cepField])
 
   function handleUseCep() {
-
     if (!cepPreview) {
       return
     }
@@ -189,7 +159,7 @@ export function useAddressLookup({
 
     setCepPreview(null)
 
-    onSourceChange?.("manual")
+    onSourceChange?.('manual')
   }
 
   return {

@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { useMaskWeightInput } from "./use-mask-weight-input"
+import { useState } from 'react'
+import { useMaskWeightInput } from './use-mask-weight-input'
 
 type Product = {
   id: string
@@ -20,38 +20,37 @@ type TransactionItem = {
 
 type Props = {
   products: Product[]
-  transactionType: "COMPRA" | "VENDA"
+  transactionType: 'COMPRA' | 'VENDA'
 }
 
-export function useTransaction({ products, transactionType }: Props) {
+export function useTransaction({ products }: Props) {
   const [items, setItems] = useState<TransactionItem[]>([])
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const weightInput = useMaskWeightInput()
 
-  const currentTotal =
-    (selectedProduct?.price ?? 0) * weightInput.parsedValue
+  const currentTotal = (selectedProduct?.price ?? 0) * weightInput.parsedValue
 
   function setProduct(id: string) {
-    const product = products.find(p => p.id === id) || null
+    const product = products.find((p) => p.id === id) || null
     setSelectedProduct(product)
   }
 
   function addItem() {
     if (!selectedProduct) return false
-    
+
     const parsedWeight = weightInput.parsedValue
 
     if (parsedWeight <= 0) return false
- 
-    setItems(prev => [
+
+    setItems((prev) => [
       ...prev,
       {
         productId: selectedProduct.id,
         productName: selectedProduct.name,
         weight: parsedWeight,
         unitPrice: selectedProduct.price,
-        total: currentTotal
-      }
+        total: currentTotal,
+      },
     ])
 
     weightInput.reset()
@@ -60,13 +59,10 @@ export function useTransaction({ products, transactionType }: Props) {
   }
 
   function removeItem(index: number) {
-    setItems(prev => prev.filter((_, i) => i !== index))
+    setItems((prev) => prev.filter((_, i) => i !== index))
   }
 
-  const total = items.reduce(
-    (acc, i) => acc + i.total,
-    0
-  )
+  const total = items.reduce((acc, i) => acc + i.total, 0)
 
   function reset() {
     setItems([])
@@ -84,6 +80,6 @@ export function useTransaction({ products, transactionType }: Props) {
     setProduct,
     addItem,
     removeItem,
-    reset
+    reset,
   }
 }
