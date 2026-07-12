@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { Upload, X } from 'lucide-react'
 import clsx from 'clsx'
-import Image from 'next/image'
 
 type Props = {
   preview: string | null
@@ -119,14 +118,17 @@ export function UploadField({
               height: dimension,
             }}
           >
-            <Image
-              src={preview}
-              alt="preview"
-              className={clsx(
-                'h-full w-full border object-cover shadow-sm',
-                rounded ? 'rounded-full' : 'rounded-lg',
-              )}
-            />
+            {
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={preview}
+                alt="preview"
+                className={clsx(
+                  'h-full w-full border object-cover shadow-sm',
+                  rounded ? 'rounded-full' : 'rounded-lg',
+                )}
+              />
+            }
 
             <button
               type="button"
