@@ -16,7 +16,7 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
 
 import type { Organization } from '@/contexts/organization-context'
-import { setOrganizationCookie } from '@/app/api/auth/change-tenant/route'
+import { setOrganizationCookie } from '@/actions/change-tenant/route'
 
 interface Props {
   organizations: Organization[]
@@ -33,7 +33,7 @@ export function OrganizationSwitcherClient({
   const hasOrganization = !!currentOrg
 
   async function handleChangeOrganization(org: Organization) {
-    setOrganizationCookie(org.slug)
+    await setOrganizationCookie(org.slug)
   }
 
   function getInitials(name: string) {
