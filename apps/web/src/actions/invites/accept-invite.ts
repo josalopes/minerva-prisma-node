@@ -1,21 +1,17 @@
-"use server"
+'use server'
 
-import { revalidateTag } from "next/cache"
+import { revalidateTag } from 'next/cache'
 
-import { ActionResult } from "@/types/action-result"
+import { ActionResult } from '@/types/action-result'
 
-import {
-  acceptInviteSchema,
-} from "../../../../../packages/contracts/invite"
+import { acceptInviteSchema } from '../../../../../packages/contracts/invite'
 
-import { invitesClient } from "@/http/modules/invites/invites.client"
+// import { invitesClient } from "@/http/modules/invites/invites.client"
 
 export async function acceptInviteAction(
-  data: unknown
+  data: unknown,
 ): Promise<ActionResult<void>> {
-
-  const result =
-    acceptInviteSchema.safeParse(data)
+  const result = acceptInviteSchema.safeParse(data)
 
   if (!result.success) {
     return {
@@ -25,29 +21,21 @@ export async function acceptInviteAction(
   }
 
   try {
+    // await invitesClient.accept(
+    //   result.data
+    // )
 
-    await invitesClient.accept(
-      result.data
-    )
+    revalidateTag('invites')
 
-    revalidateTag("invites")
-
-    revalidateTag("members")
+    revalidateTag('members')
 
     return {
       success: true,
     }
-
   } catch (error) {
-
     return {
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Erro inesperado.",
+      message: error instanceof Error ? error.message : 'Erro inesperado.',
     }
-
   }
-
 }
