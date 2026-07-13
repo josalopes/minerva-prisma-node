@@ -1,33 +1,25 @@
-"use server"
+'use server'
 
-import { revalidateTag } from "next/cache"
+import { revalidateTag } from 'next/cache'
 
-import { ActionResult } from "@/types/action-result"
+import { ActionResult } from '@/types/action-result'
 
-import { invitesClient } from "@/http/modules/invites/invites.client"
+// import { invitesClient } from "@/http/modules/invites/invites.client"
 
-export async function resendInviteAction(
-  id: string
-): Promise<ActionResult<void>> {
-
+export async function resendInviteAction(): Promise<ActionResult<void>> {
+// id: string
   try {
+    // await invitesClient.resend(id)
 
-    await invitesClient.resend(id)
-
-    revalidateTag("invites")
+    revalidateTag('invites')
 
     return {
       success: true,
     }
-
   } catch (error) {
-
     return {
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Erro inesperado.",
+      message: error instanceof Error ? error.message : 'Erro inesperado.',
     }
   }
 }
