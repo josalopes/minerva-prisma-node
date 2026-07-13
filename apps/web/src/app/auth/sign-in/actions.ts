@@ -7,6 +7,7 @@ import { cookies } from 'next/headers'
 import { signInWithPassword } from '@/http/profile/sign-in-with-password'
 import { signInWithLoginCodePassword } from '@/http/profile/sign-in-with-logincode-password'
 import { acceptInvite } from '@/http/invites/accept-invite'
+import { ActionResult } from '@/types/action-result'
 
 const signInSchema = z.object({
   email: z.email({ message: 'Email inválido' }),
@@ -22,7 +23,9 @@ const signInLoginCodeSchema = z.object({
     .min(6, { message: 'A senha deve ter no mínimo 6 caracteres' }),
 })
 
-export async function signInWithEmailAndPassword(data: FormData) {
+export async function signInWithEmailAndPassword(
+  data: FormData,
+): Promise<ActionResult<void>> {
   const entries = Object.fromEntries(data)
 
   const result = signInSchema.safeParse(entries)
@@ -30,7 +33,7 @@ export async function signInWithEmailAndPassword(data: FormData) {
   if (!result.success) {
     const errors = result.error.flatten().fieldErrors
 
-    return { success: false, message: null, errors }
+    return { success: false, message: undefined, errors }
   }
 
   const { email, password } = result.data
@@ -61,7 +64,7 @@ export async function signInWithEmailAndPassword(data: FormData) {
       return {
         success: false,
         message,
-        errors: null,
+        errors: undefined,
       }
     }
 
@@ -70,11 +73,11 @@ export async function signInWithEmailAndPassword(data: FormData) {
     return {
       success: false,
       message: 'Erro inesperado ao tentar fazer login',
-      errors: null,
+      errors: undefined,
     }
   }
 
-  return { success: true, message: null, errors: null }
+  return { success: true, message: undefined, errors: undefined }
 }
 
 export async function signInWithLoginCodeAndPassword(data: FormData) {

@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "pnpm env:load next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "pnpm env:load next build --turbopack",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:report": "eslint . > lint-report.txt 2>&1 && echo ESLint finalizado",
     "lint:report:fix": "eslint . --fix > lint-report-fix.txt 2>&1",
+    "check": "turbo run build",
     "env:load": "dotenv -e ../../.env --"
   },
   "dependencies": {

@@ -2,6 +2,7 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+// import { addressSchema, Address as AddressFormData } from '@saas/contracts'
 import { addressSchema, AddressFormData } from '@/schemas/address-schema'
 import { formatZipCode } from '@/utils/format-zip'
 import { fetchCep } from '@/utils/fetch-cep'
@@ -58,9 +59,7 @@ export function AddressForm({
         <input
           {...register('zipCode')}
           placeholder="CEP"
-          onChange={(e) =>
-            setValue('zipCode', formatZipCode(e.target.value))
-          }
+          onChange={(e) => setValue('zipCode', formatZipCode(e.target.value))}
           onBlur={handleZipBlur}
         />
         {errors.zipCode && <span>{errors.zipCode.message}</span>}
@@ -105,9 +104,7 @@ export function AddressForm({
         Endereço principal
       </label>
 
-      <button type="submit">
-        Salvar endereço
-      </button>
+      <button type="submit">Salvar endereço</button>
     </form>
   )
 }

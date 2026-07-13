@@ -51,13 +51,13 @@ export default async function Settings() {
                 <OrganizationForm
                   isUpdating
                   initialData={{
-                    id: organization.id,
+                    // id: organization.id,
                     name: organization.name,
-                    slug: organization.slug,
+                    // slug: organization.slug,
                     cpfCnpj: organization.cpfCnpj,
                     personType: organization.personType,
                     domain: organization.domain,
-                    shouldAttachUsersByDomain:
+                    shouldAttachUserByDomain:
                       organization?.shouldAttachUserByDomain,
                   }}
                 />

@@ -7,6 +7,8 @@ import { createProduct } from '@/http/product/create-product'
 import { deleteProduct } from '@/http/product/delete-product'
 import { updateProduct } from '@/http/product/update-product'
 import { productSchema } from './schemas'
+import { ActionResult } from '@/types/action-result'
+import { Product } from './columns'
 
 interface UpdateProductProps {
   productId: string
@@ -16,7 +18,9 @@ interface UpdateProductProps {
   measureUnit: string
 }
 
-export async function createProductAction(data: FormData) {
+export async function createProductAction(
+  data: FormData,
+): Promise<ActionResult<Product>> {
   const entries = Object.fromEntries(data.entries())
 
   const result = productSchema.safeParse(entries)
@@ -24,7 +28,7 @@ export async function createProductAction(data: FormData) {
   if (!result.success) {
     const errors = result.error.flatten().fieldErrors
 
-    return { success: false, message: null, errors }
+    return { success: false, message: undefined, errors }
   }
 
   const { name, code, price, measureUnit } = result.data
@@ -49,18 +53,22 @@ export async function createProductAction(data: FormData) {
       return {
         success: false,
         message,
-        errors: null,
+        errors: undefined,
       }
     }
 
     return {
       success: false,
       message: 'Erro inesperado ao criar produto',
-      errors: null,
+      errors: undefined,
     }
   }
 
-  return { success: true, message: 'Produto salvo com sucesso', errors: null }
+  return {
+    success: true,
+    message: 'Produto salvo com sucesso',
+    errors: undefined,
+  }
 }
 
 export async function deleteProductAction(productCode: string) {
@@ -101,7 +109,7 @@ export async function updateProductAction({
   code,
   price,
   measureUnit,
-}: UpdateProductProps) {
+}: UpdateProductProps): Promise<ActionResult<Product>> {
   const data = {
     productId,
     name,
@@ -114,7 +122,7 @@ export async function updateProductAction({
 
   if (!result.success) {
     const errors = result.error.flatten().fieldErrors
-    return { success: false, message: null, errors }
+    return { success: false, message: undefined, errors }
   }
 
   const org = await getCurrentOrg()
@@ -127,7 +135,6 @@ export async function updateProductAction({
       name,
       code,
       price: Number(priceRaw),
-      // price: priceInCents,
       measureUnit,
     })
   } catch (err) {
@@ -136,20 +143,20 @@ export async function updateProductAction({
       return {
         success: false,
         message,
-        errors: null,
+        errors: undefined,
       }
     }
 
     return {
       success: false,
       message: 'Erro inesperado ao atualizar o produto',
-      errors: null,
+      errors: undefined,
     }
   }
 
   return {
     success: true,
     message: 'Produto atualizado com sucesso',
-    errors: null,
+    errors: undefined,
   }
 }
