@@ -1,3 +1,4 @@
+import { addressTypeSchema } from '@saas/contracts'
 import { z } from 'zod'
 
 export const addressSchema = z.object({
@@ -10,7 +11,7 @@ export const addressSchema = z.object({
   zipCode: z.string().min(8, 'CEP inválido'),
   country: z.string().optional(),
   isPrimary: z.boolean(),
-  type: z.string().optional(),
+  type: addressTypeSchema,
 })
 
 export type AddressFormData = z.infer<typeof addressSchema>

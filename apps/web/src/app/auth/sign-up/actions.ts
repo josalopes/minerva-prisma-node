@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { HTTPError } from 'ky'
 
 import { signUp } from '@/http/profile/sign-up'
+import { ActionResult } from '@/types/action-result'
 
 const signUpSchema = z
   .object({
@@ -20,7 +21,9 @@ const signUpSchema = z
     path: ['password_confirmation'],
   })
 
-export async function signUpAction(data: FormData) {
+export async function signUpAction(
+  data: FormData,
+): Promise<ActionResult<void>> {
   const entries = Object.fromEntries(data.entries())
 
   const result = signUpSchema.safeParse(entries)
@@ -28,7 +31,7 @@ export async function signUpAction(data: FormData) {
   if (!result.success) {
     const errors = result.error.flatten().fieldErrors
 
-    return { success: false, message: null, errors }
+    return { success: false, message: undefined, errors }
   }
 
   const { name, email, password } = result.data
@@ -45,16 +48,16 @@ export async function signUpAction(data: FormData) {
       return {
         success: false,
         message,
-        errors: null,
+        errors: undefined,
       }
     }
 
     return {
       success: false,
       message: 'Erro inesperado ao tentar fazer login',
-      errors: null,
+      errors: undefined,
     }
   }
 
-  return { success: true, message: null, errors: null }
+  return { success: true, message: undefined, errors: undefined }
 }

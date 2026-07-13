@@ -1,18 +1,16 @@
-"use client"
+'use client'
 
-import {
-  DndContext,
-  closestCenter,
-} from "@dnd-kit/core"
+import { DndContext, closestCenter } from '@dnd-kit/core'
 
 import {
   arrayMove,
   SortableContext,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
+} from '@dnd-kit/sortable'
 
-import { useState } from "react"
-import { AddressCard, Address } from "./address-card"
+import { useState } from 'react'
+import { AddressCard } from './address-card'
+import { Address } from '@saas/contracts'
 
 interface Props {
   addresses: Address[]

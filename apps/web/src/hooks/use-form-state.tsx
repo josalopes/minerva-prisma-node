@@ -1,23 +1,18 @@
 import { useTransition, useState } from 'react'
 import { requestFormReset } from 'react-dom'
-interface FormState {
-  success: boolean
-  message: string | null
-  errors: Record<string, string[]> | null
-}
 
-export function useFormState(
-  action: (data: FormData) => Promise<FormState>,
+import type { ActionResult } from '@/types/action-result'
+
+export function useFormState<T>(
+  action: (data: FormData) => Promise<ActionResult<T>>,
   onSuccess?: () => void | void,
-  initialState?: FormState,
+  initialState?: ActionResult<T>,
 ) {
   const [isPending, startTransition] = useTransition()
 
-  const [formState, setFormSate] = useState(
+  const [formState, setFormSate] = useState<ActionResult<T>>(
     initialState ?? {
       success: false,
-      message: null,
-      errors: null,
     },
   )
 

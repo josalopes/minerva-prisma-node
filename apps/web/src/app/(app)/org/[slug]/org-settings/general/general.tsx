@@ -20,17 +20,6 @@ export default async function GeneralSettings() {
   if (!slug) return
 
   const organization = await getOrganizationBySlug(slug)
-  // const organizationData = await getOrganizationBySlug(slug)
-
-  // const organization = {
-  //   id: organizationData.id,
-  //   name: organizationData.name,
-  //   domain: organizationData.domain,
-  //   slug: organizationData.slug,
-  //   cpfCnpj: organizationData.cpfCnpj,
-  //   personType: organizationData.personType,
-  //   shouldAttachUserByDomain: organizationData.shouldAttachUserByDomain,
-  // }
 
   return (
     <div className="space-y-4">
@@ -50,13 +39,13 @@ export default async function GeneralSettings() {
                 <OrganizationForm
                   isUpdating
                   initialData={{
-                    id: organization.id,
+                    // id: organization.id,
                     name: organization.name,
-                    slug: organization.slug,
+                    // slug: organization.slug,
                     cpfCnpj: organization.cpfCnpj,
                     personType: organization.personType,
                     domain: organization.domain,
-                    shouldAttachUsersByDomain:
+                    shouldAttachUserByDomain:
                       organization?.shouldAttachUserByDomain,
                   }}
                 />
