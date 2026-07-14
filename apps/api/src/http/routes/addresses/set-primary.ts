@@ -2,7 +2,6 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
-import { auth } from '@/http/middlewares/auth'
 import { successResponseSchema } from '@/lib/api-response'
 import { setPrimaryAddressService } from '@/services/addresses/set-primary-address'
 import { verifyJwt } from '@/http/hooks/verify-jwt'

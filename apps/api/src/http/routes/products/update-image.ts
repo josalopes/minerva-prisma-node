@@ -1,78 +1,76 @@
-import type { FastifyInstance } from "fastify";
-import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import type { FastifyInstance } from 'fastify'
+import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
-import { productSchema } from '@saas/auth/src/models/product';
-import { prisma } from "@/lib/prisma";
-import { getUserPermissions } from "@/utils/get-user-permissions";
-import { productUnitSchema } from "@/http/schemas";
-import { verifyJwt } from "@/http/hooks/verify-jwt";
+import { prisma } from '@/lib/prisma'
+import { verifyJwt } from '@/http/hooks/verify-jwt'
 
 export async function updateProduct(app: FastifyInstance) {
-    app
-      .withTypeProvider<ZodTypeProvider>()
-      .put('/organization/:slug/product/:id/image', {
-        preHandler: [verifyJwt],
-        schema: {
-            tags: ['Products'],
-            summary: 'Atualiza a imagem de um produto da organização',
-            body: z.object({
-                imageUrl: z.string(),
-            }),
-            params: z.object({
-                slug: z.string(),
-                id: z.string()
-            }),
-            response: {
-                400: z.object({
-                        message: z.string(),
-                    }),
-                401: z.object({
-                        message: z.string(),
-                    }),
-                204: z.null()
-            }
+  app.withTypeProvider<ZodTypeProvider>().put(
+    '/organization/:slug/product/:id/image',
+    {
+      preHandler: [verifyJwt],
+      schema: {
+        tags: ['Products'],
+        summary: 'Atualiza a imagem de um produto da organização',
+        body: z.object({
+          imageUrl: z.string(),
+        }),
+        params: z.object({
+          slug: z.string(),
+          id: z.string(),
+        }),
+        response: {
+          400: z.object({
+            message: z.string(),
+          }),
+          401: z.object({
+            message: z.string(),
+          }),
+          204: z.null(),
         },
-      }, 
-      async (request, reply) => {
-        const { slug, id } = request.params
+      },
+    },
+    async (request, reply) => {
+      const { id } = request.params
 
-        const userId = await request.getCurrentUserId()
-        const { membership, organization } = await request.getMembership(slug)
-        
-        const { imageUrl } = request.body
-        
-        const product = await prisma.product.findFirst({
-            where: {
-                id
-            }
-        })
+      // const userId = await request.getCurrentUserId()
+      // const { membership, organization } = await request.getMembership(slug)
 
-        if (!product) {
-            return reply.status(400).send({ message: 'Produto não encontrado' })
-        }
+      const { imageUrl } = request.body
 
-        // const productId = product.id
-        
-        const authProduct = productSchema.parse(product)
+      const product = await prisma.product.findFirst({
+        where: {
+          id,
+        },
+      })
 
-        const { cannot } = getUserPermissions(userId, membership.role)
+      if (!product) {
+        return reply.status(400).send({ message: 'Produto não encontrado' })
+      }
 
-        // if (cannot('update', authProduct)) {
-        //     return reply.status(401).send({ message: 'Você não tem permissão para atualizar produtos' })
-        // }
+      // const productId = product.id
 
-        
+      // const authProduct = productSchema.parse(product)
 
-        await prisma.product.update({
-            where: {
-                id
-            },
-            data: {
-                imageUrl,
-            }
-        })
+      // const { cannot } = getUserPermissions(userId, membership.role)
 
-        return reply.status(204).send()
-    })
+      // if (cannot('update', authProduct)) {
+      //   return reply
+      //     .status(401)
+      //     .send({ message: 'Você não tem permissão para atualizar produtos' })
+      // }
+
+      await prisma.product.update({
+        where: {
+          id,
+        },
+        data: {
+          imageUrl,
+        },
+      })
+
+      return reply.status(204).send()
+    },
+  )
 }

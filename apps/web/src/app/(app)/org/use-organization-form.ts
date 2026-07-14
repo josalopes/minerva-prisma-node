@@ -8,7 +8,7 @@ export interface UseOrganizationFormProps {
     name: string
     cpfCnpj: string
     personType: 'JURIDICA' | 'FISICA'
-    domain?: string | undefined
+    domain?: string | null | undefined
     shouldAttachUserByDomain: boolean
   }
 }

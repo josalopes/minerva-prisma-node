@@ -21,7 +21,6 @@ import { updateProfile } from './routes/auth/update-profile'
 import { requestPasswordRecovery } from './routes/auth/request-password-recover'
 import { resetPassword } from './routes/auth/reset-password'
 import { changePassword } from './routes/auth/change-password'
-import { authenticateWithGithub } from './routes/auth/authenticate-with-github'
 
 import { createOrganization } from './routes/orgs/create-organization'
 import { getMembership } from '@/http/routes/orgs/get-membership'
@@ -127,7 +126,6 @@ app.register(organizationMiddleware)
 app.register(createAccount)
 app.register(authenticateWithPassword)
 app.register(authenticateWithLoginCode)
-app.register(authenticateWithGithub)
 app.register(getProfile)
 app.register(updateProfile)
 app.register(requestPasswordRecovery)
@@ -188,10 +186,6 @@ app.register(createTransaction)
 app.register(cancelTransaction)
 
 app.register(testMail)
-
-// if (process.env.NODE_ENV === "development") {
-//     app.register(testMail)
-//   }
 
 app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
   logger.info(

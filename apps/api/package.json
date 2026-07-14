@@ -13,7 +13,10 @@
     "start": "node dist/http/server.js",
     "start:dev": "pnpm env:load node dist/http/server.js",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "lint:report": "eslint . > lint-report.txt 2>&1 && echo ESLint finalizado",
+    "lint:report:fix": "eslint . --fix > lint-report-fix.txt 2>&1",
+    "check": "turbo run build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -1,7 +1,10 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma'
 
-export async function gerarNextVal(seed: String) {
-  const nextSeedUserLogin = (await prisma.$queryRaw`SELECT nextval(${seed})`) as Array<{ nextval: bigint }>
-  const nextId = nextSeedUserLogin[0].nextval;
+export async function gerarNextVal(seed: string) {
+  const nextSeedUserLogin =
+    (await prisma.$queryRaw`SELECT nextval(${seed})`) as Array<{
+      nextval: bigint
+    }>
+  const nextId = nextSeedUserLogin[0].nextval
   return nextId
 }

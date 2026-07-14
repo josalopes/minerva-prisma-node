@@ -9,7 +9,6 @@ import { errorResponseSchema, successResponseSchema } from '@/lib/api-response'
 import { createOrganizationSchema } from '@saas/contracts/organization/organization.input'
 import { organizationEntitySchema } from '@saas/contracts/organization/organization.entity'
 import { createOrganizationService } from '@/services/organizations/create-organization'
-import { createSlug } from '@/utils/create-slug'
 import { verifyJwt } from '@/http/hooks/verify-jwt'
 
 export async function createOrganization(app: FastifyInstance) {
