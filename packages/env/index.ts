@@ -8,6 +8,7 @@ export const env = createEnv({
     JWT_SECRET: z.string(),
     RESEND_API_KEY: z.string(),
     MAIL_FROM: z.string(),
+    CORS_ORIGINS: z.string(),
   },
   client: {},
   shared: {
@@ -22,6 +23,7 @@ export const env = createEnv({
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     MAIL_FROM: process.env.MAIL_FROM,
+    CORS_ORIGINS: process.env.CORS_ORIGINS,
   },
   emptyStringAsUndefined: true,
 })
