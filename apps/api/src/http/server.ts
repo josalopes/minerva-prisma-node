@@ -80,6 +80,10 @@ import { testMail } from './routes/mails/test-mail'
 import { logger } from '@/lib/logger'
 import { auth } from './middlewares/auth'
 
+const allowedOrigins = env.CORS_ORIGINS.split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
 app.setSerializerCompiler(serializerCompiler)
@@ -116,8 +120,20 @@ app.register(fastifyJwt, {
 
 app.register(auth)
 
+// app.register(fastifyCors, {
+//   origin: env.NEXT_PUBLIC_URL,
+//   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+// })
+
 app.register(fastifyCors, {
-  origin: env.NEXT_PUBLIC_URL,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+      return
+    }
+
+    callback(new Error(`Origin not allowed: ${origin}`), false)
+  },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 })
 
