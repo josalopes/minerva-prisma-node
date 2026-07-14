@@ -1,66 +1,62 @@
-import { hash } from 'bcryptjs';
-import type { FastifyInstance } from 'fastify';
-import type { ZodTypeProvider } from 'fastify-type-provider-zod';
-import fastifyJwt from '@fastify/jwt'
-import z from 'zod';
+import { hash } from 'bcryptjs'
+import type { FastifyInstance } from 'fastify'
+import type { ZodTypeProvider } from 'fastify-type-provider-zod'
+import z from 'zod'
 
-import { prisma } from '@/lib/prisma';
-import { auth } from '@/http/middlewares/auth';
-import { UnauthorizedError } from '../-errors/unauthorized-error';
-import { verifyJwt } from '@/http/hooks/verify-jwt';
+import { prisma } from '@/lib/prisma'
+import { verifyJwt } from '@/http/hooks/verify-jwt'
 
 export async function resetPassword(app: FastifyInstance) {
-    app.withTypeProvider<ZodTypeProvider>()
-        .post(
-        '/password/reset', 
-        {
-            preHandler: [verifyJwt],
-           schema: {
-                tags: ['Auth'],
-                summary: 'Troca a senha',
-                body: z.object({
-                    code: z.string(),
-                    password: z.string().min(6)
-                }),              
-                response: {
-                    401: z.object({
-                            message: z.string(),
-                        }),
-                    204: z.null()
-                },
-            }, 
-        }, 
-        async (request, reply) => {
-            const { code, password } = request.body
+  app.withTypeProvider<ZodTypeProvider>().post(
+    '/password/reset',
+    {
+      preHandler: [verifyJwt],
+      schema: {
+        tags: ['Auth'],
+        summary: 'Troca a senha',
+        body: z.object({
+          code: z.string(),
+          password: z.string().min(6),
+        }),
+        response: {
+          401: z.object({
+            message: z.string(),
+          }),
+          204: z.null(),
+        },
+      },
+    },
+    async (request, reply) => {
+      const { code, password } = request.body
 
-            const tokenFromCode = await prisma.token.findUnique({
-                where: { id: code },
-            })
+      const tokenFromCode = await prisma.token.findUnique({
+        where: { id: code },
+      })
 
-            if (!tokenFromCode) {
-                return reply.status(401).send({ message: 'Token não autorizado' })
-            }
+      if (!tokenFromCode) {
+        return reply.status(401).send({ message: 'Token não autorizado' })
+      }
 
-            const passwordHash = await hash(password, 6)
+      const passwordHash = await hash(password, 6)
 
-            await prisma.$transaction([
-                prisma.user.update({
-                    where: {
-                        id: tokenFromCode.userId,
-                    },
-                    data: {
-                        passwordHash,
-                    }
-                }),
-    
-                prisma.token.delete({
-                    where: {
-                        id: code,
-                    }
-                })
-            ])
+      await prisma.$transaction([
+        prisma.user.update({
+          where: {
+            id: tokenFromCode.userId,
+          },
+          data: {
+            passwordHash,
+          },
+        }),
 
-            return reply.status(204).send()
-        }
-    )
+        prisma.token.delete({
+          where: {
+            id: code,
+          },
+        }),
+      ])
+
+      return reply.status(204).send()
+    },
+  )
 }

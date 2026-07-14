@@ -1,10 +1,8 @@
 import { AddressOwnerType } from '@prisma/client'
 import { prisma } from '../lib/prisma'
-import { audit, AuditAction, AuditEntity } from '@/services/audit'
 
 export const addressRepository = {
-  create: (data: any) =>
-    prisma.address.create({ data }),
+  create: (data: any) => prisma.address.create({ data }),
 
   update: (id: number, data: any) =>
     prisma.address.update({
@@ -27,5 +25,4 @@ export const addressRepository = {
         createdAt: 'desc',
       },
     }),
-
 }

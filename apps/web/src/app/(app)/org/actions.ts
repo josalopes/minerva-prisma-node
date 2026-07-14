@@ -16,10 +16,11 @@ import { Organization } from '@saas/contracts/organization'
 import { organizationsClient } from '@/http/modules/organizations/organizations.client'
 
 export async function createOrganizationAction(
-  data: FormData,
+  data: unknown,
 ): Promise<ActionResult<Organization>> {
-  const values = Object.fromEntries(data)
-  const result = createOrganizationSchema.safeParse(values)
+  // const values = Object.fromEntries(data)
+
+  const result = createOrganizationSchema.safeParse(data)
 
   if (!result.success) {
     return {

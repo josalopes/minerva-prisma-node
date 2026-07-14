@@ -1,34 +1,20 @@
 import { prisma } from '@/lib/prisma'
-import { PersonType } from '@prisma/client'
 import { audit, AuditAction, AuditEntity } from '../audit'
 import { RequestContext } from '@/http/request-context'
 import { createLogger } from '@/lib/logger'
-
-interface CreateOrganizationRequest {
-  name: string
-  cpfCnpj: string
-  domain?: string | undefined
-  shouldAttachUserByDomain?: boolean
-  personType: PersonType
-}
-interface CreateOrganizationResponse {
-  id: string
-  slug: string
-  name: string
-  cpfCnpj: string
-  domain: string | null | undefined
-  personType: PersonType
-  shouldAttachUserByDomain: boolean
-}
+import {
+  CreateOrganizationInput,
+  Organization,
+} from '@saas/contracts/organization'
 
 const logger = createLogger('organization')
 
 export async function createOrganizationService(
   slug: string,
   userId: string,
-  data: CreateOrganizationRequest,
+  data: CreateOrganizationInput,
   context?: RequestContext,
-): Promise<CreateOrganizationResponse> {
+): Promise<Organization> {
   return await prisma.$transaction(async (tx) => {
     const organization = await tx.organization.create({
       data: {

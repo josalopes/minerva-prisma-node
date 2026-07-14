@@ -1,5 +1,5 @@
+import { Organization } from '@saas/contracts/organization'
 import { prisma } from '@/lib/prisma'
-import { PersonType } from '@prisma/client'
 import { audit, AuditAction, AuditEntity } from '../audit'
 import { RequestContext } from '@/http/request-context'
 
@@ -8,22 +8,13 @@ interface UpdateOrganizationRequest {
   domain?: string | undefined
   shouldAttachUserByDomain?: boolean
 }
-interface UpdateOrganizationResponse {
-  id: string;
-  slug: string;
-  name: string;
-  cpfCnpj: string;
-  domain: string | null | undefined;
-  personType: PersonType;
-  shouldAttachUserByDomain: boolean;
-}
 
 export async function updateOrganizationService(
-  organizationId: string, 
-  userId: string, 
+  organizationId: string,
+  userId: string,
   data: UpdateOrganizationRequest,
-  context?: RequestContext
-): Promise<UpdateOrganizationResponse> {
+  context?: RequestContext,
+): Promise<Organization> {
   return await prisma.$transaction(async (tx) => {
     const response = await prisma.organization.update({
       where: {
@@ -42,10 +33,10 @@ export async function updateOrganizationService(
         userId,
         entity: AuditEntity.ORGANIZATION,
         entityId: response.id,
-        action: AuditAction.CREATE,
-        description: `Organização "${response.name}" criada.`,
+        action: AuditAction.UPDATE,
+        description: `Organização "${response.name}" atualizada.`,
         ipAddress: context?.ipAddress,
-        userAgent: context?.userAgent
+        userAgent: context?.userAgent,
       },
       tx,
     )
