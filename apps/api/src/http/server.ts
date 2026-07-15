@@ -10,7 +10,7 @@ import {
   ZodTypeProvider,
 } from 'fastify-type-provider-zod'
 
-import { env } from '@saas/env'
+import { env } from '@saas/env/api'
 import { organizationMiddleware } from '@/http/middlewares/organization'
 
 import { createAccount } from './routes/auth/create-account'
@@ -119,11 +119,6 @@ app.register(fastifyJwt, {
 })
 
 app.register(auth)
-
-// app.register(fastifyCors, {
-//   origin: env.NEXT_PUBLIC_URL,
-//   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-// })
 
 app.register(fastifyCors, {
   origin: (origin, callback) => {

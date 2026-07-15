@@ -1,7 +1,7 @@
 import { resend } from '@/lib/resend'
 
 import { InviteEmail } from '@/mail/templates/invite-email'
-import { env } from '@saas/env'
+import { env } from '@saas/env/api'
 
 import { createLogger } from '@/lib/logger'
 
@@ -23,10 +23,10 @@ export class MailService {
   }: SendInviteMailInput) {
     const logger = createLogger('mail')
 
-    const url = `${env.NEXT_PUBLIC_URL}/invite/${token}`
+    const url = `${env.APP_URL}/invite/${token}`
 
     const result = await resend.emails.send({
-      from: process.env.MAIL_FROM!,
+      from: env.MAIL_FROM,
       to,
       subject: `Convite para participar da organização ${organization}`,
 

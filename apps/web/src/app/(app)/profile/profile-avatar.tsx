@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 
 import semFoto from '../../../../public/DSC_5886.png'
 import { updateProfile } from '@/http/profile/update-profile'
-import { env } from '@saas/env'
+import { env } from '@saas/env/web'
 
 interface AvatarProfileProps {
   avatarUrl: string | null
