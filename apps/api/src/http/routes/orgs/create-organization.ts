@@ -6,8 +6,10 @@ import { apiError } from '@/lib/http-error'
 import { gerarNextVal } from '@/utils/generate-next-sequence'
 
 import { errorResponseSchema, successResponseSchema } from '@/lib/api-response'
-import { createOrganizationSchema } from '@saas/contracts/organization/organization.input'
-import { organizationEntitySchema } from '@saas/contracts/organization/organization.entity'
+import {
+  createOrganizationSchema,
+  organizationEntitySchema,
+} from '@saas/contracts/organization'
 import { createOrganizationService } from '@/services/organizations/create-organization'
 import { verifyJwt } from '@/http/hooks/verify-jwt'
 
