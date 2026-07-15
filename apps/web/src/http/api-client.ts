@@ -1,7 +1,7 @@
 import ky from 'ky'
 import { getCookie } from 'cookies-next'
 import type { CookiesFn } from 'cookies-next'
-import { env } from '@saas/env'
+import { env } from '@saas/env/web'
 
 export const api = ky.create({
   prefixUrl: env.NEXT_PUBLIC_API_URL,
