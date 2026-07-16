@@ -76,6 +76,8 @@ import { errorHandler } from './error-handler'
 import { createTransaction } from './routes/transactions/create-transaction'
 import { cancelTransaction } from './routes/transactions/cancel-transaction'
 
+import { healthCheck } from './routes/health/health'
+
 import { testMail } from './routes/mails/test-mail'
 import { logger } from '@/lib/logger'
 import { auth } from './middlewares/auth'
@@ -197,6 +199,7 @@ app.register(createTransaction)
 app.register(cancelTransaction)
 
 app.register(testMail)
+app.register(healthCheck)
 
 app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
   logger.info(
