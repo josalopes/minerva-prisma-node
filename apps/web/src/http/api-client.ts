@@ -2,6 +2,7 @@ import ky from 'ky'
 import { getCookie } from 'cookies-next'
 import type { CookiesFn } from 'cookies-next'
 import { env } from '@saas/env/web'
+import { wakeupService } from '@/lib/wakeup'
 
 export const api = ky.create({
   prefixUrl: env.NEXT_PUBLIC_API_URL,
@@ -9,6 +10,10 @@ export const api = ky.create({
     beforeRequest: [
       async (request) => {
         let cookieStore: CookiesFn | undefined
+
+        if (typeof window !== 'undefined' && !request.url.endsWith('/health')) {
+          await wakeupService.waitUntilReady()
+        }
 
         if (typeof window === 'undefined') {
           const { cookies: serverCookies } = await import('next/headers')
