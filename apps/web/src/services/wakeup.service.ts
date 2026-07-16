@@ -26,7 +26,7 @@ export class WakeupService {
     }
   }
 
-  async waitUntilReady({ timeout = 30000, interval = 2000 } = {}) {
+  async waitUntilReady({ timeout = 30000, interval = 500 } = {}) {
     const started = performance.now()
 
     console.log('[Wakeup] Iniciando wakeup...')
@@ -46,7 +46,7 @@ export class WakeupService {
       return this.pending
     }
 
-    console.log('[Wakeup] Iniciando wakeup...')
+    console.log('[Wakeup] Aguardando wakeup pendente...')
 
     this.pending = this.wait(timeout, interval)
 
@@ -56,34 +56,6 @@ export class WakeupService {
 
     return result
   }
-
-  // private async wait(timeout: number, interval: number) {
-  //   const started = Date.now()
-
-  //   while (Date.now() - started < timeout) {
-  //     const result = await this.ping()
-
-  //     if (result.ok) {
-  //       //
-  //       console.log('[Wakeup] API disponível.')
-  //       //
-  //       this.ready = true
-  //       return true
-  //     }
-
-  //     //
-  //     console.log('[Wakeup] API ainda indisponível. Tentando novamente...')
-  //     //
-
-  //     await new Promise((resolve) => setTimeout(resolve, interval))
-  //   }
-
-  //   //
-  //   console.log('[Wakeup] Timeout.')
-  //   //
-
-  //   return false
-  // }
 
   private async wait(timeout: number, interval: number) {
     const started = performance.now()
