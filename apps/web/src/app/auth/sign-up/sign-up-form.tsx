@@ -18,8 +18,10 @@ export function SignUpForm() {
 
   const [{ success, message, errors }, handleSubmit, isPending] = useFormState(
     signUpAction,
-    () => {
-      router.push('/auth/sign-in')
+    {
+      onSuccess: () => {
+        router.push('/auth/sign-in')
+      },
     },
   )
 

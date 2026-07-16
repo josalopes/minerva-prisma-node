@@ -38,13 +38,6 @@ export function SignInForm() {
     },
   )
 
-  // const [{ success, message, errors }, handleSubmit, isPending] = useFormState(
-  //   signInWithEmailAndPassword,
-  //   () => {
-  //     router.push('/')
-  //   },
-  // )
-
   useEffect(() => {
     void wakeupService.waitUntilReady().catch(() => {
       // Ignora. O beforeSubmit fará a verificação definitiva.

@@ -57,10 +57,12 @@ export function DialogProduct({
         })
     : createProductAction
 
-  const [{ success, message }, handleSubmit] = useFormState(formAction, () => {
-    queryClient.invalidateQueries({
-      queryKey: [org, 'products'],
-    })
+  const [{ success, message }, handleSubmit] = useFormState(formAction, {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [org, 'products'],
+      })
+    },
   })
 
   const [isLoading] = useState(false)

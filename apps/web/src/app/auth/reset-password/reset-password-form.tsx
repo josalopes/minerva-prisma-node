@@ -22,8 +22,10 @@ export function ResetPasswordForm() {
 
   const [{ success, message, errors }, handleSubmit] = useFormState(
     signInWithEmailAndPassword,
-    () => {
-      router.push('/')
+    {
+      onSuccess: () => {
+        router.push('/')
+      },
     },
   )
 
