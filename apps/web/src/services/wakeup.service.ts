@@ -27,10 +27,15 @@ export class WakeupService {
   }
 
   async waitUntilReady({ timeout = 30000, interval = 2000 } = {}) {
+    const started = performance.now()
+
+    console.log('[Wakeup] Iniciando wakeup...')
+
     if (this.ready) {
-      //
-      console.log('[Wakeup] API já está disponível.')
-      //
+      const elapsed = performance.now() - started
+
+      console.log(`[Wakeup] API disponível em ${elapsed.toFixed(0)} ms`)
+
       return true
     }
 
@@ -52,30 +57,58 @@ export class WakeupService {
     return result
   }
 
-  private async wait(timeout: number, interval: number) {
-    const started = Date.now()
+  // private async wait(timeout: number, interval: number) {
+  //   const started = Date.now()
 
-    while (Date.now() - started < timeout) {
+  //   while (Date.now() - started < timeout) {
+  //     const result = await this.ping()
+
+  //     if (result.ok) {
+  //       //
+  //       console.log('[Wakeup] API disponível.')
+  //       //
+  //       this.ready = true
+  //       return true
+  //     }
+
+  //     //
+  //     console.log('[Wakeup] API ainda indisponível. Tentando novamente...')
+  //     //
+
+  //     await new Promise((resolve) => setTimeout(resolve, interval))
+  //   }
+
+  //   //
+  //   console.log('[Wakeup] Timeout.')
+  //   //
+
+  //   return false
+  // }
+
+  private async wait(timeout: number, interval: number) {
+    const started = performance.now()
+    let attempts = 0
+
+    while (performance.now() - started < timeout) {
+      attempts++
+
       const result = await this.ping()
 
       if (result.ok) {
-        //
-        console.log('[Wakeup] API disponível.')
-        //
+        const elapsed = performance.now() - started
+
+        console.log(
+          `[Wakeup] API disponível em ${(elapsed / 1000).toFixed(2)}s (${attempts} tentativa(s)).`,
+        )
+
         this.ready = true
         return true
       }
 
-      //
-      console.log('[Wakeup] API ainda indisponível. Tentando novamente...')
-      //
-
       await new Promise((resolve) => setTimeout(resolve, interval))
     }
 
-    //
     console.log('[Wakeup] Timeout.')
-    //
 
     return false
   }
