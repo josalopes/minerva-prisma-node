@@ -12,6 +12,9 @@ import { Loader2, AlertTriangle } from 'lucide-react'
 
 import { signInWithEmailAndPassword } from './actions'
 import { useFormState } from '@/hooks/use-form-state'
+import { useEffect } from 'react'
+import { wakeupService } from '@/lib/wakeup'
+import { toast } from 'sonner'
 
 export function SignInForm() {
   const router = useRouter()
@@ -19,10 +22,34 @@ export function SignInForm() {
 
   const [{ success, message, errors }, handleSubmit, isPending] = useFormState(
     signInWithEmailAndPassword,
-    () => {
-      router.push('/')
+    {
+      beforeSubmit: async () => {
+        const ready = await wakeupService.waitUntilReady()
+
+        if (!ready) {
+          toast.error('Não foi possível conectar ao servidor.')
+          return false
+        }
+      },
+
+      onSuccess: () => {
+        router.push('/')
+      },
     },
   )
+
+  // const [{ success, message, errors }, handleSubmit, isPending] = useFormState(
+  //   signInWithEmailAndPassword,
+  //   () => {
+  //     router.push('/')
+  //   },
+  // )
+
+  useEffect(() => {
+    void wakeupService.waitUntilReady().catch(() => {
+      // Ignora. O beforeSubmit fará a verificação definitiva.
+    })
+  }, [])
 
   return (
     <div>
@@ -84,16 +111,6 @@ export function SignInForm() {
           <Link href="/auth/sign-up">Criar nova conta</Link>
         </Button>
       </form>
-      {/* <Separator />
-
-            <form action={signInWithCode}>
-                <Button
-                    type="submit"
-                    className="w-full"
-                >
-                    Entrar com código
-                </Button>
-            </form> */}
     </div>
   )
 }

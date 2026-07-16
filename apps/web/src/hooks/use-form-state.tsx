@@ -3,15 +3,20 @@ import { requestFormReset } from 'react-dom'
 
 import type { ActionResult } from '@/types/action-result'
 
+interface UseFormStateOptions<T> {
+  onSuccess?: () => void
+  beforeSubmit?: (data: FormData) => Promise<boolean | void>
+  initialState?: ActionResult<T>
+}
+
 export function useFormState<T>(
   action: (data: FormData) => Promise<ActionResult<T>>,
-  onSuccess?: () => void | void,
-  initialState?: ActionResult<T>,
+  options?: UseFormStateOptions<T>,
 ) {
   const [isPending, startTransition] = useTransition()
 
   const [formState, setFormSate] = useState<ActionResult<T>>(
-    initialState ?? {
+    options?.initialState ?? {
       success: false,
     },
   )
@@ -22,11 +27,19 @@ export function useFormState<T>(
     const form = event.currentTarget
     const data = new FormData(form)
 
+    if (options?.beforeSubmit) {
+      const result = await options.beforeSubmit(data)
+
+      if (result === false) {
+        return
+      }
+    }
+
     startTransition(async () => {
       const state = await action(data)
 
-      if (state.success && onSuccess) {
-        onSuccess()
+      if (state.success && options?.onSuccess) {
+        options.onSuccess()
       }
 
       setFormSate(state)
