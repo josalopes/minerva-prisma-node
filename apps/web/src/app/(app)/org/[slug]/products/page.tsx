@@ -1,7 +1,6 @@
 // import { ability } from "@/auth/auth"
 import { getProducts } from '@/http/product/get-products'
 import ProductList from './products-list'
-import Header from '@/components/header'
 
 interface ProjectsProps {
   params: Promise<{
@@ -16,7 +15,6 @@ export default async function Projects({ params }: ProjectsProps) {
 
   return (
     <div className="space-y-4">
-      <Header />
       {/* {permissions?.can('create', 'Project') && ( */}
       <ProductList productList={productList} />
       {/* )} */}

@@ -17,6 +17,7 @@ import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
 
 import type { Organization } from '@/contexts/organization-context'
 import { setOrganizationCookie } from '@/actions/change-tenant/route'
+import { useRouter } from 'next/navigation'
 
 interface Props {
   organizations: Organization[]
@@ -32,8 +33,14 @@ export function OrganizationSwitcherClient({
   const currentOrg = currentOrganization
   const hasOrganization = !!currentOrg
 
+  const router = useRouter()
+
   async function handleChangeOrganization(org: Organization) {
     await setOrganizationCookie(org.slug)
+
+    router.push(`/org/${org.slug}/products`)
+
+    router.refresh()
   }
 
   function getInitials(name: string) {

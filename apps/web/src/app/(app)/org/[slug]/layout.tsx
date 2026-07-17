@@ -1,10 +1,14 @@
 import { ReactNode } from 'react'
+
 import { getOrganizationBySlug } from '@/http/organizations/get-organization-by-slug'
+
 import {
   Organization,
   OrganizationProvider,
 } from '@/contexts/organization-context'
-import { SidebarDashboardClient } from '@/app/(panel)/dashboard/_components/sidebar'
+
+import DashboardShell from '@/components/dashboard-shell'
+
 interface OrgLayoutProps {
   children: ReactNode
   params: Promise<{
@@ -14,6 +18,7 @@ interface OrgLayoutProps {
 
 export default async function OrgLayout({ children, params }: OrgLayoutProps) {
   const { slug } = await params
+
   const response = await getOrganizationBySlug(slug)
 
   const organization: Organization = {
@@ -26,7 +31,7 @@ export default async function OrgLayout({ children, params }: OrgLayoutProps) {
 
   return (
     <OrganizationProvider organization={organization}>
-      <SidebarDashboardClient>{children}</SidebarDashboardClient>
+      <DashboardShell>{children}</DashboardShell>
     </OrganizationProvider>
   )
 }

@@ -12,37 +12,20 @@ import { Loader2, AlertTriangle } from 'lucide-react'
 
 import { signInWithEmailAndPassword } from './actions'
 import { useFormState } from '@/hooks/use-form-state'
-// import { useEffect } from 'react'
-// import { wakeupService } from '@/lib/wakeup'
-// import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 export function SignInForm() {
-  // const router = useRouter()
+  const router = useRouter()
   const searchParams = useSearchParams()
 
   const [{ success, message, errors }, handleSubmit, isPending] = useFormState(
     signInWithEmailAndPassword,
-    // {
-    //   beforeSubmit: async () => {
-    //     const ready = await wakeupService.waitUntilReady()
-
-    //     if (!ready) {
-    //       toast.error('Não foi possível conectar ao servidor.')
-    //       return false
-    //     }
-    //   },
-
-    //   onSuccess: () => {
-    //     router.push('/')
-    //   },
-    // },
+    {
+      onSuccess: () => {
+        router.push('/')
+      },
+    },
   )
-
-  // useEffect(() => {
-  //   void wakeupService.waitUntilReady().catch(() => {
-  //     // Ignora. O beforeSubmit fará a verificação definitiva.
-  //   })
-  // }, [])
 
   return (
     <div>

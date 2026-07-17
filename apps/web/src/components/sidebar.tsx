@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import clsx from 'clsx'
 
@@ -13,6 +13,8 @@ import {
   ChevronDown,
 } from 'lucide-react'
 
+import { Boxes, Users, Settings } from 'lucide-react'
+
 import {
   Collapsible,
   CollapsibleContent,
@@ -21,7 +23,7 @@ import {
 
 import { Button } from '@/components/ui/button'
 
-import logoImg from '../../../../../public/logo-ambiental-reciclagem.png'
+import logoImg from '../../public/logo-ambiental-reciclagem.png'
 import { useOrganization } from '@/hooks/use-organization'
 import { SidebarActionButton } from './sidebar-action-button'
 
@@ -39,6 +41,14 @@ export function SidebarDashboardClient({
   const [openOperation, setOpenOperation] = useState(false)
   const [openPerson, setOpenPerson] = useState(false)
   const [openAdministration, setOpenAdministration] = useState(false)
+
+  useEffect(() => {
+    if (isCollapsed) {
+      setOpenOperation(false)
+      setOpenPerson(false)
+      setOpenAdministration(false)
+    }
+  }, [isCollapsed])
 
   function handleMember() {
     if (!currentOrg) {
@@ -95,31 +105,39 @@ export function SidebarDashboardClient({
     <div className="flex h-screen w-full">
       <aside
         className={clsx(
-          'bg-background flex h-full flex-col border-r p-4 transition-all duration-300',
+          'bg-background fixed top-0 left-0 z-30 flex h-screen flex-col border-r p-4 transition-all duration-300',
           {
             'w-20': isCollapsed,
             'w-64': !isCollapsed,
-            'hidden md:fixed md:flex': true,
           },
         )}
       >
-        <div className="mt-4 mb-6">
-          {!isCollapsed && (
-            <Image
-              src={logoUrl || logoImg}
-              alt="Logo da organização"
-              width={0}
-              height={0}
-              sizes="100vw"
-              priority
-              quality={100}
-              className="h-auto w-40"
-            />
+        <div
+          className={clsx(
+            'mt-4 mb-6 flex items-center',
+            isCollapsed ? 'justify-center' : 'justify-start',
           )}
+        >
+          <Image
+            src={logoUrl || logoImg}
+            alt="Logo da organização"
+            width={0}
+            height={0}
+            sizes="100vw"
+            priority
+            quality={100}
+            className={clsx(
+              'h-auto transition-all duration-300',
+              isCollapsed ? 'w-10' : 'w-40',
+            )}
+          />
         </div>
 
         <Button
-          className="mb-2 self-end bg-gray-100 text-zinc-900 hover:bg-gray-50"
+          className={clsx(
+            'mb-4 bg-gray-100 text-zinc-900 hover:bg-gray-50',
+            isCollapsed ? 'self-center' : 'self-end',
+          )}
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
           {!isCollapsed ? (
@@ -130,13 +148,24 @@ export function SidebarDashboardClient({
         </Button>
 
         <Collapsible open={openOperation} onOpenChange={setOpenOperation}>
-          <CollapsibleTrigger className="hover:bg-accent flex w-full items-center justify-between rounded-md px-2 py-2">
-            <span>Operação</span>
-
-            {openOperation ? (
-              <ChevronDown className="h-4 w-4" />
+          <CollapsibleTrigger
+            className={clsx(
+              'hover:bg-accent flex w-full items-center rounded-md px-2 py-2 transition-colors',
+              isCollapsed ? 'justify-center' : 'justify-between',
+            )}
+          >
+            {isCollapsed ? (
+              <Boxes className="h-5 w-5" />
             ) : (
-              <ChevronRight className="h-4 w-4" />
+              <>
+                <span>Operação</span>
+
+                {openOperation ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </>
             )}
           </CollapsibleTrigger>
 
@@ -165,13 +194,24 @@ export function SidebarDashboardClient({
         </Collapsible>
 
         <Collapsible open={openPerson} onOpenChange={setOpenPerson}>
-          <CollapsibleTrigger className="hover:bg-accent flex w-full items-center justify-between rounded-md px-2 py-2">
-            <span>Pessoas</span>
-
-            {openPerson ? (
-              <ChevronDown className="h-4 w-4" />
+          <CollapsibleTrigger
+            className={clsx(
+              'hover:bg-accent flex w-full items-center rounded-md px-2 py-2 transition-colors',
+              isCollapsed ? 'justify-center' : 'justify-between',
+            )}
+          >
+            {isCollapsed ? (
+              <Users className="h-5 w-5" />
             ) : (
-              <ChevronRight className="h-4 w-4" />
+              <>
+                <span>Pessoas</span>
+
+                {openPerson ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </>
             )}
           </CollapsibleTrigger>
 
@@ -203,13 +243,24 @@ export function SidebarDashboardClient({
           open={openAdministration}
           onOpenChange={setOpenAdministration}
         >
-          <CollapsibleTrigger className="hover:bg-accent flex w-full items-center justify-between rounded-md px-2 py-2">
-            <span>Administração</span>
-
-            {openAdministration ? (
-              <ChevronDown className="h-4 w-4" />
+          <CollapsibleTrigger
+            className={clsx(
+              'hover:bg-accent flex w-full items-center rounded-md px-2 py-2 transition-colors',
+              isCollapsed ? 'justify-center' : 'justify-between',
+            )}
+          >
+            {isCollapsed ? (
+              <Settings className="h-5 w-5" />
             ) : (
-              <ChevronRight className="h-4 w-4" />
+              <>
+                <span>Administração</span>
+
+                {openAdministration ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </>
             )}
           </CollapsibleTrigger>
 
@@ -240,9 +291,7 @@ export function SidebarDashboardClient({
           },
         )}
       >
-        <main className="min-h-0 flex-1 overflow-y-auto px-2 py-4 md:p-6">
-          {children}
-        </main>
+        {children}
       </div>
     </div>
   )

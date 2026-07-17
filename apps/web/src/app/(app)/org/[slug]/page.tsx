@@ -1,13 +1,13 @@
-import Header from "@/components/header";
+// import { redirect } from 'next/navigation'
 
-export default async function OrgHome() {
-  return (
-    <div className="space-y-4 py-4">
-      <Header />
-      <main className="mx-auto w-full max-w-[1200px] space-y-4">
-      </main>
-  </div>
+// interface OrgHomeProps {
+//   params: Promise<{
+//     slug: string
+//   }>
+// }
 
-  )
-}
+// export default async function OrgHome({ params }: OrgHomeProps) {
+//   const { slug } = await params
 
+//   redirect(`/org/${slug}/dashboard`)
+// }
