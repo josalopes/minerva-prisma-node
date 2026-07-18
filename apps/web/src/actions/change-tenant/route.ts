@@ -1,10 +1,14 @@
-"use server"
+'use server'
 
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
 
 export async function setOrganizationCookie(slug: string) {
-  (await cookies()).set('current-org', slug)
+  const cookieStore = await cookies()
 
-  redirect(`/org/${slug}`)
+  cookieStore.set('current-org', slug, {
+    path: '/',
+    maxAge: 60 * 60 * 24 * 7,
+    sameSite: 'lax',
+    httpOnly: true,
+  })
 }

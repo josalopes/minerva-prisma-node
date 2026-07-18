@@ -7,7 +7,7 @@ import {
   OrganizationProvider,
 } from '@/contexts/organization-context'
 
-import DashboardShell from '@/components/dashboard-shell'
+import DashboardShell from '@/components/layout/dashboard-shell'
 
 interface OrgLayoutProps {
   children: ReactNode

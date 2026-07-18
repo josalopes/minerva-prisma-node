@@ -84,7 +84,7 @@ export function OrganizationSwitcherClient({
           {organizations.map((org) => (
             <DropdownMenuItem
               key={org.id}
-              onClick={() => handleChangeOrganization(org)}
+              onSelect={() => handleChangeOrganization(org)}
             >
               <Avatar className="mr-2 size-4">
                 {org.avatarUrl && <AvatarImage src={org.avatarUrl} />}
