@@ -26,7 +26,7 @@ export class WakeupService {
     }
   }
 
-  async waitUntilReady({ timeout = 30000, interval = 500 } = {}) {
+  async waitUntilReady({ timeout = 120000, interval = 500 } = {}) {
     const started = performance.now()
 
     console.log('[Wakeup] Iniciando wakeup...')

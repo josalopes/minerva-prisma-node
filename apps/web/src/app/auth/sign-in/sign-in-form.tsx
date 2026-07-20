@@ -13,6 +13,8 @@ import { Loader2, AlertTriangle } from 'lucide-react'
 import { signInWithEmailAndPassword } from './actions'
 import { useFormState } from '@/hooks/use-form-state'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { wakeupService } from '@/lib/wakeup'
 
 export function SignInForm() {
   const router = useRouter()
@@ -26,6 +28,19 @@ export function SignInForm() {
       },
     },
   )
+
+  //
+  useEffect(() => {
+    console.log('antes')
+
+    wakeupService
+      .waitUntilReady()
+      .then((result) => console.log('resultado', result))
+      .catch((err) => console.error('erro', err))
+
+    console.log('depois')
+  }, [])
+  //
 
   return (
     <div>

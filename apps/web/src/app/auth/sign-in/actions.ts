@@ -8,6 +8,7 @@ import { signInWithLoginCodePassword } from '@/http/profile/sign-in-with-loginco
 import { acceptInvite } from '@/http/invites/accept-invite'
 import { ActionResult } from '@/types/action-result'
 import { signInWithPassword } from '@/http/profile/sign-in-with-password'
+import { parseHttpError } from '@/http/translate-http-error'
 
 const signInSchema = z.object({
   email: z.email({ message: 'Email inválido' }),
@@ -59,11 +60,16 @@ export async function signInWithEmailAndPassword(
       } catch {}
     }
   } catch (err) {
+    //
+    console.error(err.constructor.name)
+    console.error(err)
+    //
     if (err instanceof HTTPError) {
-      const { message } = await err.response.json()
+      const apiError = await parseHttpError(err)
+
       return {
         success: false,
-        message,
+        message: apiError.message,
         errors: undefined,
       }
     }
@@ -72,7 +78,7 @@ export async function signInWithEmailAndPassword(
 
     return {
       success: false,
-      message: 'Erro inesperado ao tentar fazer login',
+      message: 'Erro inesperado.',
       errors: undefined,
     }
   }

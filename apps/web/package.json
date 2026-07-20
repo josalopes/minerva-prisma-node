@@ -10,6 +10,7 @@
     "lint:fix": "eslint . --fix",
     "lint:report": "eslint . > lint-report.txt 2>&1 && echo ESLint finalizado",
     "lint:report:fix": "eslint . --fix > lint-report-fix.txt 2>&1",
+    "qa": "tsx src/tools/qa/index.ts",
     "check": "turbo run build",
     "env:load": "dotenv -e ../../.env --"
   },
@@ -79,6 +80,7 @@
     "eslint-config-prettier": "^10.1.8",
     "postcss": "^8.5.9",
     "tailwindcss": "^4.1.13",
+    "tsx": "^4.20.5",
     "tw-animate-css": "^1.3.8",
     "typescript": "^5"
   },

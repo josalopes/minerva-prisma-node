@@ -27,6 +27,9 @@ out/
 build
 dist
 
+# Generated QA reports
+reports/
+
 
 # Debug
 npm-debug.log*
