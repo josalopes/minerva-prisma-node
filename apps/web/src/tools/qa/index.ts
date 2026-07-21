@@ -11,6 +11,7 @@ import { MarkdownReporter } from './reporters/markdown.reporter'
 
 import { ReportWriter } from './writers/report-writer'
 import { RuleReportWriter } from './writers/rule-report-writer'
+import { ReportIndexWriter } from './writers/report-index-writer'
 
 async function main() {
   console.clear()
@@ -60,6 +61,7 @@ async function main() {
 
   // Save reports grouped by rule
   await RuleReportWriter.save(report)
+  await ReportIndexWriter.save(report)
 
   // Console output
   process.stdout.write(txt)

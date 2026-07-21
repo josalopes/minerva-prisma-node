@@ -6,6 +6,7 @@ import { QaResult } from '../engine/qa-result'
 
 import { JsonReporter } from '../reporters/json.reporter'
 import { MarkdownReporter } from '../reporters/markdown.reporter'
+import { groupResultsByRule } from '../utils/group-results-by-rule'
 
 export class RuleReportWriter {
   private static readonly RULES_DIR = join(process.cwd(), 'reports', 'rules')
@@ -15,7 +16,8 @@ export class RuleReportWriter {
       recursive: true,
     })
 
-    const groups = this.groupByRule(report)
+    // const groups = this.groupByRule(report)
+    const groups = groupResultsByRule(report)
 
     const markdownReporter = new MarkdownReporter()
     const jsonReporter = new JsonReporter()
