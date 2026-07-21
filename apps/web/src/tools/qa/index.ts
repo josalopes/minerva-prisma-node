@@ -1,6 +1,6 @@
 import { QaEngine } from './engine/qa-engine'
 import { Scanner } from './scanner'
-import { NoConsoleRule, TodoCommentsRule } from './rules'
+import { EmptyCatchRule, NoConsoleRule, TodoCommentsRule } from './rules'
 import { ConsoleReporter } from './reporters'
 import { QaReport } from './engine/qa-report'
 import { ReportWriter } from './writers/report-writer'
@@ -20,6 +20,7 @@ async function main() {
 
   engine.register(new NoConsoleRule())
   engine.register(new TodoCommentsRule())
+  engine.register(new EmptyCatchRule())
 
   const startedAt = performance.now()
 
