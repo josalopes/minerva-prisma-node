@@ -1,5 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { QaReport } from '../engine/qa-report'
+import { QaResult } from '../engine/qa-result'
 
 export type ReportFormat = 'txt' | 'md' | 'json' | 'html'
 
@@ -9,6 +11,21 @@ export class ReportWriter {
     ReportWriter.REPORTS_DIR,
     'history',
   )
+
+  private static groupByRule(report: QaReport) {
+    return report.results.reduce(
+      (groups, result) => {
+        if (!groups[result.ruleId]) {
+          groups[result.ruleId] = []
+        }
+
+        groups[result.ruleId].push(result)
+
+        return groups
+      },
+      {} as Record<string, QaResult[]>,
+    )
+  }
 
   static async save(format: ReportFormat, output: string): Promise<void> {
     await mkdir(this.HISTORY_DIR, {
